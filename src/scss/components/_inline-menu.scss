@@ -1,0 +1,23 @@
+%inline-menu {
+  padding: 16px 20px;
+  background-color: $N11;
+  border: 1px solid $N9;
+  box-shadow: 0 8px 10px 0 rgba(10,11,12,0.56);
+  border-radius: 2px;
+  z-index: 3;
+}
+
+%inline-menu-text {
+  font-size: $H100;
+  color: $N0;
+  line-height: 1;
+  white-space: nowrap;
+  transition: color ease-in-out 0.2s;
+}
+
+%inline-menu-icon {
+  fill: $N0;
+  width: 14px;
+  height: 14px;
+  transition: fill ease-in-out 0.2s;
+}

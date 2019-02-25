@@ -1,0 +1,34 @@
+%inline-nav-list {
+  list-style: none;
+  @include flex-row(flex-start, center);
+}
+%inline-nav-item {
+  margin-right: 20px;
+}
+%inline-nav-link {
+  display: inline-block;
+  padding-bottom: 8px;
+  color: $N8;
+  border-bottom: 1px solid transparent;
+  font-weight: 500;
+  font-size: $H400;
+  transition-property: color, border-color;
+  transition-duration: 0.2s;
+  transition-timing-function: ease-in-out;
+  &:hover {
+    @media screen and (min-width: $screen-desktop) {
+      color: $N6;
+    }
+  }
+  &:active {
+    color: $N0;
+  }
+  &--active {
+    border-color: $N2;
+    color: $N2;
+  }
+}
+.inline-nav-link-active {
+  border-color: $N2;
+  color: $N2;
+}

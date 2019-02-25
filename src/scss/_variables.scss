@@ -1,0 +1,85 @@
+/* ---COLORS--- */
+
+$radio-text-color: #8A9099;
+
+// Naturel
+$N0: #ffffff;
+$N1: #f5f9ff;
+$N2: #e6ecf5;
+$N3: #dee5ef;
+$N4: #cbd2de;
+$N5: #b0b7c2;
+$N6: #9399a3;
+$N7: #818892;
+$N8: #6d727a;
+$N88: #74787F;
+$N9: #484c52;;
+$N10: #313438;
+$N11: #242629;
+$N12: #1d1f21;
+$N13: #17181a;
+$N14: #0a0b0c;
+$N15: #121314;
+
+// Blue
+$B1: #649bff;
+$B2: #3d81ff;
+$B3: #3162ff;
+$B4: #2550d9;
+$B5: #1f42b3;
+$B6: #1435a3;
+$B7: #1b3385;
+$B8: #142766;
+$B9: #111e47;
+$B10: #0e1733;
+$B11: #0d111f;
+$B12: #1C1D1F;
+
+// Aqua
+$A1: #00d1ff;
+
+// Green
+$G1: #1fd16f;
+$G2: #00b853;
+$G3: #008F40;
+
+// Yellow
+$Y1: #ffab00;
+
+// Pink
+$P1: #fc2390;
+
+// Red
+$R1: #ff2727;
+$R2: #ff5858;
+
+/* other color */
+$NAV-BG-WRAPPER-COLOR: rgba(30, 31, 34, 0.92);
+
+/* ---FONR FAMILY--- */
+$base-font: -apple-system, BlinkMacSystemFont, 'sfpro', sans-serif;
+
+/* ---FONT SIZE--- */
+$H900: 2rem; // 32px
+$H800: 1.5rem; // 24px
+$H700: 1.25rem; // 20px
+$H600: 1.125rem; // 18px
+$H550: 1rem; // 16px
+$H500: 0.9375rem; // 15px
+$H400: 0.875rem; // 14px
+$H300: 0.8125rem; // 13px
+$H200: 0.75rem; // 12px
+$H100: 0.6875rem; // 11px
+$H050: 0.625rem; // 10px
+
+/* Screens */
+$screen-iphone-6: 375px;
+$screen-iphone-plus: 414px;
+$screen-tablet-small: 480px;
+$screen-tablet: 768px;
+$screen-tablet-large: 860px;
+$screen-netbook: 960px;
+$screen-desktop: 1024px;
+$screen-desktop-large: 1280px;
+$screen-hd: 1366px;
+$screen-fullhd: 1440px;

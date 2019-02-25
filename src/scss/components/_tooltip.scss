@@ -1,0 +1,14 @@
+%tooltip {
+  background: $N11;
+  box-shadow: 0 6px 12px 0 rgba(0,0,0,0.32);
+  border-radius: 2px;
+  padding: 11px 16px;
+  animation-name: fadeIn;
+  animation-duration: 0.6s;
+}
+%tooltip-text {
+  font-size: $H100;
+  color: $N6;
+  font-weight: 500;
+}
+
