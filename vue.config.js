@@ -1,6 +1,6 @@
 module.exports = {
   baseUrl: process.env.NODE_ENV === 'production'
-    ? '/saas/dist'
+    ? '/saas/dist/'
     : '/',
   css: {
     loaderOptions: {
