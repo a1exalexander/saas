@@ -255,9 +255,6 @@ export default {
       return Validation.email(this.form.email);
     },
     loginDisabled() {
-      if (this.recaptcha) {
-        return this.checkPassword && this.checkEmail;
-      }
       return this.checkPassword && this.checkEmail;
     },
   },
