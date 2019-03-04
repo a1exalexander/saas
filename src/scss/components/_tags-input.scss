@@ -1,0 +1,127 @@
+/* The input */
+.tags-input {
+  @extend %input;
+  flex-wrap: wrap;
+  align-items: center;
+  padding: 9px 12px;
+  @media screen and (min-width: $screen-tablet) {
+    min-height: 36px;
+  }
+}
+
+.tags-input input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  font-size: $H300;
+  font-weight: 400;
+  color: $N2;
+}
+
+.tags-input input:focus {
+  outline: none;
+}
+
+// .tags-input input[type="text"] {
+//   color: #495057;
+// }
+
+// .tags-input-wrapper-default {
+//   padding: .5rem .25rem;
+
+//   background: #fff;
+
+//   border: 1px solid transparent;
+//   border-radius: .25rem;
+//   border-color: #dbdbdb;
+// }
+
+/* The tag badges & the remove icon */
+.tags-input span {
+  margin: 1px 0.3rem 1px 0;
+}
+
+.tags-input-remove {
+  cursor: pointer;
+  position: relative;
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  overflow: hidden;
+}
+
+.tags-input-remove:before, .tags-input-remove:after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  top: 50%;
+  left: 0;
+  background: $N0;
+  
+  height: 2px;
+  margin-top: -1px;
+}
+
+.tags-input-remove:before {
+  transform: rotate(45deg);
+}
+.tags-input-remove:after {
+  transform: rotate(-45deg);
+}
+
+/* Tag badge styles */
+.tags-input-badge {
+  display: inline-block;
+  padding: 6px 7px;
+  font-size: $H200;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: baseline;
+  border-radius: 2px;
+  @media screen and (min-width: $screen-tablet) {
+    font-size: $H100;
+  }
+}
+
+.tags-input-badge-pill {
+  padding-right: 0.6em;
+  padding-left: 0.6em;
+  border-radius: 2px;
+}
+
+.tags-input-badge-selected-default {
+  color: $N0;
+  background-color: $N9;
+}
+
+/* Typeahead - badges */
+.typeahead-badges > span {
+  cursor: pointer;
+  margin-right: 0.3rem;
+}
+
+/* Typeahead - dropdown */
+.typeahead-dropdown {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  position: absolute;
+  width: 100%;
+}
+
+.typeahead-dropdown li {
+  padding: .25rem 1rem;
+  cursor: pointer;
+}
+
+/* Typeahead elements style/theme */
+.tags-input-typeahead-item-default {
+  color: #fff;
+  background-color: #343a40;
+}
+
+.tags-input-typeahead-item-highlighted-default {
+  color: #fff;
+  background-color: #007bff;
+}

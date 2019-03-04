@@ -1,5 +1,12 @@
 <template>
 <nav class='navigation'>
+  <transition
+    name="custom-classes-transition"
+    enter-active-class="animated dur03 fadeIn"
+    leave-active-class="animated dur03 fadeOut"
+    mode="out-in">
+  <invite-popup v-if='invitePopup' @cancel='closeInvitePopup'/>
+  </transition>
   <div class="navigation__inner">
     <section class="navigation__header">
       <div class="navigation__header-inner">
@@ -10,52 +17,57 @@
       </div>
     </section>
     <ul class="navigation__list">
-      <li class="navigation__item">
+      <li class="navigation__item" :class='{"navigation__item--active": routeCustomers }'>
         <icon-investor class='navigation__item-icon'/>
         <router-link to='/customers' class="navigation__item-text">Customers</router-link>
       </li>
-      <li class="navigation__item">
+      <li class="navigation__item" :class='{"navigation__item--active": routeExchanges }'>
         <icon-exchanges class='navigation__item-icon'/>
         <router-link to='/exchanges' class="navigation__item-text">Exchanges</router-link>
       </li>
-      <li class="navigation__item">
+      <li class="navigation__item" :class='{"navigation__item--active": routeTransactions }'>
         <icon-billing class='navigation__item-icon'/>
         <p class="navigation__item-text">Transactions</p>
       </li>
-      <li class="navigation__item">
+      <li class="navigation__item" :class='{"navigation__item--active": routeLegal }'>
         <icon-legal class='navigation__item-icon'/>
         <p class="navigation__item-text">Legal</p>
       </li>
     </ul>
   </div>
-  <section class="navigation__profile">
-    <div class="navigation__profile-card">
-      <div class="navigation__ava-wrapper">
-        <img class="navigation__ava" :src="getAva" alt="avatar">
+  <div class="navigation__inner">
+    <invite-button
+      class='navigation__invite-button'
+      @click.native='openInvitePopup'/>
+    <section class="navigation__profile">
+      <div class="navigation__profile-card">
+        <div class="navigation__ava-wrapper">
+          <img class="navigation__ava" :src="getAva" alt="avatar">
+        </div>
+        <p class="navigation__profile-name">{{ getName }}</p>
       </div>
-      <p class="navigation__profile-name">{{ getName }}</p>
-    </div>
-    <div
-      class="navigation__popover-wrapper"
-      @mouseleave="popover = false">
-      <a
-        href='#'
-        class='navigation__profile-button'
-        v-html='"\&\#8226\&\#8226\&\#8226"'
-        @mouseover="popover = true">
-      </a>
-      <transition
-        name="custom-classes-transition"
-        enter-active-class="animated dur06 pullUp"
-        leave-active-class="animated dur03 fadeOut"
-        mode="out-in">
-      <popover-navigation
-        class='navigation__popover'
-        @click.native="popover = false"
-        v-show="popover"/>
-      </transition>
-    </div>
-  </section>
+      <div
+        class="navigation__popover-wrapper"
+        @mouseleave="popover = false">
+        <a
+          href='#'
+          class='navigation__profile-button'
+          v-html='"\&\#8226\&\#8226\&\#8226"'
+          @mouseover="popover = true">
+        </a>
+        <transition
+          name="custom-classes-transition"
+          enter-active-class="animated dur06 pullUp"
+          leave-active-class="animated dur03 fadeOut"
+          mode="out-in">
+        <popover-navigation
+          class='navigation__popover'
+          @click.native="popover = false"
+          v-show="popover"/>
+        </transition>
+      </div>
+    </section>
+  </div>
 </nav>
 </template>
 <script>
@@ -64,6 +76,8 @@ import IconBilling from '@/components/common/icons/IconBilling.vue';
 import IconLegal from '@/components/common/icons/IconLegal.vue';
 import IconExchanges from '@/components/common/icons/IconExchanges.vue';
 import PopoverNavigation from '@/components/common/PopoverNavigation.vue';
+import InviteButton from '@/components/inviteInvestor/InviteButton.vue';
+import InvitePopup from '@/components/inviteInvestor/InvitePopup.vue';
 import { mapState } from 'vuex';
 
 export default {
@@ -74,6 +88,8 @@ export default {
     IconLegal,
     IconExchanges,
     PopoverNavigation,
+    InviteButton,
+    InvitePopup,
   },
   data() {
     return {
@@ -84,11 +100,18 @@ export default {
         logo: require('@/assets/images/iin-logo.png'),
       },
       popover: false,
+      invitePopup: false,
     };
   },
   methods: {
     closePopover() {
       this.popover = false;
+    },
+    openInvitePopup() {
+      this.invitePopup = true;
+    },
+    closeInvitePopup() {
+      this.invitePopup = false;
     },
   },
   computed: {
@@ -97,6 +120,26 @@ export default {
       getAva: state => state.profile.ava,
       getlogo: state => state.profile.fundLogo,
     }),
+    routeCustomers() {
+      const { path } = this.$route;
+      const re = /(customers)/g;
+      return re.test(path);
+    },
+    routeExchanges() {
+      const { path } = this.$route;
+      const re = /(exchanges)/g;
+      return re.test(path);
+    },
+    routeTransactions() {
+      const { path } = this.$route;
+      const re = /(transactions)/g;
+      return re.test(path);
+    },
+    routeLegal() {
+      const { path } = this.$route;
+      const re = /(legal)/g;
+      return re.test(path);
+    },
   },
 };
 </script>
@@ -106,7 +149,7 @@ export default {
   display: none;
   @media screen and (min-width: $screen-tablet) {
     display: flex;
-    background-color: $N13;
+    background-color: $N15;
     height: 100vh;
     width: 220px;
     min-width: 220px;
@@ -168,6 +211,16 @@ export default {
     @include flex-row(flex-start, center);
     margin-bottom: 22px;
     cursor: pointer;
+    &--active {
+      .navigation {
+        &__item-icon {
+          fill: $N0;
+        }
+        &__item-text {
+          color: $N0;
+        }
+      }
+    }
     &:hover {
       .navigation {
         @media screen and (min-width: $screen-desktop) {
@@ -223,6 +276,10 @@ export default {
     bottom: 12px;
     right: -14px;
     z-index: 2;
+  }
+  &__invite-button {
+    width: 100%;
+    margin-bottom: 16px;
   }
 }
 </style>

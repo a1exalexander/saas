@@ -77,16 +77,6 @@
           v-html="myErrors.password">
         </p>
       </div>
-      <vue-recaptcha
-        class="login-recaptcha"
-        @click.stop
-        ref="recaptcha"
-        theme='dark'
-        sitekey="6Lej1pQUAAAAAEe8hfLDbMGh31AHHA8Hi9FDf-lJ"
-        @verify="onVerify"
-        @expired="onExpired"
-        v-if='!recaptcha'>
-      </vue-recaptcha>
       <label class="auth__checkbox checkbox">
         <input
           type="checkbox"
@@ -133,8 +123,6 @@ import Validation from '@/js/validation';
 import IconEyeOff from '@/components/common/icons/IconEyeOff.vue';
 import CloseButton from '@/components/common/buttons/CloseButton.vue';
 import MessageSuccess from '@/components/common/messages/MessageSuccess.vue';
-import VueRecaptcha from 'vue-recaptcha';
-import { siteKey } from '@/js/api';
 import { mapMutations, mapState, mapActions } from 'vuex';
 
 export default {
@@ -151,7 +139,6 @@ export default {
     MessageSuccess,
     CloseButton,
     IconCheck2,
-    VueRecaptcha,
   },
   data() {
     return {
@@ -159,7 +146,6 @@ export default {
         password: '',
         email: '',
       },
-      recaptchaToken: '',
       showPasswordStatus: false,
       myErrors: {
         password: '',
@@ -184,12 +170,6 @@ export default {
     ...mapActions('login', [
       'AUTH_REQUEST',
     ]),
-    onVerify(response) {
-      this.recaptchaToken = response;
-    },
-    onExpired() {
-      this.recaptchaToken = '';
-    },
     close() {
       this.$router.push('/auth');
     },

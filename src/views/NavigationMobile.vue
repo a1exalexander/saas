@@ -1,6 +1,18 @@
 <template>
 <nav class='nav'>
-  <section class="nav__menu">
+  <transition
+    name="custom-classes-transition"
+    enter-active-class="animated dur03 fadeIn"
+    leave-active-class="animated dur03 fadeOut"
+    mode="out-in">
+  <invite-popup v-if='invitePopup' @cancel='closeInvitePopup'/>
+  </transition>
+  <transition
+    name="custom-classes-transition"
+    enter-active-class="animated dur03 slideInLeft"
+    leave-active-class="animated dur02 slideOutLeft"
+    mode="out-in">
+  <section class="nav__menu" v-if='visible'>
     <div class="nav__inner">
       <section class="nav__header">
         <div class="nav__header-inner">
@@ -11,37 +23,60 @@
         </div>
       </section>
       <ul @click='hideNavDelay' class="nav__list">
-        <router-link to='/customers' tag='li' class="nav__item">
+        <router-link
+          to='/customers'
+          tag='li'
+          class="nav__item"
+          :class='{"nav__item--active": routeCustomers }'>
           <icon-investor class='nav__item-icon'/>
           <p class="nav__item-text">Customers</p>
         </router-link>
-        <router-link to='/exchanges' tag='li' class="nav__item">
+        <router-link
+          to='/exchanges'
+          tag='li'
+          class="nav__item"
+          :class='{"nav__item--active": routeExchanges }'>
           <icon-exchanges class='nav__item-icon'/>
           <p class="nav__item-text">Exchanges</p>
         </router-link>
-        <router-link to='/transactions' tag='li' class="nav__item">
+        <router-link
+          to='/transactions'
+          tag='li'
+          class="nav__item"
+          :class='{"nav__item--active": routeTransactions }'>
           <icon-billing class='nav__item-icon'/>
           <p class="nav__item-text">Transactions</p>
         </router-link>
-        <router-link to='/legal' tag='li' class="nav__item">
+        <router-link
+          to='/legal'
+          tag='li'
+          class="nav__item"
+          :class='{"nav__item--active": routeLegal }'>
           <icon-legal class='nav__item-icon'/>
           <p class="nav__item-text">Legal</p>
         </router-link>
       </ul>
     </div>
-    <section class="nav__profile">
-      <div class="nav__profile-card">
-        <div class="nav__ava-wrapper">
-          <img class="nav__ava" :src="getAva" alt="avatar">
+    <div class="nav__inner">
+      <invite-button
+        @click.native='openInvitePopup'
+        class='nav__invite-button'/>
+      <section class="nav__profile">
+        <div class="nav__profile-card">
+          <div class="nav__ava-wrapper">
+            <img class="nav__ava" :src="getAva" alt="avatar">
+          </div>
+          <p class="nav__profile-name">{{ getName }}</p>
         </div>
-        <p class="nav__profile-name">{{ getName }}</p>
-      </div>
-      <button class='nav__profile-button' v-html='"\&\#8226\&\#8226\&\#8226"'></button>
-    </section>
+        <button class='nav__profile-button' v-html='"\&\#8226\&\#8226\&\#8226"'></button>
+      </section>
+    </div>
   </section>
+  </transition>
   <div
-    class="nav__bg-inner"
-    @click='hideNav'>
+    class="nav__bg-inner animated slow fadeIn"
+    @click='hideNav'
+    v-if='visible'>
     <close-button
       class="nav__close-button"
       @click.native='hideNav'/>
@@ -54,6 +89,8 @@ import IconInvestor from '@/components/common/icons/IconInvestor.vue';
 import IconBilling from '@/components/common/icons/IconBilling.vue';
 import IconLegal from '@/components/common/icons/IconLegal.vue';
 import IconExchanges from '@/components/common/icons/IconExchanges.vue';
+import InviteButton from '@/components/inviteInvestor/InviteButton.vue';
+import InvitePopup from '@/components/inviteInvestor/InvitePopup.vue';
 import { mapState } from 'vuex';
 
 export default {
@@ -64,6 +101,8 @@ export default {
     IconBilling,
     IconLegal,
     IconExchanges,
+    InviteButton,
+    InvitePopup,
   },
   data() {
     return {
@@ -73,16 +112,25 @@ export default {
         // eslint-disable-next-line
         logo: require('@/assets/images/iin-logo.png'),
       },
+      visible: false,
+      invitePopup: false,
     };
   },
   methods: {
     hideNav() {
+      this.visible = false;
       this.$emit('hideNav');
     },
     hideNavDelay() {
       setTimeout(() => {
         this.hideNav();
       }, 100);
+    },
+    openInvitePopup() {
+      this.invitePopup = true;
+    },
+    closeInvitePopup() {
+      this.invitePopup = false;
     },
   },
   computed: {
@@ -91,6 +139,29 @@ export default {
       getAva: state => state.profile.ava,
       getlogo: state => state.profile.fundLogo,
     }),
+    routeCustomers() {
+      const { path } = this.$route;
+      const re = /(customers)/g;
+      return re.test(path);
+    },
+    routeExchanges() {
+      const { path } = this.$route;
+      const re = /(exchanges)/g;
+      return re.test(path);
+    },
+    routeTransactions() {
+      const { path } = this.$route;
+      const re = /(transactions)/g;
+      return re.test(path);
+    },
+    routeLegal() {
+      const { path } = this.$route;
+      const re = /(legal)/g;
+      return re.test(path);
+    },
+  },
+  mounted() {
+    this.visible = true;
   },
 };
 </script>
@@ -103,16 +174,16 @@ export default {
   height: 100vh;
   width: 100vw;
   z-index: 11;
-  background-color: $NAV-BG-WRAPPER-COLOR;
+  background-color: transparent;
   @include flex-row(stretch, stretch);
   @media screen and (min-width: $screen-tablet) {
     display: none;
   }
   &__bg-inner {
-    flex: 0 0 80px;
+    flex: 1 1;
     background-color: $NAV-BG-WRAPPER-COLOR;
-    @include flex-col(flex-start, center);
-    padding: 16px 0;
+    @include flex-col(flex-start, flex-end);
+    padding: 24px;
   }
   &__logo-wrapper {
     width: 30px;
@@ -124,7 +195,7 @@ export default {
     height: auto;
   }
   &__menu {
-    width: 100%;
+    flex: 0 0 280px;
     height: 100%;
     background-color: $N13;
     padding: 32px 28px 68px;
@@ -162,6 +233,16 @@ export default {
     @include flex-row(flex-start, center);
     margin-bottom: 26px;
     cursor: pointer;
+    &--active {
+      .nav {
+        &__item-icon {
+          fill: $N0;
+        }
+        &__item-text {
+          color: $N0;
+        }
+      }
+    }
   }
   &__item-icon {
     fill: $N6;
@@ -169,10 +250,16 @@ export default {
     height: 22px;
     margin-right: 10px;
     pointer-events: none;
+    transition-property: color, fill, opacity;
+    transition-duration: 0.2s;
+    transition-timing-function: ease-in-out;
   }
   &__item-text {
     font-size: $H500;
     color: $N6;
+    transition-property: color, fill, opacity;
+    transition-duration: 0.2s;
+    transition-timing-function: ease-in-out;
   }
   &__ava-wrapper {
     width: 32px;
@@ -184,6 +271,10 @@ export default {
   &__ava {
     width: 100%;
     height: 100%;
+  }
+  &__invite-button {
+    width: 100%;
+    margin-bottom: 20px;
   }
 }
 </style>

@@ -2,10 +2,14 @@
   <div class='app' id="app">
     <transition
       name="custom-classes-transition"
-      enter-active-class="animated dur06 slideInLeft"
-      leave-active-class="animated dur04 slideOutLeft"
+      enter-active-class="animated dur03 fadeIn"
+      leave-active-class="animated dur03 fadeOut"
       mode="out-in">
-    <navigation-mobile class='navigation-fixed' @hideNav='hideNav' v-if='navVisible'/>
+    <navigation-mobile
+      class='navigation-fixed'
+      @hideNav='hideNav'
+      v-if='navVisible'
+      :visible='navVisible'/>
     </transition>
     <navigation-desktop v-if='desktopNav'/>
     <mobile-nav-bar @showNav='showNav' :class='{"opacity": !mobileBar}'/>

@@ -15,10 +15,10 @@ export default {
 </script>
 <style lang="scss">
 .close-button {
-  padding: 6px;
+  padding: 4px;
   &__image {
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
     fill: $N6;
   }
 }

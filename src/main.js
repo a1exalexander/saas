@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import vueNumeralFilterInstaller from 'vue-numeral-filter';
 import http from 'axios';
+import VueClipboard from 'vue-clipboard2';
 import App from './App.vue';
 import router from './router';
 import store from './store';
@@ -13,6 +14,7 @@ if (token) {
   http.defaults.headers.common['Authorization'] = token;
 }
 
+Vue.use(VueClipboard);
 Vue.use(vueNumeralFilterInstaller);
 Vue.config.productionTip = false;
 

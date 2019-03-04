@@ -1,10 +1,4 @@
-# [SaaS](https://a1exalexander.github.io/saas/dist/)
-
-### This is a crypto platform site. 
-
->Site created using Vue.js.
-
->Javascript wrote using ES6.
+# sass
 
 ## Project setup
 ```
