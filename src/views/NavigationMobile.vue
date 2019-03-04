@@ -10,23 +10,23 @@
           <p class="nav__title">Initial Index Fund</p>
         </div>
       </section>
-      <ul class="nav__list">
-        <li class="nav__item">
+      <ul @click='hideNavDelay' class="nav__list">
+        <router-link to='/customers' tag='li' class="nav__item">
           <icon-investor class='nav__item-icon'/>
           <p class="nav__item-text">Customers</p>
-        </li>
-        <li class="nav__item">
+        </router-link>
+        <router-link to='/exchanges' tag='li' class="nav__item">
           <icon-exchanges class='nav__item-icon'/>
           <p class="nav__item-text">Exchanges</p>
-        </li>
-        <li class="nav__item">
+        </router-link>
+        <router-link to='/transactions' tag='li' class="nav__item">
           <icon-billing class='nav__item-icon'/>
           <p class="nav__item-text">Transactions</p>
-        </li>
-        <li class="nav__item">
+        </router-link>
+        <router-link to='/legal' tag='li' class="nav__item">
           <icon-legal class='nav__item-icon'/>
           <p class="nav__item-text">Legal</p>
-        </li>
+        </router-link>
       </ul>
     </div>
     <section class="nav__profile">
@@ -78,6 +78,11 @@ export default {
   methods: {
     hideNav() {
       this.$emit('hideNav');
+    },
+    hideNavDelay() {
+      setTimeout(() => {
+        this.hideNav();
+      }, 100);
     },
   },
   computed: {

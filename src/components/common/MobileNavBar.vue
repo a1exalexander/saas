@@ -20,7 +20,13 @@ export default {
   },
   computed: {
     title() {
-      return this.$route.name;
+      let { name } = this.$route;
+      if (name === 'Investors') {
+        name = 'Customers';
+      } else if (name === 'customer-introduction') {
+        name = 'Customer\'s profile';
+      }
+      return name;
     },
   },
 };

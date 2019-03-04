@@ -109,6 +109,7 @@ export default {
     background-color: $N13;
     height: 100vh;
     width: 220px;
+    min-width: 220px;
     padding: 28px 22px 22px 20px;
   }
   @media screen and (min-width: $screen-desktop) {
@@ -198,6 +199,8 @@ export default {
     transition-timing-function: ease-in-out;
   }
   &__ava-wrapper {
+    flex-shrink: 0;
+    flex-grow: 0;
     width: 32px;
     height: 32px;
     overflow: hidden;

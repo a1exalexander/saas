@@ -1,5 +1,11 @@
 <template>
 <main class="auth__wrapper">
+  <message-success
+    class='auth__message'
+    v-if='emailConfirmMessage'
+    @click.native='toggleEmailConfirmedMessage(false)'>
+    Your email address has been confirmed!
+  </message-success>
   <icon-logo class='auth__logo'/>
   <section class="auth animated dur09 fadeIn">
     <div class="auth__mobile-header">
@@ -19,7 +25,7 @@
     </div>
     <div class="auth__title-wrapper">
       <p class="auth__title">{{ $t('auth.titles.login') }}</p>
-      <router-link to='/auth/investor-signup' class="only-mobile-block">
+      <router-link to='/investor-auth/signup' class="only-mobile-block">
         <subtle>{{ $t('auth.links.signup') }}</subtle>
       </router-link>
     </div>
@@ -83,7 +89,7 @@
         </div>
       </label>
       <div class="auth__button-wrapper">
-        <router-link to='/auth/recovery'>
+        <router-link to='/investor-auth/recovery'>
           <subtle>{{ $t('auth.links.password') }}</subtle>
         </router-link>
         <button-primary
@@ -96,7 +102,7 @@
   </section>
   <footer class="auth__footer">
     <p class="auth__footer-text">{{ $t('auth.links.signup') }}</p>
-    <router-link to='/auth/investor-signup'>
+    <router-link to='/investor-auth/signup'>
       <button-secondary>{{ $t('auth.buttons.signup') }}</button-secondary>
     </router-link>
   </footer>
@@ -114,6 +120,7 @@ import IconLogo from '@/components/common/icons/IconLogo.vue';
 import Validation from '@/js/validation';
 import IconEyeOff from '@/components/common/icons/IconEyeOff.vue';
 import CloseButton from '@/components/common/buttons/CloseButton.vue';
+import MessageSuccess from '@/components/common/messages/MessageSuccess.vue';
 import { mapMutations, mapState } from 'vuex';
 
 export default {
@@ -129,6 +136,7 @@ export default {
     IconEyeOff,
     CloseButton,
     IconCheck2,
+    MessageSuccess,
   },
   data() {
     return {
@@ -152,12 +160,14 @@ export default {
   methods: {
     ...mapMutations({
       toggleKeepingUser: 'investorLogin/toggleKeepingUser',
+      toggleEmailConfirmedMessage: 'investorSignup/toggleEmailConfirmedMessage',
+      toggleResetMessage: 'investorLogin/toggleResetMessage',
     }),
     close() {
-      this.$router.push('/auth');
+      this.$router.push('/investor-auth');
     },
     login() {
-      this.$router.push('/profile');
+      // this.$router.push('/profile');
     },
     showPassword() {
       const element = document.getElementById('login-password');
@@ -199,6 +209,7 @@ export default {
     ...mapState({
       keepUser: state => state.investorLogin.keepUser,
       resetMessage: state => state.investorLogin.resetMessage,
+      emailConfirmMessage: state => state.investorSignup.emailConfirmMessage,
     }),
     keepMe: {
       get() {
@@ -227,6 +238,7 @@ export default {
     },
   },
   beforeDestroy() {
+    this.toggleEmailConfirmedMessage(false);
     this.toggleResetMessage(false);
   },
 };

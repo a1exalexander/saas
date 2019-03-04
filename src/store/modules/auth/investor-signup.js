@@ -6,6 +6,7 @@ const state = {
   email: '',
   password: '',
   agree: '',
+  emailConfirmMessage: false,
 };
 
 const mutations = {
@@ -20,6 +21,9 @@ const mutations = {
   },
   toggleAgree(state) {
     state.agree = !state.agree;
+  },
+  toggleEmailConfirmedMessage(state, value) {
+    state.emailConfirmMessage = !!value;
   },
 };
 

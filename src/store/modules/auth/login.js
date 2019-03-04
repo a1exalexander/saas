@@ -1,5 +1,7 @@
 /* eslint-disable */
 // Becouse 'no-shadow' and 'no-param-reassing' errors of state aren't errors
+import http from 'axios';
+import { directorAuth } from '@/js/api';
 
 const state = {
   token: localStorage.getItem('user-token') || '',
@@ -8,6 +10,7 @@ const state = {
   keepUser: false,
   offRecaptcha: false,
   resetMessage: false,
+  recaptcha: localStorage.getItem('recaptcha') || '',
 };
 
 const mutations = {
@@ -37,6 +40,11 @@ const mutations = {
     state.keepUser = !state.keepUser;
   },
   toggleRecaptcha(state, value) {
+    if (value) {
+      localStorage.setItem('recaptcha', 'off');
+    } else {
+      localStorage.removeItem('recaptcha');
+    }
     state.offRecaptcha = value;
   },
   toggleResetMessage(state, value) {
@@ -49,15 +57,25 @@ const getters = {
   authStatus: state => state.authStatus,
 };
 
-// TODO: Promis functions must be replaced by Http requests
 const actions = {
-  AUTH_REQUEST: ({ commit, dispatch }, user) => {
+  AUTH_REQUEST: ({ commit, dispatch, state }, user) => {
     return new Promise((resolve, reject) => {
       commit('AUTH_REQUEST');
-      localStorage.setItem('user-token', 'super-token');
-      commit('AUTH_SUCCESS', 'super-token');
-      dispatch('USER_REQUEST');
-      resolve();
+      http.post(directorAuth.signin, user)
+      .then((response) => {
+        const { token } = response.data;
+        if (state.keepUser) {
+          localStorage.setItem('user-token', token);
+        }
+        http.defaults.headers.common['Authorization'] = token;
+        commit('AUTH_SUCCESS', token);
+        dispatch('USER_REQUEST');
+        resolve(response);
+      })
+      .catch((error) => {
+        commit('AUTH_ERROR');
+        reject(error);
+      })
     });
   },
   AUTH_LOGOUT: ({ commit }) => {

@@ -55,7 +55,11 @@
           <p class="add-investor__label-text">Country</p>
           <drop-menu-country :getCountry='form.country' @select='selectCountry'/>
         </label>
-        <div class="add-investor__button-wrapper">
+        <div class="add-investor__buttons-wrapper">
+          <button-secondary
+            class='add-investor__button add-investor__button--cancel-secondary'
+            @click.native='cancel'>Cancel
+          </button-secondary>
           <button-primary
             class='add-investor__button add-investor__button--save'
             :disabled='!allReady'
@@ -126,8 +130,9 @@ export default {
     ]),
     save() {
       this.loading = true;
+      const data = this.form;
       setTimeout(() => {
-        this.addInvestor(this.form);
+        this.addInvestor(data);
         this.loading = false;
         this.cancel();
       }, 1000);
@@ -205,6 +210,10 @@ export default {
     this.generateId();
     this.generateFakeBalance();
   },
+  beforeUpadete() {
+    this.generateId();
+    this.generateFakeBalance();
+  },
 };
 </script>
 <style lang="scss">
@@ -214,11 +223,29 @@ export default {
   right: 0;
   left: 0;
   min-height: 100vh;
-  z-index: 11;
+  z-index: 12;
+  @include flex-col(stretch, stretch);
+  @media screen and (min-width: $screen-tablet) {
+    padding: 32px;
+    background: rgba(10,11,12,0.80);
+    position: fixed;
+    bottom: 0;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    overflow-y: auto;
+  }
   &__card {
     background-color: $N13;
     padding: 28px;
     position: relative;
+    flex: 1 1;
+    @media screen and (min-width: $screen-tablet) {
+      flex: 0 1 34%;
+      min-width: 440px;
+      position: relative;
+      padding: 32px 40px;
+    }
   }
   &__title {
     font-size: $H800;
@@ -247,14 +274,45 @@ export default {
   }
   &__button {
     width: 100%;
+    @media screen and (min-width: $screen-tablet) {
+      width: auto;
+    }
     &--save {
       margin-bottom: 20px;
+      @media screen and (min-width: $screen-tablet) {
+        margin: 0;
+      }
+    }
+    &--cancel-transparent {
+      @media screen and (min-width: $screen-tablet) {
+        display: none;
+      }
+    }
+    &--cancel-secondary {
+      display: none;
+      @media screen and (min-width: $screen-tablet) {
+        display: flex;
+        margin-right: 24px;
+      }
+    }
+  }
+  &__buttons-wrapper {
+    @media screen and (min-width: $screen-tablet) {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
     }
   }
   &__close-button {
     position: absolute;
     right: 22px;
     top: 30px;
+    @media screen and (min-width: $screen-tablet) {
+      svg {
+        width: 16px;
+        height: 16px;
+      }
+    }
   }
 }
 </style>

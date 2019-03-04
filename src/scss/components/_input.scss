@@ -11,6 +11,7 @@
   transition-property: border-color, border-width;
   transition-duration: 0.2s;
   transition-timing-function: ease-in-out;
+  @include flex-row(flex-start, center);
   @media screen and (min-width: $screen-tablet) {
     border-color: $N8;
     min-height: 36px;

@@ -180,9 +180,10 @@ export default {
       'setName',
       'setEmail',
       'toggleAgree',
+      'toggleEmailConfirmedMessage',
     ]),
     close() {
-      this.$router.push('/auth');
+      this.$router.push('/investor-auth');
     },
     showPassword() {
       const element = document.getElementById('signup-password');
@@ -236,7 +237,9 @@ export default {
     },
     signup() {
       this.loading.signup = true;
+      this.toggleEmailConfirmedMessage(true);
       setTimeout(() => {
+        this.$router.push('/investor-auth');
         this.loading.signup = false;
       }, 1000);
     },
@@ -322,10 +325,6 @@ export default {
     checkEmail(value) {
       if (value) this.myErros.email = '';
     },
-  },
-  beforeDestroy() {
-    this.toggleEmailConfirmedMessage(false);
-    this.toggleResetMessage(false);
   },
 };
 </script>

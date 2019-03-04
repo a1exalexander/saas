@@ -38,7 +38,7 @@
           class="auth__input"
           @blur='errorEmail'
           :class='{"input-error": myErrors.email}'
-          v-model.trim="email">
+          v-model.trim="form.email">
         <p
           class="input-text-error animated dur04 bounceIn"
           v-show='myErrors.email'
@@ -69,13 +69,24 @@
         class="auth__input auth__input--password"
         :class='{"input-error": myErrors.password}'
         @blur='errorPassword'
-        v-model.trim="password">
+        v-model.trim="form.password"
+        autocomplete="off">
         <p
           class="input-text-error animated dur04 bounceIn"
           v-show='myErrors.password'
           v-html="myErrors.password">
         </p>
       </div>
+      <vue-recaptcha
+        class="login-recaptcha"
+        @click.stop
+        ref="recaptcha"
+        theme='dark'
+        sitekey="6Lej1pQUAAAAAEe8hfLDbMGh31AHHA8Hi9FDf-lJ"
+        @verify="onVerify"
+        @expired="onExpired"
+        v-if='!recaptcha'>
+      </vue-recaptcha>
       <label class="auth__checkbox checkbox">
         <input
           type="checkbox"
@@ -95,6 +106,7 @@
         <button-primary
           @click.prevent.native='login'
           :disabled='!loginDisabled'
+          :class='{"button-loading": authStatus === "loading"}'
           >{{ $t('auth.buttons.login') }}
         </button-primary>
       </div>
@@ -121,7 +133,9 @@ import Validation from '@/js/validation';
 import IconEyeOff from '@/components/common/icons/IconEyeOff.vue';
 import CloseButton from '@/components/common/buttons/CloseButton.vue';
 import MessageSuccess from '@/components/common/messages/MessageSuccess.vue';
-import { mapMutations, mapState } from 'vuex';
+import VueRecaptcha from 'vue-recaptcha';
+import { siteKey } from '@/js/api';
+import { mapMutations, mapState, mapActions } from 'vuex';
 
 export default {
   name: 'Login',
@@ -137,11 +151,15 @@ export default {
     MessageSuccess,
     CloseButton,
     IconCheck2,
+    VueRecaptcha,
   },
   data() {
     return {
-      password: '',
-      email: '',
+      form: {
+        password: '',
+        email: '',
+      },
+      recaptchaToken: '',
       showPasswordStatus: false,
       myErrors: {
         password: '',
@@ -163,6 +181,15 @@ export default {
       toggleEmailConfirmedMessage: 'signup/toggleEmailConfirmedMessage',
       toggleResetMessage: 'login/toggleResetMessage',
     }),
+    ...mapActions('login', [
+      'AUTH_REQUEST',
+    ]),
+    onVerify(response) {
+      this.recaptchaToken = response;
+    },
+    onExpired() {
+      this.recaptchaToken = '';
+    },
     close() {
       this.$router.push('/auth');
     },
@@ -195,7 +222,7 @@ export default {
       const error3 = this.errorsText.email[2];
       this.myErrors.email = '';
       setTimeout(() => {
-        if (!this.email) {
+        if (!this.form.email) {
           this.myErrors.email = error1;
         } else if (!this.checkEmail) {
           this.myErrors.email = error3;
@@ -210,6 +237,8 @@ export default {
       keepUser: state => state.login.keepUser,
       emailConfirmMessage: state => state.signup.emailConfirmMessage,
       resetMessage: state => state.login.resetMessage,
+      authStatus: state => state.login.authStatus,
+      recaptcha: state => state.login.recaptcha,
     }),
     keepMe: {
       get() {
@@ -220,21 +249,24 @@ export default {
       },
     },
     checkPassword() {
-      return Validation.password(this.password);
+      return Validation.password(this.form.password);
     },
     checkEmail() {
-      return Validation.email(this.email);
+      return Validation.email(this.form.email);
     },
     loginDisabled() {
-      return this.checkPassword && this.checkEmail;
+      if (this.recaptcha) {
+        return this.checkPassword && this.checkEmail;
+      }
+      return this.checkPassword && this.checkEmail && this.recaptchaToken;
     },
   },
   watch: {
-    checkPassword(value) {
-      if (value) this.myErros.password = '';
-    },
     checkEmail(value) {
-      if (value) this.myErros.email = '';
+      if (value) this.myErrors.email = '';
+    },
+    checkPassword(value) {
+      if (value) this.myErrors.password = '';
     },
   },
   beforeDestroy() {
@@ -243,3 +275,8 @@ export default {
   },
 };
 </script>
+<style lang="scss">
+.login-recaptcha {
+  margin-bottom: 32px;
+}
+</style>
