@@ -258,7 +258,7 @@ export default {
       if (this.recaptcha) {
         return this.checkPassword && this.checkEmail;
       }
-      return this.checkPassword && this.checkEmail && this.recaptchaToken;
+      return this.checkPassword && this.checkEmail;
     },
   },
   watch: {
