@@ -194,7 +194,11 @@ export default {
       this.$router.push('/auth');
     },
     login() {
-      this.$router.push('/profile');
+      this.AUTH_REQUEST(this.form).then((response) => {
+        console.log(response);
+      }).catch((error) => {
+        console.log(error);
+      });
     },
     showPassword() {
       const element = document.getElementById('login-password');
