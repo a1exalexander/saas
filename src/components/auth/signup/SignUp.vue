@@ -9,7 +9,7 @@
     <header class="signup-step">
       <div class="signup-step__mobile-header">
         <icon-logo class="signup-step__horizontal-logo"/>
-        <router-link to='/auth' class="signup-step__close-button">
+        <router-link @click.stop.prevent to='/auth' class="signup-step__close-button">
           <icon-close class="signup-step__close-image"/>
         </router-link>
       </div>
@@ -202,7 +202,7 @@ export default {
       'allReady',
     ]),
     ...mapState('signup', {
-      getName: state => state.personalInfo.name,
+      getName: state => state.personalInfo.name_first,
       getEmail: state => state.personalInfo.email,
       getGender: state => state.personalInfo.gender,
       getFundName: state => state.fund.name,
@@ -248,6 +248,7 @@ export default {
 .signup {
   @include flex-row(flex-start, stretch);
   min-height: 100vh;
+  flex: 1 1;
   &__aside {
     display: none;
     @media screen and (min-width: $screen-tablet) {
@@ -365,6 +366,7 @@ export default {
     width: 20px;
     height: 20px;
     fill: $N6;
+    pointer-events: none;
   }
   &__item {
     cursor: pointer;

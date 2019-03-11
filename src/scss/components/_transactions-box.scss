@@ -1,0 +1,95 @@
+.transaction-box {
+  flex: 1 1;
+  background-color: $N13;
+  @media screen and (min-width: $screen-tablet) {
+    background-color: $N12;
+  }
+  &__head {
+    padding: 24px 28px 12px;
+    position: relative;
+    z-index: 2;
+    background-color: $N13;
+    @media screen and (min-width: $screen-tablet) {
+      padding: 24px 40px 0;
+      border-bottom: 1px solid $N10;
+      background-color: $N12;
+    }
+  }
+  &__row {
+    @include flex-row(flex-start, center);
+    &--space {
+      justify-content: space-between;
+    }
+    &--margin {
+      @media screen and (min-width: $screen-tablet) {
+        margin-bottom: 26px;
+      }
+    }
+  }
+  &__thead {
+    display: none;
+     @media screen and (min-width: $screen-tablet) {
+      list-style: none;
+      display: grid;
+      grid-template-columns: 2fr repeat(3, 1fr) 0.8fr 0.7fr;
+      grid-column-gap: 5%;
+      justify-content: space-between;	
+      padding-bottom: 9px;
+    }
+  }
+  &__title {
+    font-size: $H700;
+    font-weight: 500;
+  }
+  &__search-label {
+    @extend %search-label;
+    min-height: 36px;
+  }
+  &__search-tablet {
+    display: none;
+    @media screen and (min-width: $screen-tablet) {
+      display: flex;
+    }
+  }
+  &__search-mobile {
+    display: flex;
+    @media screen and (min-width: $screen-tablet) {
+      display: none;
+    }
+  }
+  &__search-icon {
+    @extend %search-icon;
+    &--static {
+      position: static;
+    }
+  }
+  &__search-input {
+    @extend %search-input;
+    min-height: 36px;
+    width: 170px;
+    font-size: $H300;
+    @media screen and (min-width: $screen-tablet) {
+      width: 250px;
+    }
+  }
+  &__field {
+    position: relative;
+  }
+  &__text {
+    @include text($H200, 500, $N6);
+  }
+  &__item-icon {
+    width: 18px;
+    height: 18px;
+    fill: $N6;
+    margin-left: 4px;
+    position: relative;
+    top: 1px;
+  }
+  &__item {
+    @include flex-row(flex-start, center);
+    &--end {
+      justify-self: end;
+    }
+  }
+}

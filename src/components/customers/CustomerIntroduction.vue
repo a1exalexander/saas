@@ -338,7 +338,7 @@ export default {
       });
     },
     redirectRoute() {
-      this.$router.push('/customers');
+      this.$router.push('/director/customers');
     },
     compareData(newData, oldData) {
       if (newData && oldData) {

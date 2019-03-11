@@ -40,6 +40,36 @@
     display: block;
   }
 }
+.mobile-flex {
+  display: flex;
+  @media screen and (min-width: $screen-tablet) {
+    display: none;
+  }
+}
+.mobile-block {
+  display: block;
+  @media screen and (min-width: $screen-tablet) {
+    display: none;
+  }
+}
+.tablet-flex {
+  display: none;
+  @media screen and (min-width: $screen-tablet) {
+    display: flex;
+  }
+}
+.tablet-inline {
+  display: none;
+  @media screen and (min-width: $screen-tablet) {
+    display: inline-block;
+  }
+}
+.tablet-block {
+  display: none;
+  @media screen and (min-width: $screen-tablet) {
+    display: block;
+  }
+}
 .is-flex {
   display: flex;
 }
@@ -70,6 +100,7 @@
 
 .opacity {
   opacity: 0;
+  pointer-events: none;
 }
 
 .disable {

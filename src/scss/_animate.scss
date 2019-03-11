@@ -7,7 +7,77 @@
  *
  * Copyright (c) 2018 Daniel Eden
  */
- .pullDown{
+
+ /*
+==============================================
+stretchLeft
+==============================================
+*/
+
+.stretchLeft{
+	animation-name: stretchLeft;
+	-webkit-animation-name: stretchLeft;	
+
+	animation-duration: 1.5s;	
+	-webkit-animation-duration: 1.5s;
+
+	animation-timing-function: ease-out;	
+	-webkit-animation-timing-function: ease-out;	
+
+	transform-origin: 100% 0%;
+	-ms-transform-origin: 100% 0%;
+	-webkit-transform-origin: 100% 0%; 
+}
+
+@keyframes stretchLeft {
+	0% {
+		transform: scaleX(0.3);
+	}
+	40% {
+		transform: scaleX(1.02);
+	}
+	60% {
+		transform: scaleX(0.98);
+	}
+	80% {
+		transform: scaleX(1.01);
+	}
+	100% {
+		transform: scaleX(0.98);
+	}				
+	80% {
+		transform: scaleX(1.01);
+	}
+	100% {
+		transform: scaleX(1);
+	}							
+}
+
+@-webkit-keyframes stretchLeft {
+	0% {
+		-webkit-transform: scaleX(0.3);
+	}
+	40% {
+		-webkit-transform: scaleX(1.02);
+	}
+	60% {
+		-webkit-transform: scaleX(0.98);
+	}
+	80% {
+		-webkit-transform: scaleX(1.01);
+	}
+	100% {
+		-webkit-transform: scaleX(0.98);
+	}				
+	80% {
+		-webkit-transform: scaleX(1.01);
+	}
+	100% {
+		-webkit-transform: scaleX(1);
+	}		
+}
+
+.pullDown{
 	animation-name: pullDown;
 	-webkit-animation-name: pullDown;	
 
@@ -3923,7 +3993,7 @@ pullUp
   animation-direction: reverse;
 }
 .list-complete-item {
-  transition: all 0.6s;
+  transition: all 0.2s;
 }
 .list-complete-enter, .list-complete-leave-to
 /* .list-complete-leave-active до версии 2.1.8 */ {
@@ -3934,8 +4004,8 @@ pullUp
   position: absolute;
   right: 0;
   left: 0;
-  @media screen and (min-width: $screen-tablet) {
-    right: 40px;
-    left: 40px;
-  }
+  // @media screen and (min-width: $screen-tablet) {
+  //   right: 40px;
+  //   left: 40px;
+  // }
 }

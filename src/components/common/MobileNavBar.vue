@@ -25,6 +25,8 @@ export default {
         name = 'Customers';
       } else if (name === 'customer-introduction') {
         name = 'Customer\'s profile';
+      } else if (name === 'payouts' || name === 'deposits' || name === 'methods') {
+        name = 'Transactions';
       }
       return name;
     },

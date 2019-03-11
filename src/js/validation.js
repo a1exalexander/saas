@@ -48,7 +48,7 @@ const validation = {
   },
   phone(phone) {
     // eslint-disable-next-line
-    const re = /^(((\(\+\d{2}0\)\s?)|(\+?\d{2}0\s?)|(\d?0))(\d{2}\s?\-?(\d){3}\-?\s?(\d{2})\-?\s?(\d{2})))$/;
+    const re = /^(((\(\+\d{2}([0-9])\)\s?)|(\+?\d{2}[0-9]\s?)|(\d?[0-9]))(\d{2}\s?\-?(\d){3}\-?\s?(\d{2})\-?\s?(\d{2})))$/;
     return re.test(phone);
   },
   phoneCount(phone) {

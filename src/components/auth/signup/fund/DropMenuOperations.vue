@@ -47,9 +47,9 @@ export default {
   data() {
     return {
       operations: [
-        'Mutual fund',
-        'Hedge fund',
-        'Money market fund',
+        'Found',
+        'ICO',
+        'Campaign',
       ],
     };
   },
@@ -59,12 +59,12 @@ export default {
       'toggleDropMenu',
     ]),
     select(item) {
-      this.setFund(['operation', item]);
+      this.setFund(['business_type', item]);
     },
   },
   computed: {
     ...mapState('signup', {
-      getOperation: state => state.fund.operation,
+      getOperation: state => state.fund.business_type,
       showDropMenu: state => state.dropMenu.operations,
     }),
     mobileOperations: {
@@ -72,7 +72,7 @@ export default {
         return this.getOperation;
       },
       set(element) {
-        this.setFund(['operation', element]);
+        this.setFund(['business_type', element]);
       },
     },
   },

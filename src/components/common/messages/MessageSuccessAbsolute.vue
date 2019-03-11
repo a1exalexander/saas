@@ -28,6 +28,7 @@ export default {
 };
 </script>
 <style lang="scss">
+@import '~@/scss/components/flag-message';
 .message-success-absolute {
   @extend %flag-message;
   background-color: $G2;

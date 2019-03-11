@@ -1,7 +1,7 @@
 /* eslint-disable */
 // Becouse 'no-shadow' and 'no-param-reassing' errors of state aren't errors
 import moment from 'moment-timezone';
-import router from '@/router'
+import router from '@/router';
 
 const state = {
   investors: [],
@@ -92,9 +92,10 @@ const actions = {
   },
   changeRouteBeforeRemove() { 
     return new Promise ((resolve, reject) => {
-      router.push('/customers');
+      router.push('/director/customers');
       const timer = setInterval(() => {
-        if (router.currentRoute.name === 'Investors') {
+        const { name } = router.currentRoute;
+        if (name === 'Investors' || name === 'Customers') {
           clearInterval(timer);
           resolve();
         }

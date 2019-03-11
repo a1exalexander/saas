@@ -14,6 +14,14 @@
   line-height: 1;
   white-space: nowrap;
   transition: color ease-in-out 0.2s;
+  @media screen and (min-width: $screen-desktop) {
+    &:hover {
+      color: $N3;
+    }
+    &:hover svg {
+      fill: $N3;
+    }
+  }
 }
 
 %inline-menu-icon {

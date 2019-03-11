@@ -20,6 +20,7 @@
   </p>
   <button-primary-icon
     class='email-step__button animated dur05 fadeIn'
+    :class='{"button-loading": loading.next}'
     @click.native='start'>{{ $t('auth.buttons.start') }}
     <icon-long-arrow-right class='icon-button-right'/>
   </button-primary-icon>
@@ -30,6 +31,7 @@
       :class='{"email-step__tooltip-wrapper--show": tooltip}'>
       <subtle
         class="email-step__link email-step__link--resend"
+        :class='{"button-loading-subtle": loading.resend}'
         :disabled='disabledResend'
         @click.native='resendEmail'>{{ $t('auth.buttons.resend') }}
       </subtle>
@@ -69,7 +71,7 @@ import Subtle from '@/components/common/buttons/Subtle.vue';
 import IconLongArrowRight from '@/components/common/icons/IconLongArrowRight.vue';
 import RetypeEmail from '@/components/auth/signup/email/RetypeEmail.vue';
 import MessageSuccessAbsolute from '@/components/common/messages/MessageSuccessAbsolute.vue';
-import { mapState, mapMutations } from 'vuex';
+import { mapState, mapMutations, mapActions } from 'vuex';
 
 export default {
   name: 'EmailStep',
@@ -88,6 +90,10 @@ export default {
       count: 0,
       tooltip: false,
       disabledResend: false,
+      loading: {
+        resend: false,
+        next: false,
+      },
     };
   },
   computed: {
@@ -99,9 +105,14 @@ export default {
     ...mapMutations('signup', [
       'toggleEmailConfirmedMessage',
     ]),
+    ...mapActions('signup', {
+      resendMyEmail: 'resendEmail',
+    }),
     start() {
-      this.toggleEmailConfirmedMessage(true);
-      this.$router.push('/auth');
+      this.loading.next = true;
+      this.$router.push('/auth', () => {
+        this.loading.next = false;
+      });
     },
     saveEmail() {
       this.retypeEmail = false;
@@ -109,14 +120,22 @@ export default {
     },
     resendEmail() {
       if (this.count < 3) {
+        this.loading.resend = true;
         this.resendMessageStatus = false;
-        setTimeout(() => {
-          this.resendMessageStatus = true;
-        }, 15);
-        setTimeout(() => {
-          this.resendMessageStatus = false;
-        }, 6000);
-        this.count += 1;
+        this.resendMyEmail()
+          .then((resp) => {
+            this.resendMessageStatus = true;
+            setTimeout(() => {
+              this.resendMessageStatus = false;
+            }, 6000);
+            this.count += 1;
+            this.loading.resend = false;
+            console.log(resp);
+          })
+          .catch((error) => {
+            this.loading.resend = false;
+            console.log(error);
+          });
       } else {
         this.disabledResend = true;
         this.tooltip = true;

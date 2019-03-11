@@ -181,6 +181,7 @@
   <div class="personal-info-step__button-wrapper">
     <button-primary-icon
       :disabled='showContinue'
+      :class='{"button-loading": loading}'
       @click.prevent.native='nextStep'>{{ $t('auth.buttons.continue') }}
       <icon-long-arrow-right class='icon-button-right'/>
     </button-primary-icon>
@@ -201,8 +202,7 @@ import ButtonSecondary from '@/components/common/buttons/ButtonSecondary.vue';
 import IconLongArrowRight from '@/components/common/icons/IconLongArrowRight.vue';
 import IconCheck from '@/components/common/icons/IconCheck.vue';
 import Validation from '@/js/validation';
-import Format from '@/js/format';
-import { mapState, mapMutations } from 'vuex';
+import { mapState, mapMutations, mapActions } from 'vuex';
 
 export default {
   name: 'PersonalInfoStep',
@@ -239,13 +239,15 @@ export default {
         phone: '',
         age: '',
       },
+      loading: false,
     };
   },
   methods: {
     ...mapMutations('signup', [
       'setPersonalInfo',
-      'setStepStatus',
-      'setRouterStatus',
+    ]),
+    ...mapActions('signup', [
+      'stepOne',
     ]),
     nameError() {
       const [error1, error2] = this.errorsText.name;
@@ -309,13 +311,16 @@ export default {
       }, 15);
     },
     nextStep() {
-      this.setRouterStatus('fund');
-      this.setStepStatus('personalInfo');
+      this.loading = true;
+      this.stepOne()
+        .then(() => {
+          this.loading = false;
+        });
     },
   },
   computed: {
     ...mapState('signup', {
-      getName: state => state.personalInfo.name,
+      getName: state => state.personalInfo.name_first,
       getEmail: state => state.personalInfo.email,
       getPhone: state => state.personalInfo.phone,
       getAge: state => state.personalInfo.age,
@@ -341,7 +346,7 @@ export default {
         return this.getName;
       },
       set(value) {
-        this.setPersonalInfo(['name', value]);
+        this.setPersonalInfo(['name_first', value]);
       },
     },
     email: {
@@ -357,11 +362,7 @@ export default {
         return this.getPhone;
       },
       set(value) {
-        if (Validation.phone(value)) {
-          this.setPersonalInfo(['phone', Format.phone(value)]);
-        } else {
-          this.setPersonalInfo(['phone', value]);
-        }
+        this.setPersonalInfo(['phone', value]);
       },
     },
     age: {

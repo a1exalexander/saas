@@ -65,8 +65,8 @@
   </div>
   <transition
     name="custom-classes-transition"
-    enter-active-class="animated dur08 fadeIn"
-    leave-active-class="animated dur04 fadeOut"
+    enter-active-class="animated dur04 fadeIn"
+    leave-active-class="animated dur03 fadeOut"
     mode="out-in">
   <div class="investor__drop-menu" v-if='dropMenu'>
     <div class="investor__drop-item">
@@ -107,7 +107,7 @@ export default {
   },
   methods: {
     openProfile(id) {
-      this.$router.push({ path: `/customers/profile/${id}` });
+      this.$router.push({ path: `/director/customers/profile/${id}` });
     },
   },
 };
@@ -115,7 +115,7 @@ export default {
 <style lang="scss">
 .investor {
   transition-property: height, max-height, flex;
-  transition-duration: 0.6s;
+  transition-duration: 0.2s;
   transition-timing-function: linear;
   max-height: 80px;
   &--open {

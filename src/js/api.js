@@ -1,5 +1,7 @@
-const directorUrl = 'http://104.248.17.143/director';
-const siteKey = '6Lej1pQUAAAAAEe8hfLDbMGh31AHHA8Hi9FDf-lJ';
+const directorUrl = 'http://api.saas.fundplatform.io/director';
+const siteKey = process.env.NODE_ENV === 'production'
+  ? '6Lf225MUAAAAAM9d3nHrr415t4Ko7gEjAKdw-QWr'
+  : '6Lej1pQUAAAAAEe8hfLDbMGh31AHHA8Hi9FDf-lJ';
 
 const directorAuth = {
   signin: `${directorUrl}/singin`,

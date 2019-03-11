@@ -4,8 +4,8 @@
   :class='{"exchanges-api--open": dropMenu}'>
   <transition
     name="custom-classes-transition"
-    enter-active-class="animated dur08 fadeIn"
-    leave-active-class="animated dur06 fadeOut"
+    enter-active-class="animated dur04 fadeIn"
+    leave-active-class="animated dur03 fadeOut"
     mode="out-in">
   <exchanges-api-remove-popup
     @removeMyApi='removeMyApi'
@@ -83,8 +83,8 @@
   </div>
   <transition
     name="custom-classes-transition"
-    enter-active-class="animated dur06 fadeIn"
-    leave-active-class="animated dur04 fadeOut"
+    enter-active-class="animated dur04 fadeIn"
+    leave-active-class="animated dur02 fadeOut"
     mode="out-in">
   <div class="exchanges-api__drop" v-show='dropMenu'>
     <p class="exchanges-api__drop-text">API Key</p>
@@ -174,7 +174,7 @@ export default {
   border-radius: 2px;
   padding: 0;
   transition-property: height, max-height, flex;
-  transition-duration: 0.6s;
+  transition-duration: 0.4s;
   position: relative;
   transition-timing-function: linear;
   max-height: 80px;

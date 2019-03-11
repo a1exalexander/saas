@@ -63,7 +63,7 @@ const actions = {
       commit('AUTH_REQUEST');
       http.post(directorAuth.signin, user)
       .then((response) => {
-        const { token } = response.data;
+        const { auth_token: token } = response.data;
         if (state.keepUser) {
           localStorage.setItem('user-token', token);
         }

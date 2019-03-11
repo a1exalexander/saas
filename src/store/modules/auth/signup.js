@@ -1,19 +1,22 @@
 /* eslint-disable */
 // Becouse 'no-shadow' and 'no-param-reassing' errors of state aren't errors
 import Validation from '@/js/validation';
+import http from 'axios';
+import { directorAuth } from '@/js/api';
 
 const state = {
   personalInfo: {
-    name: '',
+    name_first: '',
+    name_last: '',
     email: '',
     phone: '',
     age: '',
     gender: '',
   },
   fund: {
-    name: '',
+    business_name: '',
     country: '',
-    operation: '',
+    business_type: '',
   },
   password: {
     value: '',
@@ -36,6 +39,10 @@ const state = {
     operations: false,
   },
   emailConfirmMessage: false,
+  token: {
+    stepOne: '',
+    resendEmail: '',
+  },
 };
 
 const mutations = {
@@ -83,37 +90,36 @@ const mutations = {
   closeDropMenu(state, type) {
     state.dropMenu[type] = false;
   },
+  openDropCountriesMenu(state) {
+    state.dropMenu.countries = true;
+  },
+  setToken(state, [type, token]) {
+    state.token[type] = token;
+  },
+  setCountry(state, value) {
+    state.fund.country = value;
+  },
 };
 
 const getters = {
   readyPersonalInfoStep: (state) => {
-    return Validation.name(state.personalInfo.name)
+    return Validation.name(state.personalInfo.name_first)
       && Validation.email(state.personalInfo.email)
       && state.personalInfo.gender;
   },
   readyFundStep: (state) => {
-    return state.fund.name && state.fund.country && state.fund.operation;
+    return state.fund.business_name && state.fund.country && state.fund.business_type;
   },
-  readyPasswordStep: (state) => {
-    return Validation.password(state.password.value) && state.password.agree;
-  },
-  activePersonalInfoStep: (state) => {
-    return  state.routerStatus.personalInfo;
-  },
-  activeFundStep: (state, getters) => {
-    return getters.readyPersonalInfoStep && state.routerStatus.fund;
-  },
+  readyPasswordStep: state => Validation.password(state.password.value) && state.password.agree,
+  activePersonalInfoStep: state => state.routerStatus.personalInfo,
+  activeFundStep: (state, getters) => getters.readyPersonalInfoStep && state.routerStatus.fund,
   activePasswordStep: (state, getters) => {
     return getters.readyPersonalInfoStep
           && getters.readyFundStep
           && state.routerStatus.password;
   },
-  activeEmailStep: (state, getters) => {
-    return  getters.allReady && state.routerStatus.email;
-  },
-  getPasswordStatus: (state) => {
-    return !!state.password.value;
-  },
+  activeEmailStep: (state, getters) => getters.allReady && state.routerStatus.email,
+  getPasswordStatus: state => !!state.password.value,
   allReady: (state, getters) => {
     return  getters.readyPersonalInfoStep
           && getters.readyFundStep
@@ -135,8 +141,58 @@ const actions = {
       if (getters.allReady) {
         commit('setRouterStatus', type);
       }
-    }
-  }
+    };
+  },
+  stepOne({ commit }) {
+    return new Promise((resolve, reject) => {
+      commit('setRouterStatus', 'fund');
+      commit('setStepStatus', 'personalInfo');
+      resolve();
+    });
+  },
+  stepTwo({ commit, state }) {
+    const data = Object.assign(state.personalInfo, state.fund);
+    return new Promise((resolve, reject) => {
+      http.post(directorAuth.signUp1, data)
+        .then((response) => {
+          const { auth_token: token } = response.data;
+          commit('setToken', ['stepOne', token]);
+          resolve(response);
+        })
+        .catch((error) => {
+          reject(error);
+        });
+    });
+  },
+  stepThree({ commit, state }) {
+    const data = {
+      'password-1': state.password.value,
+      'password-2': state.password.value,
+      auth_token: state.token.stepOne,
+    };
+    return new Promise((resolve, reject) => {
+      http.post(directorAuth.signUp2, data)
+        .then((response) => {
+          resolve(response);
+        })
+        .catch((error) => {
+          reject(error);
+        });
+    });
+  },
+  resendEmail({ state }) {
+    return new Promise((resolve, reject) => {
+      http.post(directorAuth.resendEmail, state.personalInfo.email)
+        .then((response) => {
+          const { auth_token: token } = response.data;
+          commit('setToken', ['resendEmail', token]);
+          resolve(response);
+        })
+        .catch((error) => {
+          reject(error);
+        });
+    });
+  },
 };
 
 export default {

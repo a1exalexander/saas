@@ -1,5 +1,5 @@
 %search-label {
-  @include flex-row(stretch, center);
+  @include flex-row(flex-start, center);
   position: relative;
 }
 %search-input {
@@ -23,8 +23,8 @@
 }
 %search-icon {
   position: absolute;
-  width: 14px;
-  height: 14px;
-  fill: $N9;
+  width: 16px;
+  height: 16px;
+  fill: $N7;
   left: 16px;
 }

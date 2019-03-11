@@ -17,8 +17,8 @@ export default {
 .close-button {
   padding: 4px;
   &__image {
-    width: 18px;
-    height: 18px;
+    width: 16px;
+    height: 16px;
     fill: $N6;
   }
 }

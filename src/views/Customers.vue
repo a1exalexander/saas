@@ -2,8 +2,8 @@
   <div class="customers">
     <transition
       name="custom-classes-transition"
-      enter-active-class="animated dur06 fadeIn"
-      leave-active-class="animated dur04 fadeOut"
+      enter-active-class="animated dur03 fadeIn"
+      leave-active-class="animated dur03 fadeOut"
       mode="out-in">
     <add-investor-popup
       @cancel='closeAddCustomerPopup'
@@ -18,39 +18,48 @@
             <input type="text" class="customers__search-input">
           </label>
         </div>
-        <button-primary-icon @click.native='addCustomer' v-if='isInvestors'>
+        <!-- TODO: coming soon -->
+        <!-- <button-primary-icon @click.native='addCustomer' v-if='isInvestors'>
           <icon-plus class='icon-button-left icon-large'/>
           <span>Add an investor</span>
-        </button-primary-icon>
+        </button-primary-icon> -->
       </div>
       <nav class="customers__nav">
         <ul class="customers__nav-list">
           <li class="customers__nav-item">
             <router-link
-              to='/customers'
+              to='/director/customers'
               class="customers__nav-link"
               :class='{"inline-nav-link-active": routeName === "Leads"}'>Leads
             </router-link>
           </li>
           <li class="customers__nav-item">
             <router-link
-              to='/customers'
+              to='/director/customers'
               class="customers__nav-link"
               :class='{"inline-nav-link-active": routeName === "Contacts"}'>Contacts
             </router-link>
           </li>
           <li class="customers__nav-item">
             <router-link
-              to='/customers/investors'
+              to='/director/customers/investors'
               class="customers__nav-link"
-              :class='{"inline-nav-link-active": routeName === "Investors"}'>Investors
+              :class='{"inline-nav-link-active": routeName === "Investors"
+                || routeName === "Customers"}'
+              >Investors
             </router-link>
           </li>
         </ul>
       </nav>
     </header>
     <main class="customers__main">
+      <transition
+        name="custom-classes-transition"
+        enter-active-class="animated dur03 fadeIn"
+        leave-active-class="animated dur03 fadeOut"
+        mode="out-in">
       <router-view/>
+      </transition>
     </main>
   </div>
 </template>
@@ -72,6 +81,7 @@ export default {
   data() {
     return {
       addCustomerPopup: false,
+      loading: true,
     };
   },
   computed: {

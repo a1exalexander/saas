@@ -243,7 +243,6 @@ export default {
     @media screen and (min-width: $screen-tablet) {
       flex: 0 1 34%;
       min-width: 440px;
-      position: relative;
       padding: 32px 40px;
     }
   }

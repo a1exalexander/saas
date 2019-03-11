@@ -1,0 +1,162 @@
+.transaction-card {
+  padding: 16px 20px 16px 28px;
+  border-bottom: 1px solid $N10;
+  @media screen and (min-width: $screen-tablet) {
+    padding: 14px 40px;
+    border-color: $N10;
+  }
+  &__list {
+    list-style: none;
+    @include flex-row(space-between, center);
+    @media screen and (min-width: $screen-tablet) {
+      display: grid;
+      grid-template-columns: 2fr repeat(3, 1fr) 0.8fr 0.7fr;
+      grid-column-gap: 5%;
+      justify-content: space-between;	
+    }
+  }
+  &__item {
+    @include flex-row(flex-start, center);
+    &--end {
+      justify-self: end;
+    }
+  }
+  &__item-icon {
+    width: 18px;
+    height: 18px;
+    fill: $N0;
+    margin-right: 8px;
+    cursor: pointer;
+    &--small-right {
+      width: 14px;
+      height: 14px;
+      margin: 0 0 0 8px;
+    }
+  }
+  &__row {
+    @include flex-row(flex-start, center);
+    &--space-start {
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+    &--end {
+      align-items: flex-end;
+    }
+  }
+  &__text {
+    @include text($H200);
+    line-height: 1;
+    display: inline-block;
+    @media screen and (min-width: $screen-tablet) {
+      color: $N6;
+    }
+    &--name {
+      margin-bottom: 5px;
+      color: $N0;
+    }
+    &--date {
+      color: $N6;
+      font-size: $H100;
+      margin-right: 4px;
+      @media screen and (min-width: $screen-tablet) {
+        margin: 0;
+        color: $N0;
+        font-size: $H200;
+        margin-bottom: 6px;
+      }
+    }
+    &--time {
+      color: $N9;
+      font-size: $H100;
+      @media screen and (min-width: $screen-tablet) {
+        color: $N6;
+        font-size: $H200;
+      }
+    }
+    &--balance {
+      font-weight: 500;
+      font-size: $H400;
+      @media screen and (min-width: $screen-tablet) {
+        font-size: $H200;
+      }
+    }
+    &--rejected {
+      color: $Y1;
+    }
+    &--successful {
+      color: $G1;
+    }
+    &--status {
+      &::first-letter {
+        text-transform: capitalize;
+      }
+    }
+    &--white {
+      color: $N0;
+    }
+  }
+  &__label {
+    @include text($H200, 400, $N6);
+    margin-bottom: 8px;
+  }
+  &__image-wrapper {
+    @extend %image-wrapper;
+    width: 26px;
+    height: 26px;
+    margin-right: 8px;
+    @media screen and (min-width: $screen-tablet) {
+      width: 36px;
+      height: 36px;
+      margin-right: 20px;
+    }
+  }
+  &__image {
+    @extend %image;
+  }
+  &__icon-arrow-button {
+    margin-left: 10px;
+    padding: 4px;
+    @media screen and (min-width: $screen-iphone-6) {
+      margin-left: 16px;
+    }
+    @media screen and (min-width: $screen-tablet) {
+      display: none;
+    }
+  }
+  &__icon-arrow {
+    width: 28px;
+    height: 28px;
+    fill: $N0;
+  }
+  &__drop-menu {
+    padding: 20px 28px;
+    border-bottom: 1px solid $N10;
+    @include flex-row(flex-start, stretch);
+    flex-wrap: wrap;
+  }
+  &__drop-item {
+    flex: 0 0 50%;
+    margin-bottom: 18px;
+    &:last-child, &:nth-last-child(2) {
+      margin: 0;
+    }
+  }
+  &__drop-icon {
+    width: 16px;
+    height: 16px;
+    fill: $B4;
+    margin-right: 6px;
+  }
+  &__col {
+    @include flex-col(flex-start, flex-start);
+    &--space {
+      justify-content: space-between;
+    }
+    &--margin {
+      margin-right: 34px;
+    }
+    &--end {
+      align-items: flex-end;
+    }
+  }
+}

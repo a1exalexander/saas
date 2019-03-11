@@ -174,7 +174,7 @@ export default {
   left: 0;
   right: 0;
   overflow-y: auto;
-  z-index: 12;
+  z-index: 15;
   @include flex-row(stretch, stretch);
   @media screen and (min-width: $screen-tablet) {
     justify-content: center;

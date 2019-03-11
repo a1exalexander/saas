@@ -77,6 +77,15 @@
           v-html="myErrors.password">
         </p>
       </div>
+      <vue-recaptcha
+        class="login-recaptcha"
+        @click.stop
+        ref="recaptcha"
+        theme='dark'
+        :sitekey="recaptchaSiteKey"
+        @verify="onVerify"
+        @expired="onExpired">
+      </vue-recaptcha>
       <label class="auth__checkbox checkbox">
         <input
           type="checkbox"
@@ -123,6 +132,8 @@ import Validation from '@/js/validation';
 import IconEyeOff from '@/components/common/icons/IconEyeOff.vue';
 import CloseButton from '@/components/common/buttons/CloseButton.vue';
 import MessageSuccess from '@/components/common/messages/MessageSuccess.vue';
+import VueRecaptcha from 'vue-recaptcha';
+import { siteKey } from '@/js/api';
 import { mapMutations, mapState, mapActions } from 'vuex';
 
 export default {
@@ -139,6 +150,7 @@ export default {
     MessageSuccess,
     CloseButton,
     IconCheck2,
+    VueRecaptcha,
   },
   data() {
     return {
@@ -146,6 +158,8 @@ export default {
         password: '',
         email: '',
       },
+      recaptchaSiteKey: siteKey,
+      recaptchaToken: '',
       showPasswordStatus: false,
       myErrors: {
         password: '',
@@ -166,15 +180,31 @@ export default {
       toggleKeepingUser: 'login/toggleKeepingUser',
       toggleEmailConfirmedMessage: 'signup/toggleEmailConfirmedMessage',
       toggleResetMessage: 'login/toggleResetMessage',
+      AUTH_SUCCESS: 'login/AUTH_SUCCESS',
     }),
     ...mapActions('login', [
       'AUTH_REQUEST',
     ]),
+    onVerify(response) {
+      this.recaptchaToken = response;
+    },
+    onExpired() {
+      this.recaptchaToken = '';
+    },
     close() {
       this.$router.push('/auth');
     },
+    // TODO: change to API rest
     login() {
-      this.$router.push('/profile');
+      this.AUTH_REQUEST(this.form).then((response) => {
+        console.log(response);
+        this.$router.push('/director');
+      }).catch((error) => {
+        console.log(error);
+      });
+      // localStorage.setItem('user-token', 'test-token');
+      // this.AUTH_SUCCESS('test-token');
+      // this.$router.push('/director');
     },
     showPassword() {
       const element = document.getElementById('login-password');
@@ -218,7 +248,6 @@ export default {
       emailConfirmMessage: state => state.signup.emailConfirmMessage,
       resetMessage: state => state.login.resetMessage,
       authStatus: state => state.login.authStatus,
-      recaptcha: state => state.login.recaptcha,
     }),
     keepMe: {
       get() {
@@ -235,7 +264,10 @@ export default {
       return Validation.email(this.form.email);
     },
     loginDisabled() {
-      return this.checkPassword && this.checkEmail;
+      if (this.recaptcha) {
+        return this.checkPassword && this.checkEmail;
+      }
+      return this.checkPassword && this.checkEmail && this.recaptchaToken;
     },
   },
   watch: {

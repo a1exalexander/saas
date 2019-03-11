@@ -2,8 +2,8 @@
 <div class='exchanges'>
   <transition
     name="custom-classes-transition"
-    enter-active-class="animated dur06 fadeIn"
-    leave-active-class="animated dur04 fadeOut"
+    enter-active-class="animated dur03 fadeIn"
+    leave-active-class="animated dur03 fadeOut"
     mode="out-in">
   <exchanges-add-api-popup
     @close='addApiPopup.visible = false;'
@@ -34,7 +34,10 @@
     </div>
     <div class="exchanges__api-box exchanges__api-box--start">
       <exchanges-api-label
-        class='exchanges__api-label exchanges__api-label--margin'
+        :style='{ animationDuration: `0.${index + 3}s`  }'
+        class='exchanges__api-label
+          exchanges__api-label--margin
+          animated fadeIn'
         v-for='(item, index) in api'
         :key='index'
         :api-name='item.name'

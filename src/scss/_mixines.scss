@@ -12,10 +12,47 @@
     align-items: $align;
 }
 
+@mixin text($size, $weight: 400, $color: white) {
+  font: {
+    size: $size;
+    weight: $weight;
+  }
+  color: $color;
+}
 
-
-
-
-
-
-
+@mixin button-loading($color) {
+  color: transparent;
+  position: relative;
+  cursor: pointer;
+  p, span, svg {
+    opacity: 0;
+    visibility: hidden;
+    fill: transparent;
+  }
+  &:hover {
+    color: transparent;
+    p, span, svg {
+      opacity: 0;
+      visibility: hidden;
+      fill: transparent;
+    }
+  } 
+  &:after {
+    align-self: center;
+    content: ''; 
+    margin: auto;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    display: block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid $color;
+    border-radius: 290486px;
+    border-right-color: transparent;
+    animation: button-loading 0.6s linear infinite;
+    pointer-events: none;
+  }
+}

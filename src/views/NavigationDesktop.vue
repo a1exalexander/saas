@@ -19,19 +19,18 @@
     <ul class="navigation__list">
       <li class="navigation__item" :class='{"navigation__item--active": routeCustomers }'>
         <icon-investor class='navigation__item-icon'/>
-        <router-link to='/customers' class="navigation__item-text">Customers</router-link>
+        <router-link to='/director/customers' class="navigation__item-text">Customers</router-link>
       </li>
       <li class="navigation__item" :class='{"navigation__item--active": routeExchanges }'>
         <icon-exchanges class='navigation__item-icon'/>
-        <router-link to='/exchanges' class="navigation__item-text">Exchanges</router-link>
+        <router-link to='/director/exchanges' class="navigation__item-text">Exchanges</router-link>
       </li>
       <li class="navigation__item" :class='{"navigation__item--active": routeTransactions }'>
         <icon-billing class='navigation__item-icon'/>
-        <p class="navigation__item-text">Transactions</p>
-      </li>
-      <li class="navigation__item" :class='{"navigation__item--active": routeLegal }'>
-        <icon-legal class='navigation__item-icon'/>
-        <p class="navigation__item-text">Legal</p>
+        <router-link
+          to='/director/transactions'
+          class="navigation__item-text">Transactions
+        </router-link>
       </li>
     </ul>
   </div>
@@ -57,8 +56,8 @@
         </a>
         <transition
           name="custom-classes-transition"
-          enter-active-class="animated dur06 pullUp"
-          leave-active-class="animated dur03 fadeOut"
+          enter-active-class="animated dur03 fadeIn"
+          leave-active-class="animated dur02 fadeOut"
           mode="out-in">
         <popover-navigation
           class='navigation__popover'
@@ -73,7 +72,6 @@
 <script>
 import IconInvestor from '@/components/common/icons/IconInvestor.vue';
 import IconBilling from '@/components/common/icons/IconBilling.vue';
-import IconLegal from '@/components/common/icons/IconLegal.vue';
 import IconExchanges from '@/components/common/icons/IconExchanges.vue';
 import PopoverNavigation from '@/components/common/PopoverNavigation.vue';
 import InviteButton from '@/components/inviteInvestor/InviteButton.vue';
@@ -85,7 +83,6 @@ export default {
   components: {
     IconInvestor,
     IconBilling,
-    IconLegal,
     IconExchanges,
     PopoverNavigation,
     InviteButton,
@@ -133,11 +130,6 @@ export default {
     routeTransactions() {
       const { path } = this.$route;
       const re = /(transactions)/g;
-      return re.test(path);
-    },
-    routeLegal() {
-      const { path } = this.$route;
-      const re = /(legal)/g;
       return re.test(path);
     },
   },
@@ -196,6 +188,7 @@ export default {
   &__profile-button {
     color: $N9;
     padding-bottom: 4px;
+    cursor: pointer;
   }
   &__profile-name {
     font-size: $H050;

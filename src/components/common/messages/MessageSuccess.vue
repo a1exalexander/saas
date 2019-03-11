@@ -19,6 +19,7 @@ export default {
 };
 </script>
 <style lang="scss">
+@import '~@/scss/components/flag-message';
 .message-success {
   background-color: $G2;
   @extend %flag-message;

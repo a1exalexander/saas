@@ -86,6 +86,15 @@
         <p class="password-conditions__text">{{ $t('auth.errors.password.number') }}</p>
       </li>
     </ul>
+    <vue-recaptcha
+      class="password-step__recaptcha"
+      @click.stop
+      ref="recaptcha"
+      theme='dark'
+      :sitekey="recaptchaSiteKey"
+      @verify="onVerify"
+      @expired="onExpired">
+    </vue-recaptcha>
     <label class="password-step__checkbox checkbox">
       <input
         type="checkbox"
@@ -107,6 +116,7 @@
     </label>
     <button-primary-icon
       class='fund-step__button animated dur05 fadeIn'
+      :class='{"button-loading": loading}'
       @click.prevent.native='nextStep'
       :disabled='!passwordReady'>{{ $t('auth.buttons.continue') }}
       <icon-long-arrow-right class='icon-button-right'/>
@@ -121,9 +131,16 @@ import IconCheck2 from '@/components/common/icons/IconCheck2.vue';
 import IconCheck from '@/components/common/icons/IconCheck.vue';
 import IconLongArrowRight from '@/components/common/icons/IconLongArrowRight.vue';
 import ButtonPrimaryIcon from '@/components/common/buttons/ButtonPrimaryIcon.vue';
-import { mapGetters, mapState, mapMutations } from 'vuex';
 import Validation from '@/js/validation';
+import VueRecaptcha from 'vue-recaptcha';
 import IconEyeOff from '@/components/common/icons/IconEyeOff.vue';
+import { siteKey } from '@/js/api';
+import {
+  mapGetters,
+  mapState,
+  mapMutations,
+  mapActions,
+} from 'vuex';
 
 export default {
   name: 'PasswordStep',
@@ -135,6 +152,7 @@ export default {
     ButtonPrimaryIcon,
     IconLongArrowRight,
     IconEyeOff,
+    VueRecaptcha,
   },
   data() {
     return {
@@ -147,6 +165,9 @@ export default {
         password: '',
       },
       showPasswordStatus: false,
+      recaptchaSiteKey: siteKey,
+      recaptchaToken: '',
+      loading: false,
     };
   },
   methods: {
@@ -156,9 +177,27 @@ export default {
       'setStepStatus',
       'setRouterStatus',
     ]),
+    ...mapActions('signup', [
+      'stepThree',
+    ]),
+    onVerify(response) {
+      this.recaptchaToken = response;
+    },
+    onExpired() {
+      this.recaptchaToken = '';
+    },
     nextStep() {
-      this.setRouterStatus('email');
-      this.setStepStatus('password');
+      this.loading = true;
+      this.stepThree()
+        .then((resp) => {
+          this.setRouterStatus('email');
+          this.setStepStatus('password');
+          this.loading = false;
+          console.log(resp);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     },
     showPassword() {
       const element = document.getElementById('signup-pasword');
@@ -222,7 +261,9 @@ export default {
       return Validation.eightChars(this.password);
     },
     passwordReady() {
-      return Validation.password(this.password) && this.getAgree;
+      return Validation.password(this.password)
+        && this.getAgree
+        && this.recaptchaToken;
     },
     anyReady() {
       return this.lowerCase

@@ -16,9 +16,9 @@
 %flag-message-wrapper {
   pointer-events: none;
   position: fixed;
-  top: 0;
-  right: 0;
-  left: 0;
+  top: -1px;
+  right: -1px;
+  left: -1px;
   z-index: 100;
   @include flex-row(stretch, stretch);
   @media screen and (min-width: $screen-tablet) {

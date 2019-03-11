@@ -62,11 +62,12 @@ export default {
   svg {
     transition: fill ease-in-out 0.2s;
     fill: $N0;
-    width: 10px;
-    height: 10px;
     @media screen and (min-width: $screen-tablet) {
       align-self: flex-end;
     }
+  }
+  span, p {
+    padding-bottom: 1px;
   }
 }
 </style>

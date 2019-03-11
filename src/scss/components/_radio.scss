@@ -38,7 +38,7 @@
   border: 1px solid $N7;
   @media screen and (min-width:$screen-tablet) {
     font-weight: 400;
-    background-color: $N9;
+    background-color: $N10;
     min-height: 32px;
     border: none;
     color: $radio-text-color;
@@ -67,10 +67,10 @@
 
 %radio-button-checked {
   background-color: $N14;
-  color: $B4;
+  color: $B3;
   border-color: $B3;
   @media screen and (min-width:$screen-tablet) {
-    background-color: $N10;
+    background-color: $B4;
     color: $N0;
   }
 }

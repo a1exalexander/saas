@@ -9,6 +9,9 @@ import profile from './modules/profile/profile';
 import investorProfile from './modules/profile/investor-profile';
 import exchanges from './modules/exchanges/exchanges';
 import investors from './modules/customers/investors';
+import payouts from './modules/transactions/payouts';
+import deposits from './modules/transactions/deposits';
+import billing from './modules/transactions/billing';
 
 Vue.use(Vuex);
 
@@ -22,6 +25,9 @@ const store = new Vuex.Store({
     investorLogin,
     investorProfile,
     investors,
+    payouts,
+    deposits,
+    billing,
   },
 });
 

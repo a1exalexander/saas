@@ -1,54 +1,13 @@
 .button-loading {
-  color: transparent;
-  position: relative;
-  p {
-    opacity: 0;
-    visibility: hidden;
-  }
-  span {
-    opacity: 0;
-    visibility: hidden;
-  }
-  svg {
-    fill: transparent;
-  }
-	&:after {
-    align-self: center;
-    content: ''; 
-    margin: auto;
-    position: absolute;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    right: 0;
-		display: block;
-		width: 16px;
-		height: 16px;
-		border: 2px solid $N0;
-		border-radius: 290486px;
-		border-right-color: transparent;
-		animation: button-loading 0.6s linear infinite;
-		pointer-events: none;
-	}
+  @include button-loading($N0);
 }
 
 .button-loading-secondary {
-  color: transparent;
-  svg {
-    fill: transparent;
-  }
-	&:after {
-		content: '';
-		display: block;
-		position: absolute;
-		width: 16px;
-		height: 16px;
-		border: 2px solid $N14;
-		border-radius: 290486px;
-		border-right-color: transparent;
-		animation: button-loading 0.6s linear infinite;
-		pointer-events: none;
-	}
+  @include button-loading($N14);
+}
+
+.button-loading-subtle {
+  @include button-loading($B4);
 }
 
 @keyframes button-loading {

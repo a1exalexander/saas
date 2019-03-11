@@ -1,9 +1,6 @@
 .popover-revert {
-  display: none;
-  @media screen and (min-width: $screen-tablet) {
-    will-change: display, transform;
-    display: block;
-  }
+  will-change: display, transform;
+  display: block;
   &__inner {
     will-change: transform;
     position: relative;

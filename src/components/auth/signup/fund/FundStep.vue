@@ -77,6 +77,7 @@
     v-if='countryStatus'/>
   <button-primary-icon
     class='fund-step__button animated dur05 fadeIn'
+    :class='{"button-loading": loading}'
     v-if='countryStatus'
     :disabled='!operationStatus'
     @click.stop.prevent.native='nextStep'>{{ $t('auth.buttons.continue') }}
@@ -90,7 +91,7 @@ import IconCheck from '@/components/common/icons/IconCheck.vue';
 import IconLongArrowRight from '@/components/common/icons/IconLongArrowRight.vue';
 import DropMenuCountry from '@/components/auth/signup/fund/DropMenuCountry.vue';
 import DropMenuOperations from '@/components/auth/signup/fund/DropMenuOperations.vue';
-import { mapState, mapMutations } from 'vuex';
+import { mapState, mapMutations, mapActions } from 'vuex';
 
 export default {
   name: 'FundStep',
@@ -106,20 +107,22 @@ export default {
       myErrors: {
         name: '',
       },
+      loading: false,
     };
   },
   computed: {
     ...mapState('signup', {
-      getName: state => state.fund.name,
+      getName: state => state.fund.business_name,
       getCountry: state => state.fund.country,
-      getOperation: state => state.fund.operation,
+      getOperation: state => state.fund.business_type,
+      token: state => state.token,
     }),
     name: {
       get() {
         return this.getName;
       },
       set(value) {
-        this.setFund(['name', value]);
+        this.setFund(['business_name', value]);
       },
     },
     country: {
@@ -135,7 +138,7 @@ export default {
         return this.getOperation;
       },
       set(value) {
-        this.setFund(['operation', value]);
+        this.setFund(['business_type', value]);
       },
     },
     nameStatus() {
@@ -156,10 +159,23 @@ export default {
       'closeDropMenu',
       'setRouterStatus',
     ]),
+    ...mapActions('signup', [
+      'stepTwo',
+    ]),
     nextStep() {
+      this.loading = true;
       this.closeDropMenus();
-      this.setRouterStatus('password');
-      this.setStepStatus('fund');
+      this.stepTwo()
+        .then((resp) => {
+          this.setRouterStatus('password');
+          this.setStepStatus('fund');
+          this.loading = false;
+          console.log(resp);
+        })
+        .catch((error) => {
+          this.loading = false;
+          console.log(error);
+        });
     },
     nameError() {
       this.myErrors.name = '';

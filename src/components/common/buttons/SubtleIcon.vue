@@ -1,8 +1,8 @@
 <template>
-  <a class='subtle-icon'>
+  <button class='subtle-icon'>
     <div class="subtle-icon__border"></div>
     <slot/>
-  </a>
+  </button>
 </template>
 <script>
 export default {
@@ -46,6 +46,10 @@ export default {
   }
   &:active &__border {
     opacity: 0;
+  }
+  span, p {
+    position: relative;
+    bottom: 1px;
   }
   svg {
     transition: fill ease-in-out 0.2s;

@@ -1,15 +1,15 @@
 <template>
-<nav class='nav'>
+<nav class='nav' @click='closePopover'>
   <transition
     name="custom-classes-transition"
-    enter-active-class="animated dur03 fadeIn"
-    leave-active-class="animated dur03 fadeOut"
+    enter-active-class="animated dur02 fadeIn"
+    leave-active-class="animated dur02 fadeOut"
     mode="out-in">
   <invite-popup v-if='invitePopup' @cancel='closeInvitePopup'/>
   </transition>
   <transition
     name="custom-classes-transition"
-    enter-active-class="animated dur03 slideInLeft"
+    enter-active-class="animated dur02 slideInLeft"
     leave-active-class="animated dur02 slideOutLeft"
     mode="out-in">
   <section class="nav__menu" v-if='visible'>
@@ -24,7 +24,7 @@
       </section>
       <ul @click='hideNavDelay' class="nav__list">
         <router-link
-          to='/customers'
+          to='/director/customers'
           tag='li'
           class="nav__item"
           :class='{"nav__item--active": routeCustomers }'>
@@ -32,7 +32,7 @@
           <p class="nav__item-text">Customers</p>
         </router-link>
         <router-link
-          to='/exchanges'
+          to='/director/exchanges'
           tag='li'
           class="nav__item"
           :class='{"nav__item--active": routeExchanges }'>
@@ -40,20 +40,12 @@
           <p class="nav__item-text">Exchanges</p>
         </router-link>
         <router-link
-          to='/transactions'
+          to='/director/transactions'
           tag='li'
           class="nav__item"
           :class='{"nav__item--active": routeTransactions }'>
           <icon-billing class='nav__item-icon'/>
           <p class="nav__item-text">Transactions</p>
-        </router-link>
-        <router-link
-          to='/legal'
-          tag='li'
-          class="nav__item"
-          :class='{"nav__item--active": routeLegal }'>
-          <icon-legal class='nav__item-icon'/>
-          <p class="nav__item-text">Legal</p>
         </router-link>
       </ul>
     </div>
@@ -68,13 +60,32 @@
           </div>
           <p class="nav__profile-name">{{ getName }}</p>
         </div>
-        <button class='nav__profile-button' v-html='"\&\#8226\&\#8226\&\#8226"'></button>
+        <div
+          class="nav__popover-wrapper">
+          <a
+            href='#'
+            class='nav__profile-button'
+            v-html='"\&\#8226\&\#8226\&\#8226"'
+            @click.stop.prevent="popover = !popover">
+          </a>
+          <transition
+            name="custom-classes-transition"
+            enter-active-class="animated dur03 fadeIn"
+            leave-active-class="animated dur02 fadeOut"
+            mode="out-in">
+          <popover-navigation
+            class='nav__popover'
+            @closeNav='hideNavDelay'
+            @click.native.stop.prevent
+            v-show="popover"/>
+          </transition>
+        </div>
       </section>
     </div>
   </section>
   </transition>
   <div
-    class="nav__bg-inner animated slow fadeIn"
+    class="nav__bg-inner animated dur06 fadeIn"
     @click='hideNav'
     v-if='visible'>
     <close-button
@@ -87,8 +98,8 @@
 import CloseButton from '@/components/common/buttons/CloseButton.vue';
 import IconInvestor from '@/components/common/icons/IconInvestor.vue';
 import IconBilling from '@/components/common/icons/IconBilling.vue';
-import IconLegal from '@/components/common/icons/IconLegal.vue';
 import IconExchanges from '@/components/common/icons/IconExchanges.vue';
+import PopoverNavigation from '@/components/common/PopoverNavigation.vue';
 import InviteButton from '@/components/inviteInvestor/InviteButton.vue';
 import InvitePopup from '@/components/inviteInvestor/InvitePopup.vue';
 import { mapState } from 'vuex';
@@ -99,10 +110,10 @@ export default {
     CloseButton,
     IconInvestor,
     IconBilling,
-    IconLegal,
     IconExchanges,
     InviteButton,
     InvitePopup,
+    PopoverNavigation,
   },
   data() {
     return {
@@ -113,6 +124,7 @@ export default {
         logo: require('@/assets/images/iin-logo.png'),
       },
       visible: false,
+      popover: false,
       invitePopup: false,
     };
   },
@@ -120,6 +132,9 @@ export default {
     hideNav() {
       this.visible = false;
       this.$emit('hideNav');
+    },
+    closePopover() {
+      this.popover = false;
     },
     hideNavDelay() {
       setTimeout(() => {
@@ -154,11 +169,6 @@ export default {
       const re = /(transactions)/g;
       return re.test(path);
     },
-    routeLegal() {
-      const { path } = this.$route;
-      const re = /(legal)/g;
-      return re.test(path);
-    },
   },
   mounted() {
     this.visible = true;
@@ -180,6 +190,12 @@ export default {
     display: none;
   }
   &__bg-inner {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 12;
     flex: 1 1;
     background-color: $NAV-BG-WRAPPER-COLOR;
     @include flex-col(flex-start, flex-end);
@@ -198,7 +214,9 @@ export default {
     flex: 0 0 280px;
     height: 100%;
     background-color: $N13;
-    padding: 32px 28px 68px;
+    position: relative;
+    z-index: 13;
+    padding: 32px 28px;
     @include flex-col(space-between, stretch);
   }
   &__header {
@@ -275,6 +293,16 @@ export default {
   &__invite-button {
     width: 100%;
     margin-bottom: 20px;
+  }
+  &__popover-wrapper {
+    position: relative;
+    padding: 5px 0;
+  }
+  &__popover {
+    position: absolute;
+    bottom: 12px;
+    right: -14px;
+    z-index: 22;
   }
 }
 </style>

@@ -12,6 +12,12 @@
   <div class="investors__head">
     <div class="investors__title-wrapper">
       <h2 class="investors__title">Investors</h2>
+      <subtle-icon
+        v-if='isInvestors'
+        class="investors__export-button">
+        <icon-base class='icon-button-left'/>
+        <span>Export</span>
+      </subtle-icon>
     </div>
     <ul class="investors__head-list">
       <li class="investors__head-item">Full name</li>
@@ -36,10 +42,11 @@
       >Investors will appear here after making investments in your fund.
       You can also invite an investor
     </p>
-    <button-primary-icon @click.native='addInvestor'>
-      <icon-plus class='icon-button-left icon-large'/>
+    <!-- TODO: coming soon -->
+    <!-- <button-primary-icon @click.native='addInvestor'>
+      <icon-plus class='icon-button-left investors__icon-button'/>
       <span>Add an investor</span>
-    </button-primary-icon>
+    </button-primary-icon> -->
   </div>
   <div class="investors__field" v-else>
     <div class="investors__subfield-mobile">
@@ -76,6 +83,7 @@
 <script>
 import IconInvestor from '@/components/common/icons/IconInvestor.vue';
 import IconPlus from '@/components/common/icons/IconPlus.vue';
+import IconBase from '@/components/common/icons/IconBase.vue';
 import SubtleIcon from '@/components/common/buttons/SubtleIcon.vue';
 import ButtonPrimaryIcon from '@/components/common/buttons/ButtonPrimaryIcon.vue';
 import AddInvestorPopup from '@/components/customers/AddInvestorPopup.vue';
@@ -91,6 +99,7 @@ export default {
     AddInvestorPopup,
     SubtleIcon,
     Investor,
+    IconBase,
   },
   data() {
     return {
@@ -105,7 +114,7 @@ export default {
       this.addInvestorPopup = false;
     },
     openProfile(id) {
-      this.$router.push({ path: `/customers/profile/${id}` });
+      this.$router.push({ path: `/director/customers/profile/${id}` });
     },
   },
   computed: {
@@ -142,6 +151,7 @@ export default {
     }
   }
   &__main-icon {
+    flex-shrink: 0;
     width: 64px;
     height: 64px;
     fill: $N8;
@@ -203,6 +213,7 @@ export default {
     }
   }
   &__title-wrapper {
+    @include flex-row(flex-start, baseline);
     margin-bottom: 22px;
   }
   &__subfield-mobile {
@@ -216,6 +227,21 @@ export default {
       display: block;
       flex: 1 1;
       overflow-y: auto;
+    }
+  }
+  &__icon-button {
+    width: 15px;
+    height: 15px;
+  }
+  &__export-button {
+    display: none;
+    @media screen and (min-width: $screen-tablet) {
+      margin-left: 16px;
+      display: block;
+      svg {
+        width: 14px;
+        height: 14px;
+      }
     }
   }
 }
