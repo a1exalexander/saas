@@ -37,8 +37,8 @@
   <div class="security__popups">
     <transition
       name="custom-classes-transition"
-      enter-active-class="animated dur06 fadeIn"
-      leave-active-class="animated dur04 fadeOut"
+      enter-active-class="animated dur03 fadeIn"
+      leave-active-class="animated dur03 fadeOut"
       mode="out-in">
     <password-form @code='togglePopup("code")' v-if='popup.changeForm' key='form'/>
     <change-password-code :verifycode='1234' v-else @cancel='cancel' key='code'/>

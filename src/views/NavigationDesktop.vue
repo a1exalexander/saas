@@ -11,7 +11,10 @@
     <section class="navigation__header">
       <div class="navigation__header-inner">
         <div class="navigation__logo-wrapper">
-          <img class="navigation__logo" :src="getlogo" alt="logo">
+          <img
+            class="navigation__logo" 
+            :src="getlogo"
+            alt="logo">
         </div>
         <p class="navigation__title">Initial Index Fund</p>
       </div>
@@ -41,7 +44,14 @@
     <section class="navigation__profile">
       <div class="navigation__profile-card">
         <div class="navigation__ava-wrapper">
-          <img class="navigation__ava" :src="getAva" alt="avatar">
+          <img
+            class="navigation__ava"
+            :src="getAva"
+            alt="avatar"
+            v-if='getAva'>
+          <icon-ava
+            class="default-ava"
+            v-else/>
         </div>
         <p class="navigation__profile-name">{{ getName }}</p>
       </div>
@@ -76,6 +86,7 @@ import IconExchanges from '@/components/common/icons/IconExchanges.vue';
 import PopoverNavigation from '@/components/common/PopoverNavigation.vue';
 import InviteButton from '@/components/inviteInvestor/InviteButton.vue';
 import InvitePopup from '@/components/inviteInvestor/InvitePopup.vue';
+import IconAva from '@/components/common/icons/IconAva.vue';
 import { mapState } from 'vuex';
 
 export default {
@@ -87,15 +98,10 @@ export default {
     PopoverNavigation,
     InviteButton,
     InvitePopup,
+    IconAva,
   },
   data() {
     return {
-      profile: {
-        // eslint-disable-next-line
-        avatar: require('@/assets/images/ava.jpg'),
-        // eslint-disable-next-line
-        logo: require('@/assets/images/iin-logo.png'),
-      },
       popover: false,
       invitePopup: false,
     };

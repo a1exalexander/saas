@@ -57,29 +57,11 @@
   <drop-menu-country
     class='fund-step__drop-menu fund-step__drop-menu--country animated dur05 fadeIn'
     v-if='nameStatus'/>
-  <div
-    class="fund-step__image-wrapper
-          fund-step__image-wrapper--operation
-          animated dur05 fadeIn"
-    :class='{"fund-step__image-wrapper--active": countryStatus, "is-flex": nameStatus}'
-    @click='closeDropMenus'>
-    <span class="fund-step__step-number" v-if='!operationStatus'>3</span>
-    <icon-check class="fund-step__image" v-else/>
-  </div>
-  <label
-    for="fund-step-operation"
-    class="fund-step__label fund-step__label--operation animated dur05 fadeIn"
-    :class='{"is-block": countryStatus}'
-    @click='closeDropMenus'>{{ $t('auth.labels.operations') }}
-  </label>
-  <drop-menu-operations
-    class='fund-step__drop-menu fund-step__drop-menu--operation animated dur05 fadeIn'
-    v-if='countryStatus'/>
   <button-primary-icon
     class='fund-step__button animated dur05 fadeIn'
     :class='{"button-loading": loading}'
     v-if='countryStatus'
-    :disabled='!operationStatus'
+    :disabled='!countryStatus'
     @click.stop.prevent.native='nextStep'>{{ $t('auth.buttons.continue') }}
     <icon-long-arrow-right class='icon-button-right'/>
   </button-primary-icon>
@@ -90,7 +72,6 @@ import ButtonPrimaryIcon from '@/components/common/buttons/ButtonPrimaryIcon.vue
 import IconCheck from '@/components/common/icons/IconCheck.vue';
 import IconLongArrowRight from '@/components/common/icons/IconLongArrowRight.vue';
 import DropMenuCountry from '@/components/auth/signup/fund/DropMenuCountry.vue';
-import DropMenuOperations from '@/components/auth/signup/fund/DropMenuOperations.vue';
 import { mapState, mapMutations, mapActions } from 'vuex';
 
 export default {
@@ -99,7 +80,6 @@ export default {
     ButtonPrimaryIcon,
     IconCheck,
     DropMenuCountry,
-    DropMenuOperations,
     IconLongArrowRight,
   },
   data() {
@@ -147,9 +127,6 @@ export default {
     countryStatus() {
       return !!this.getName && !!this.getCountry;
     },
-    operationStatus() {
-      return !!this.getName && !!this.getCountry && !!this.getOperation;
-    },
   },
   methods: {
     ...mapMutations('signup', [
@@ -194,13 +171,8 @@ export default {
       this.showOperationsDrop = false;
       this.showCountryDrop = !this.showCountryDrop;
     },
-    toggleOperationsDrop() {
-      this.showCountryDrop = false;
-      this.showOperationsDrop = !this.showOperationsDrop;
-    },
     closeAll() {
       this.showCountryDrop = false;
-      this.showOperationsDrop = false;
     },
   },
   watch: {
@@ -215,7 +187,7 @@ export default {
   width: 100%;
   display: grid;
   grid-template-columns: 24px auto;
-  grid-template-rows: repeat(7, auto);
+  grid-template-rows: repeat(5, auto);
   grid-gap: 16px;
   justify-content: stretch;
   justify-items: start;
@@ -225,8 +197,6 @@ export default {
     'line-name input-name'
     'image-country label-country'
     'line-country input-country'
-    'image-operation label-operation'
-    'line-operation input-operation'
     '. button';
   @media screen and (min-width: $screen-tablet) {
     width: 300px;
@@ -244,9 +214,6 @@ export default {
     }
     &--country {
       grid-area: image-country;
-    }
-    &--operation {
-      grid-area: image-operation;
     }
   }
   &__image {
@@ -281,9 +248,6 @@ export default {
     &--country {
       grid-area: label-country;
     }
-    &--operation {
-      grid-area: label-operation;
-    }
   }
   &__input {
     @extend %input;
@@ -309,20 +273,6 @@ export default {
       grid-area: input-country;
       z-index: 2;
     }
-    &--operation {
-      grid-area: input-operation;
-      z-index: 1;
-    }
-  }
-  &__drop-arrow {
-    @extend %drop-menu-arrow;
-  }
-  &__drop-list {
-    @extend %drop-menu-list;
-    height: 200px;
-  }
-  &__drop-item {
-    @extend %drop-menu-item;
   }
 }
 </style>

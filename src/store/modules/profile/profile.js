@@ -4,17 +4,17 @@ import moment from 'moment-timezone';
 
 const state = {
   profile: {
-    name: 'Petro Proshenko',
+    name: 'Sherlock Holmes',
     userId: 12345678,
     gender: 'male',
-    ava: require('@/assets/images/ava.jpg'),
+    ava: '',
     fundLogo: require('@/assets/images/iin-logo.png'),
     country: 'Ukraine',
-    city: '',
-    street: '',
-    postCode: '',
-    house: '',
-    apt: '',
+    city: 'London',
+    street: 'Baker Street',
+    postCode: '44444',
+    house: '221B',
+    apt: '1',
   },
   status: true,
   lastChangePassword: '1 oct. 2018',
@@ -46,7 +46,6 @@ const getters = {
   },
 };
 
-// TODO: Promis functions must be replaced by Http requests
 const actions = {
   
 };

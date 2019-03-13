@@ -2,9 +2,10 @@
 // Becouse 'no-shadow' and 'no-param-reassing' errors of state aren't errors
 import moment from 'moment-timezone';
 import router from '@/router';
+import investors from '@/helpers/api/investors';
 
 const state = {
-  investors: [],
+  investors: investors,
   investorId: '',
 };
 const newInvestorData = {
@@ -25,8 +26,10 @@ const newInvestorData = {
   manager: 'Pavlo Zibrov',
   tokens: 2300,
   lastSeen: '',
+  ava: '',
   registrationDate: '',
 }
+
 const mutations = {
   setValue(state, [type, value]) {
     const index = state.investors.findIndex((item) => {

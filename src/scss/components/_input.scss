@@ -48,6 +48,15 @@
   }
 }
 
+.input-success {
+  border-bottom: 2px solid $G1;
+  @media screen and (min-width: $screen-tablet) {
+    &:not(:focus):hover {
+      border-bottom: 2px solid $G1;
+    }
+  }
+}
+
 %input-icon {
   position: absolute;
   right: 12px;

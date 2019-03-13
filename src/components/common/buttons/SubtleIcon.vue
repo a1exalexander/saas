@@ -14,7 +14,7 @@ export default {
   background-color: transparent;
   @include flex-row(flex-start, center);
   color: $B2;
-  font-size: $H400;
+  font-size: $H500;
   font-weight: 500;
   line-height: 1;
   transition: color ease-in-out 0.2s;
@@ -54,6 +54,8 @@ export default {
   svg {
     transition: fill ease-in-out 0.2s;
     fill: $B2;
+    width: 16px;
+    height: 16px;
   }
   &:disabled {
     color: $N9;

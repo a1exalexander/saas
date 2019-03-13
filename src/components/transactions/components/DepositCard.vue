@@ -5,7 +5,14 @@
         <li class="transaction-card__item">
           <div class="transaction-card__image-wrapper">
             <!-- TODO: change to image URL by API -->
-            <img class="transaction-card__image" src="@/assets/images/ava.jpg" alt="photo">
+            <img
+              class="transaction-card__image"
+              :src="deposit.ava"
+              alt="photo"
+              v-if='deposit.ava'>
+            <icon-ava
+              class="default-ava"
+              v-else/>
           </div>
           <div class="transaction-card__col">
             <p class="transaction-card__text transaction-card__text--name">{{ deposit.name }}</p>
@@ -111,6 +118,7 @@
 import IconArrowDown from '@/components/common/icons/IconArrowDown.vue';
 import IconWallet from '@/components/common/icons/IconWallet.vue';
 import IconInfo from '@/components/common/icons/IconInfo.vue';
+import IconAva from '@/components/common/icons/IconAva.vue';
 
 export default {
   name: 'TransactionCard',
@@ -123,6 +131,7 @@ export default {
     IconArrowDown,
     IconWallet,
     IconInfo,
+    IconAva,
   },
   data() {
     return {

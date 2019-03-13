@@ -1,7 +1,7 @@
 /* eslint-disable */
 // Becouse 'no-shadow' and 'no-param-reassing' errors of state aren't errors
 import http from 'axios';
-import { directorAuth } from '@/js/api';
+import { directorAuth } from '@/api/api';
 
 const state = {
   token: localStorage.getItem('user-token') || '',

@@ -68,7 +68,7 @@
     },
     "text": {
       "sent code": "A letter with a confirmation code has been sent to the address",
-      "send send": "We will send a verification code to the adress",
+      "send code": "We will send a verification code to the adress",
       "restore": "Enter your email address to restore account",
       "not email": "Didn't get an email?",
       "or": "or",

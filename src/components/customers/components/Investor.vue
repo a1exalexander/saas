@@ -1,64 +1,71 @@
 <template>
 <div
-  class="investor"
-  :class='{"investor--open": dropMenu}'>
-  <div class="investor__card">
-    <ul class="investor__list">
-      <li class="investor__item investor__item--name">
-        <div class="investor__image-wrapper">
+  class="investor-card"
+  :class='{"investor-card--open": dropMenu}'>
+  <div class="investor-card__card">
+    <ul class="investor-card__list">
+      <li class="investor-card__item investor-card__item--name">
+        <div class="investor-card__image-wrapper">
           <!-- TODO: change to image URL by API -->
-          <img class="investor__image" src="@/assets/images/ava.jpg" alt="">
+          <img
+            class="investor-card__image"
+            :src="investor.ava"
+            alt=""
+            v-if='investor.ava'>
+          <icon-ava
+            class="default-ava"
+            v-else/>
         </div>
-        <div class="investor__name-wrapper">
-          <p class="investor__text investor__text--name">{{ investor.name }}</p>
-          <div class="investor__status">
+        <div class="investor-card__name-wrapper">
+          <p class="investor-card__text investor-card__text--name">{{ investor.name }}</p>
+          <div class="investor-card__status">
             <p
-              class="investor__status-name"
+              class="investor-card__status-name"
               >{{ investor.status?'Online':'Offline' }}
             </p>
             <span
-              class="investor__status-dot"
+              class="investor-card__status-dot"
               :class='{"status-offline": !investor.status}'>
             </span>
           </div>
         </div>
       </li>
-      <li class="investor__item">
+      <li class="investor-card__item">
         <a
           :href="`mailto:${investor.email}`"
-          class="investor__text investor__text--email">{{ investor.email }}</a>
+          class="investor-card__text investor-card__text--email">{{ investor.email }}</a>
       </li>
-      <li class="investor__item investor__item--phone investors__head-item--end">
+      <li class="investor-card__item investor-card__item--phone investors-card__head-item--end">
         <a
           :href="`mailto:${investor.phone}`"
-          class="investor__text">{{ investor.phone }}</a>
+          class="investor-card__text">{{ investor.phone }}</a>
       </li>
-      <li class="investor__item">
-        <div class="investor__image-wrapper investor__image-wrapper--small">
+      <li class="investor-card__item">
+        <div class="investor-card__image-wrapper investor-card__image-wrapper--small">
           <!-- TODO: change to image URL by API -->
-          <img class="investor__image" src="@/assets/images/ava.jpg" alt="">
+          <img class="investor-card__image" src="@/assets/images/ava.jpg" alt="">
         </div>
-        <p class="investor__text">{{ investor.manager }}</p>
+        <p class="investor-card__text">{{ investor.manager }}</p>
       </li>
-      <li class="investor__item investor__item--balance investors__head-item--end">
-        <p class="investor__text">$ {{ investor.balance | numeral('0,0') }}</p>
+      <li class="investor-card__item investor-card__item--balance investors-card__head-item--end">
+        <p class="investor-card__text">$ {{ investor.balance | numeral('0,0') }}</p>
         <button
-          class="investor__icon-arrow-button"
+          class="investor-card__icon-arrow-button"
           @click.stop.prevent='dropMenu = !dropMenu'>
         <icon-arrow-down
-          class='investor__icon-arrow'
+          class='investor-card__icon-arrow'
           :class='{"rotate-180": dropMenu}'/>
         </button>
       </li>
-      <li class="investor__item investor__item--tokens investors__head-item--end">
-        <p class="investor__text">{{ investor.tokens }}</p>
+      <li class="investor-card__item investor-card__item--tokens investors-card__head-item--end">
+        <p class="investor-card__text">{{ investor.tokens }}</p>
       </li>
-      <li class="investor__item">
-        <span class="investor__request-label">Dividend withdrawal</span>
+      <li class="investor-card__item">
+        <span class="investor-card__request-label">Dividend withdrawal</span>
       </li>
-      <li class="investor__item investor__item--dots">
-        <a href='#' @click.prevent='openProfile(investor.id)' class="investor__button">
-          <icon-dots class='investor__icon-dots'/>
+      <li class="investor-card__item investor-card__item--dots">
+        <a href='#' @click.prevent='openProfile(investor.id)' class="investor-card__button">
+          <icon-dots class='investor-card__icon-dots'/>
         </a>
       </li>
     </ul>
@@ -68,18 +75,18 @@
     enter-active-class="animated dur04 fadeIn"
     leave-active-class="animated dur03 fadeOut"
     mode="out-in">
-  <div class="investor__drop-menu" v-if='dropMenu'>
-    <div class="investor__drop-item">
-      <p class="investor__drop-label">User ID</p>
-      <p class="investor__drop-text">{{ investor.id }}</p>
+  <div class="investor-card__drop-menu" v-if='dropMenu'>
+    <div class="investor-card__drop-item">
+      <p class="investor-card__drop-label">User ID</p>
+      <p class="investor-card__drop-text">{{ investor.id }}</p>
     </div>
-    <div class="investor__drop-item">
-      <p class="investor__drop-label">Email</p>
-      <p class="investor__drop-text">{{ investor.email }}</p>
+    <div class="investor-card__drop-item">
+      <p class="investor-card__drop-label">Email</p>
+      <p class="investor-card__drop-text">{{ investor.email }}</p>
     </div>
-    <div class="investor__drop-item">
-      <p class="investor__drop-label">Phone</p>
-      <p class="investor__drop-text">{{ investor.phone }}</p>
+    <div class="investor-card__drop-item">
+      <p class="investor-card__drop-label">Phone</p>
+      <p class="investor-card__drop-text">{{ investor.phone }}</p>
     </div>
   </div>
   </transition>
@@ -88,6 +95,7 @@
 <script>
 import IconDots from '@/components/common/icons/IconDots.vue';
 import IconArrowDown from '@/components/common/icons/IconArrowDown.vue';
+import IconAva from '@/components/common/icons/IconAva.vue';
 
 export default {
   name: 'Customer',
@@ -99,6 +107,7 @@ export default {
   components: {
     IconArrowDown,
     IconDots,
+    IconAva,
   },
   data() {
     return {
@@ -113,7 +122,7 @@ export default {
 };
 </script>
 <style lang="scss">
-.investor {
+.investor-card {
   transition-property: height, max-height, flex;
   transition-duration: 0.2s;
   transition-timing-function: linear;

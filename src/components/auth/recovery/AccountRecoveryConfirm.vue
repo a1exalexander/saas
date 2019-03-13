@@ -10,10 +10,11 @@
         <input
           type="password"
           class="account-recovery-confirm__input"
-          v-model='code'>
+          v-model.trim='code'>
       </label>
       <button-primary
         @click.prevent.native='confirmCode'
+        :class='{"button-loading": loading}'
         :disabled='!code'
         class='account-recovery-confirm__button'>{{ $t('auth.buttons.send') }}
       </button-primary>
@@ -23,6 +24,8 @@
 </template>
 <script>
 import ButtonPrimary from '@/components/common/buttons/ButtonPrimary.vue';
+import { directorAuth } from '@/api/api';
+import http from 'axios';
 
 export default {
   name: 'AccountRecoveryConfirm',
@@ -35,6 +38,7 @@ export default {
   data() {
     return {
       code: '',
+      loading: '',
     };
   },
   components: {
@@ -42,7 +46,18 @@ export default {
   },
   methods: {
     confirmCode() {
-      this.$emit('confirmCode');
+      this.loading = true;
+      http.get(directorAuth.recoveryVerify, this.code)
+        .then((response) => {
+          console.log(response);
+          this.loading = false;
+          this.$emit('confirmCode', response.data.user_token);
+        }).catch((error) => {
+          this.loading = false;
+          console.log(error);
+          // TODO: change to error
+          this.$emit('confirmCode');
+        });
     },
   },
 };

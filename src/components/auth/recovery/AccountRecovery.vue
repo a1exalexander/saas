@@ -45,6 +45,7 @@
     <account-recovery-password
       class='account-recovery__field'
       :email='data.email'
+      :token='data.token'
       v-else/>
     </transition>
   </article>
@@ -83,6 +84,7 @@ export default {
       data: {
         email: '',
         hiddenEmail: '',
+        token: '',
       },
     };
   },
@@ -107,7 +109,8 @@ export default {
     sendEmail() {
       this.nextStep('confirm');
     },
-    confirmCode() {
+    confirmCode(token) {
+      this.data.token = token;
       this.nextStep('password');
     },
     back() {

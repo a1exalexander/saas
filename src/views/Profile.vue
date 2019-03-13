@@ -3,7 +3,14 @@
 <header class="profile__card" v-show='!visible.password'>
   <div class="profile__card-wrapper">
     <div class="profile__image-wrapper">
-      <img :src="getAva" alt="avatar" class="profile__image">
+      <img
+        :src="getAva"
+        alt="avatar"
+        class="profile__image"
+        v-if='getAva'>
+      <icon-ava
+        class="default-ava"
+        v-else/>
     </div>
     <div class="profile__personal-info">
       <p class="profile__name">{{ getName }}</p>
@@ -56,6 +63,7 @@
 <script>
 import PersonalInfo from '@/components/profile/PersonalInfo.vue';
 import Security from '@/components/profile/Security.vue';
+import IconAva from '@/components/common/icons/IconAva.vue';
 import { mapState } from 'vuex';
 
 export default {
@@ -63,6 +71,7 @@ export default {
   components: {
     PersonalInfo,
     Security,
+    IconAva,
   },
   data() {
     return {

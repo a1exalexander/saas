@@ -30,13 +30,13 @@
         type="password"
         autocomplete="off"
         class="recovery-password__input"
-        :class='{"input-error": error}'
-        @blur='errorPassword'
+        :class='{"input-error": myErrors.password}'
+        @blur='errorPassword("password")'
         v-model.trim="password">
       <p
         class="input-text-error animated dur04 bounceIn"
-        v-show='error'
-        v-html="error">
+        v-show='myErrors.password'
+        v-html="myErrors.password">
       </p>
     </div>
     <ul class="recovery-password__conditions password-conditions">
@@ -73,29 +73,32 @@
         <input
           id='recovery-account-password-confirm'
           type="password"
+          @blur="errorPassword('passwordConfirm')"
           class="recovery-password__input"
           v-model='passwordConfirm'>
-      </div>
-    </label>
-    <label class="recovery-password__checkbox checkbox">
-      <input
-        type="checkbox"
-        class="checkbox__input"
-        v-model='recaptcha'>
-      <div class="checkbox__inner">
-        <div class="checkbox__cell">
-          <icon-check class='checkbox__image'/>
-        </div>
-        <p class="checkbox__text">{{ $t('auth.labels.dont ask') }}
+        <p
+          class="input-text-error animated dur04 bounceIn"
+          v-show='myErrors.passwordConfirm'
+          v-html="myErrors.passwordConfirm">
         </p>
       </div>
     </label>
+    <vue-recaptcha
+      class="recovery-password__recaptcha"
+      @click.stop
+      ref="recaptcha"
+      theme='dark'
+      :sitekey="recaptchaSiteKey"
+      @verify="onVerify"
+      @expired="onExpired">
+    </vue-recaptcha>
     <div class="recovery-password__buttons-wrapper">
       <button-secondary
         @click.prevent.native='cancel'
         class="recovery-password__button">{{ $t('auth.buttons.cancel') }}</button-secondary>
       <button-primary
-        @click.prevent.native='reset'
+        @click.prevent.native='send'
+        :class='{"button-loading": loading}'
         :disabled='!allReady'>{{ $t('auth.buttons.send') }}</button-primary>
     </div>
   </form>
@@ -111,14 +114,19 @@ import IconView from '@/components/common/icons/IconView.vue';
 import IconCheck from '@/components/common/icons/IconCheck.vue';
 import PasswordError from '@/components/common/PasswordError.vue';
 import Validation from '@/js/validation';
+import VueRecaptcha from 'vue-recaptcha';
+import { siteKey, directorAuth } from '@/api/api';
 import { mapState, mapMutations } from 'vuex';
+import http from 'axios';
 
 export default {
   name: 'AccountRecoveryPassword',
   props: {
     email: {
       type: String,
-      default: '',
+    },
+    token: {
+      type: String,
     },
   },
   components: {
@@ -130,14 +138,24 @@ export default {
     ButtonSecondary,
     ButtonPrimary,
     PasswordError,
+    VueRecaptcha,
   },
   data() {
     return {
       password: '',
       passwordConfirm: '',
-      errorText: this.$t('auth.errors.password.enter'),
-      error: '',
+      errorText: [
+        this.$t('auth.errors.password.enter'),
+        this.$t('auth.errors.password.full'),
+      ],
+      myErrors: {
+        password: '',
+        passwordConfirm: '',
+      },
       showPasswordStatus: false,
+      recaptchaSiteKey: siteKey,
+      recaptchaToken: '',
+      loading: '',
     };
   },
   methods: {
@@ -145,6 +163,12 @@ export default {
       'toggleRecaptcha',
       'toggleResetMessage',
     ]),
+    onVerify(response) {
+      this.recaptchaToken = response;
+    },
+    onExpired() {
+      this.recaptchaToken = '';
+    },
     showPassword() {
       const element = document.getElementById('account-recovery-pasword');
       if (element.type === 'password') {
@@ -155,36 +179,44 @@ export default {
         this.showPasswordStatus = false;
       }
     },
-    errorPassword() {
-      this.error = '';
+    errorPassword(type) {
+      const password = this[type];
+      const [errorEnter, errorFull] = this.errorText;
+      this.myErrors[type] = '';
       setTimeout(() => {
-        if (!this.password) {
-          this.error = this.errorText;
+        if (!password) {
+          this.myErrors[type] = errorEnter;
+        } else if (!Validation.password(password)) {
+          this.myErrors[type] = errorFull;
         } else {
-          this.error = '';
+          this.myErrors[type] = '';
         }
       }, 15);
     },
     cancel() {
       this.$router.push('/auth');
     },
-    reset() {
-      this.toggleResetMessage(true);
-      this.$router.push('/auth');
+    send() {
+      this.loading = true;
+      const data = {
+        'password-1': this.password,
+        'password-2': this.passwordConfirm,
+        auth_token: this.token,
+      };
+      http.post(directorAuth.changePassword, data)
+        .then((response) => {
+          console.log(response);
+          this.loading = false;
+          this.toggleResetMessage(true);
+          this.$router.push('/auth');
+        }).catch((error) => {
+          this.loading = false;
+          console.log(error);
+          this.$router.push('/auth');
+        });
     },
   },
   computed: {
-    ...mapState('login', {
-      getRecaptcha: state => state.offRecaptcha,
-    }),
-    recaptcha: {
-      get() {
-        return this.getRecaptcha;
-      },
-      set(value) {
-        this.toggleRecaptcha(value);
-      },
-    },
     passwordReady() {
       return Validation.password(this.password);
     },
@@ -211,15 +243,18 @@ export default {
         || this.eightChars;
     },
     passwordConfirmReady() {
-      return this.password && this.password === this.passwordConfirm;
+      return Validation.password(this.passwordConfirm);
     },
     allReady() {
-      return this.passwordReady && this.passwordConfirmReady;
+      return this.passwordReady && this.passwordConfirmReady && this.recaptchaToken;
     },
   },
   watch: {
     password(value) {
-      if (value) this.error = '';
+      if (value) this.myErrors.password = '';
+    },
+    passwordConfirm(value) {
+      if (value) this.myErrors.passwordConfirm = '';
     },
   },
 };
@@ -266,8 +301,11 @@ export default {
   &__conditions {
     margin-bottom: 24px;
   }
-  &__checkbox {
+  &__recaptcha {
     margin-bottom: 32px;
+    div {
+      width: 268px !important;
+    }
   }
   &__buttons-wrapper {
     @include flex-row(flex-end, center);

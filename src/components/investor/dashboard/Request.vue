@@ -109,7 +109,7 @@
                   class="request-payout__input"
                   v-model.number.trim='amountBTC'>
               </label>
-            </div>  
+            </div>
           </div>
         </div>
         <p
@@ -182,17 +182,17 @@ export default {
     onCustom() {
       Object.keys(this.tumbler).forEach((key) => {
         this.tumbler[key] = key === 'custom';
-      })
+      });
     },
     onMax() {
       Object.keys(this.tumbler).forEach((key) => {
         this.tumbler[key] = key === 'max';
-      })
+      });
     },
     onProfit() {
       Object.keys(this.tumbler).forEach((key) => {
         this.tumbler[key] = key === 'profit';
-      })
+      });
     },
   },
   computed: {

@@ -134,7 +134,7 @@ import ButtonPrimaryIcon from '@/components/common/buttons/ButtonPrimaryIcon.vue
 import Validation from '@/js/validation';
 import VueRecaptcha from 'vue-recaptcha';
 import IconEyeOff from '@/components/common/icons/IconEyeOff.vue';
-import { siteKey } from '@/js/api';
+import { siteKey } from '@/api/api';
 import {
   mapGetters,
   mapState,

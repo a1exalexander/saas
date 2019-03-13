@@ -59,7 +59,7 @@
           <span>Add an investor</span>
         </subtle-icon>
       </div>
-      <transition-group name="list-complete" tag="div">
+      <transition-group name="list-complete">
       <investor
         v-for='investor in investors'
         :key='investor.id'
@@ -69,7 +69,7 @@
       </transition-group>
     </div>
     <div class="investors__subfield-tablet">
-      <transition-group name="list-complete" tag="div">
+      <transition-group name="list-complete">
       <investor
         v-for='investor in investors'
         :key='investor.id'
