@@ -34,13 +34,14 @@
       v-if='step.email'/>
     <account-recovery-send-email
       class='account-recovery__field'
-      :email='data.hiddenEmail'
+      :hidden='data.hiddenEmail'
+      :email='data.email'
       @sendEmail='sendEmail'
       v-else-if="step.enteredEmail"/>
     <account-recovery-confirm
       class='account-recovery__field'
       :email='data.hiddenEmail'
-      @confirmCode='confirmCode'
+      @token='confirmToken'
       v-else-if="step.confirm"/>
     <account-recovery-password
       class='account-recovery__field'
@@ -109,7 +110,7 @@ export default {
     sendEmail() {
       this.nextStep('confirm');
     },
-    confirmCode(token) {
+    confirmToken(token) {
       this.data.token = token;
       this.nextStep('password');
     },

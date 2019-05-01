@@ -1,12 +1,30 @@
 <template>
-  <button class='button-primary-icon'>
+  <button
+    class='button-primary-icon'
+    :disabled='disabled'
+    :class='{"button-loading": loading}'>
     <div class="button-primary-icon__border"></div>
     <slot/>
+    <span v-if='label'>{{ label }}</span>
   </button>
 </template>
 <script>
 export default {
   name: 'ButtonPrimary',
+  props: {
+    disabled: {
+      type: Boolean,
+      default: false,
+    },
+    label: {
+      type: String,
+      default: '',
+    },
+    loading: {
+      type: Boolean,
+      default: false,
+    },
+  },
 };
 </script>
 <style lang="scss">

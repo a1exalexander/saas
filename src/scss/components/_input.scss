@@ -1,33 +1,4 @@
-%input {
-  background-color: transparent;
-  border: 1px solid $N9;
-  border-radius: 2px;
-  box-shadow: none;
-  padding: 0 12px;
-  font-size: $H550;
-  font-weight: 400;
-  color: $N2;
-  min-height: 48px;
-  transition-property: border-color, border-width;
-  transition-duration: 0.2s;
-  transition-timing-function: ease-in-out;
-  @include flex-row(flex-start, center);
-  @media screen and (min-width: $screen-tablet) {
-    border-color: $N8;
-    min-height: 36px;
-    font-size: $H300;
-    &:hover {
-      border: 1px solid $N7;
-    }
-  }
-  &:disabled {
-    border: 1px solid $N9;
-    background-color: $N11;
-  }
-  &:focus {
-    border: 1px solid $B5;
-  }
-}
+
 
 .input-text-error {
   padding-top: 3px;
@@ -57,30 +28,3 @@
   }
 }
 
-%input-icon {
-  position: absolute;
-  right: 12px;
-  top: 16px;
-  width: 14px;
-  height: 14px;
-  @media screen and (min-width: $screen-tablet) {
-    top: 10px;
-  }
-}
-
-%input-label-text {
-  display: inline-block;
-  font-size: $H500;
-  line-height: 1.2;
-  margin-bottom: 8px;
-  @media screen and (min-width: $screen-tablet) {
-    font-size: $H200;
-  }
-}
-
-%clear-input {
-  background-color: transparent;
-  border: none;
-  outline: none;
-  width: 100%;
-}

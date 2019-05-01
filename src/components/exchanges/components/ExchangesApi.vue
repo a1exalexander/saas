@@ -2,13 +2,13 @@
 <div
   class="exchanges-api"
   :class='{"exchanges-api--open": dropMenu}'>
+
   <transition
     name="custom-classes-transition"
     enter-active-class="animated dur04 fadeIn"
     leave-active-class="animated dur03 fadeOut"
     mode="out-in">
   <exchanges-api-remove-popup
-    @removeMyApi='removeMyApi'
     :api='api'
     @cancel='removePopup = false'
     v-if='removePopup'/>
@@ -16,12 +16,16 @@
   <ul class="exchanges-api__list">
     <li class="exchanges-api__item">
       <div class="exchanges-api__logo-wrapper">
-        <img class="exchanges-api__logo" :src='apiImage' alt="logo">
+        <img
+          class="exchanges-api__logo"
+          :src='apiImage'
+          alt="logo"
+          v-if='apiImage'>
       </div>
       <p class="exchanges-api__name">{{ api.name }}</p>
     </li>
-    <li class="exchanges-api__item">
-      <p class="exchanges-api__text">{{ api.apiKey }}</p>
+    <li class="exchanges-api__item exchanges-api__item--api-key">
+      <p class="exchanges-api__text">{{ api.api_key }}</p>
     </li>
     <li class="exchanges-api__item exchanges-api__item--secret">
       <p class="exchanges-api__text" v-html='formatedSecretKey'></p>
@@ -33,8 +37,36 @@
         >{{ api.status?'Success':'failed' }}
       </span>
     </li>
+
     <li class="exchanges-api__item exchanges-api__item--right">
-      <p class="exchanges-api__text">$ {{ api.balance | numeral('0,0') }}</p>
+      <p class="exchanges-api__text">$ {{ (+api.balance_usd).toFixed(2) }}</p>
+      <div class="exchanges-api__info-wrapper">
+        <icon-info
+          @mouseover.native="popover.balance = true"
+          class='exchanges-api__icon-info tablet-block'/>
+        <transition
+          name="custom-classes-transition"
+          enter-active-class="animated dur02 fadeIn"
+          leave-active-class="animated dur02 fadeOut"
+          mode="out-in">
+        <div
+          @mouseover.native="popover.balance = true"
+          @mouseleave="popover.balance = false"
+          class="exchanges-api__popover popover"
+          v-if='popover.balance'>
+          <ul class="popover__inner">
+            <li class="popover__item">
+              <span class="popover__text">Ardor</span>
+              <span class="popover__text popover__text--bold">{{ api.balance_ardor }} $</span>
+            </li>
+            <li class="popover__item">
+              <span class="popover__text">BTC</span>
+              <span class="popover__text popover__text--bold">{{ api.balance_btc }} $</span>
+            </li>
+          </ul>
+        </div>
+        </transition>
+      </div>
     </li>
     <li class="exchanges-api__item
       exchanges-api__item--relative
@@ -70,7 +102,7 @@
       <p
         class="exchanges-api__balance"
         :class='{"exchanges-api__balance--success": api.status}'
-        >$ {{ api.balance | numeral('0,0') }}
+        >$ {{ (+api.balance_usd).toFixed(2) }}
       </p>
       <button
         class="exchanges-api__icon-arrow-button"
@@ -83,12 +115,12 @@
   </div>
   <transition
     name="custom-classes-transition"
-    enter-active-class="animated dur04 fadeIn"
+    enter-active-class="animated dur02 fadeIn"
     leave-active-class="animated dur02 fadeOut"
     mode="out-in">
   <div class="exchanges-api__drop" v-show='dropMenu'>
     <p class="exchanges-api__drop-text">API Key</p>
-    <p class="exchanges-api__drop-value">{{ api.apiKey }}</p>
+    <p class="exchanges-api__drop-value">{{ api.api_key }}</p>
     <div class="exchanges-api__row">
       <subtle-icon class='exchanges-api__button'>
         <icon-link class='icon-large icon-button-left'/>
@@ -110,7 +142,8 @@ import ExchangesApiRemovePopup from '@/components/exchanges/ExchangesApiRemovePo
 import IconTrash from '@/components/common/icons/IconTrash.vue';
 import IconLink from '@/components/common/icons/IconLink.vue';
 import SubtleIcon from '@/components/common/buttons/SubtleIcon.vue';
-import { mapGetters, mapMutations } from 'vuex';
+import IconInfo from '@/components/common/icons/IconInfo.vue';
+import { mapGetters, mapActions } from 'vuex';
 
 export default {
   name: 'ExchangesApi',
@@ -125,11 +158,15 @@ export default {
     IconLink,
     IconTrash,
     ExchangesApiRemovePopup,
+    IconInfo,
   },
   data() {
     return {
       dropMenu: false,
       removePopup: false,
+      popover: {
+        balance: false,
+      }
     };
   },
   computed: {
@@ -137,7 +174,7 @@ export default {
       'getImages',
     ]),
     apiImage() {
-      if (this.api.name) {
+      if (this.api.name in this.getImages) {
         const image = this.getImages[this.api.name];
         // eslint-disable-next-line
         return require(`@/assets/images/${image}`);
@@ -145,45 +182,41 @@ export default {
       return '';
     },
     formatedSecretKey() {
-      const charSum = this.api.secretKey.length;
-      return new Array(charSum).join('&#8226');
+      return new Array(12).join('&#8226');
     },
   },
   methods: {
-    ...mapMutations('exchanges', [
-      'removeApi',
+    ...mapActions('exchanges', [
+      'deleteExchange',
     ]),
     openRemovePopup() {
       this.removePopup = true;
     },
-    removeMyApi() {
-      this.dropMenu = false;
-      setTimeout(() => {
-        this.removePopup = false;
-        setTimeout(() => {
-          this.removeApi(this.api.apiKey);
-        }, 500);
-      }, 500);
+    removeExchange() {
+      const data = {
+        id: this.api.id,
+      };
+      this.deleteExchange(data)
+        .then((resp) => {
+          console.log(resp);
+        })
+        .catch((error) => {
+          console.log(error);
+        })
     },
   },
 };
 </script>
 <style lang="scss">
+@import '~@/scss/components/popover';
 .exchanges-api {
   background-color: transparent;
   border-radius: 2px;
   padding: 0;
-  transition-property: height, max-height, flex;
+  transition-property: height, flex;
   transition-duration: 0.4s;
   position: relative;
   transition-timing-function: linear;
-  max-height: 80px;
-  &--open {
-    max-height: 300px;
-  }
-  @media screen and (min-width: $screen-tablet) {
-    max-height: auto;
-  }
   &__icon-wrapper {
     border-radius: 50%;
     background-color: $B4;
@@ -263,11 +296,11 @@ export default {
   &__drop-text {
     font-size: $H200;
     color: $N6;
-    margin-bottom: 6px;
+    margin-bottom: 8px;
   }
   &__drop-value {
     font-size: $H300;
-    color: $N8;
+    color: $N2;
     margin-bottom: 24px;
   }
   &__row {
@@ -294,7 +327,7 @@ export default {
   &__item {
     @include flex-row(flex-start, center);
     &--right {
-      justify-self: end;
+      justify-self: flex-end;
     }
     &--secret {
       display: none;
@@ -304,6 +337,10 @@ export default {
     }
     &--relative {
       position: relative;
+    }
+    &--api-key {
+      overflow: hidden;
+      overflow-x: auto;
     }
   }
   &__status {
@@ -372,6 +409,22 @@ export default {
   &__inline-icon {
     margin-right: 6px;
     @extend %inline-menu-icon;
+  }
+  &__icon-info {
+    width: 16px;
+    height: 16px;
+    fill: $B2;
+    margin-top: 2px;
+  }
+  &__info-wrapper {
+    margin-left: 16px;
+    position: relative;
+  }
+  &__popover {
+    top: 1px;
+    left: -18px;
+    min-width: 120px;
+    z-index: 5;
   }
 }
 </style>

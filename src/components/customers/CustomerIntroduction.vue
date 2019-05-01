@@ -9,8 +9,8 @@
             type="text"
             class="customer-introduction__input"
             :class='{"input-error": myErrors.name}'
-            v-model.trim='newData.name'
-            @blur='errorName(newData.name)'>
+            v-model.trim='newData.name_first'
+            @blur='errorName(newData.name_first)'>
           <p
             class="input-text-error animated dur04 bounceIn"
             v-html='myErrors.name'
@@ -97,21 +97,21 @@
         <h2 class="customer-introduction__title customer-introduction__title--meta">Metadata</h2>
         <div class="customer-introduction__meta-item customer-introduction__meta-item--seen">
           <p class="customer-introduction__meta-label">Last seen</p>
-          <p type="text" class="customer-introduction__meta-text">{{ getInvestorById.lastSeen }}</p>
+          <p type="text" class="customer-introduction__meta-text">{{ client.last_seen }}</p>
         </div>
         <div class="customer-introduction__meta-item customer-introduction__meta-item--date">
           <p class="customer-introduction__meta-label">Registration date</p>
           <p
             type="text"
             class="customer-introduction__meta-text"
-            >{{ getInvestorById.registrationDate }}
+            >{{ client.created }}
           </p>
         </div>
         <div class="customer-introduction__meta-item customer-introduction__meta-item--status">
           <p class="customer-introduction__meta-label">Client status</p>
           <drop-status
             class="customer-introduction__drop"
-            :getStatus='newData.status'
+            :getStatus='newData.role'
             @select='selectStatus'/>
         </div>
       </div>
@@ -141,27 +141,27 @@
           <card-item
             label-name='Full name'
             input-type='name'
-            :get-value='getInvestorById.name'/>
+            :get-value='client.name_first'/>
           <card-item
             label-name='Age'
             input-type='age'
-            :get-value='getInvestorById.age'/>
+            :get-value='client.age'/>
           <card-item
             label-name='Living city'
             input-type='city'
-            :get-value='getInvestorById.city'/>
+            :get-value='client.city'/>
           <card-item
             label-name='Company'
             input-type='company'
-            :get-value='getInvestorById.company'/>
+            :get-value='client.company'/>
           <card-item
             label-name='Working sphere'
             input-type='sphere'
-            :get-value='getInvestorById.sphere'/>
+            :get-value='client.sphere'/>
           <card-item
             label-name='Current position'
             input-type='position'
-            :get-value='getInvestorById.position'/>
+            :get-value='client.position'/>
         </div>
       </div>
       <div class="customer-introduction__card">
@@ -175,20 +175,18 @@
           <card-item
             class='disable'
             label-name='Last seen'
-            input-type='age'
-            :get-value='getInvestorById.lastSeen'/>
+            input-type='date'
+            :get-value='client.last_seen'/>
           <div class="customer-introduction__meta-item">
             <p class="customer-introduction__meta-label">Client status</p>
             <drop-status
-              class="customer-introduction__drop"
-              :getStatus='getInvestorById.status'
-              @select='selectStatusGlobal'/>
+              class="customer-introduction__drop"/>
           </div>
           <card-item
             class='disable'
-            label-name='Living city'
-            input-type='city'
-            :get-value='getInvestorById.registrationDate'/>
+            label-name='Registration date'
+            input-type='date'
+            :get-value='client.created'/>
         </div>
       </div>
       <div class="customer-introduction__card">
@@ -202,11 +200,11 @@
           <card-item
             label-name='Phone'
             input-type='phone'
-            :get-value='getInvestorById.phone'/>
+            :get-value='client.phone'/>
           <card-item
             label-name='Email'
             input-type='email'
-            :get-value='getInvestorById.email'/>
+            :get-value='client.email'/>
         </div>
       </div>
     </div>
@@ -241,7 +239,7 @@ export default {
     return {
       loading: false,
       newData: {
-        name: '',
+        name_first: '',
         email: '',
         age: '',
         phone: '',
@@ -249,7 +247,7 @@ export default {
         company: '',
         sphere: '',
         position: '',
-        status: '',
+        role: '',
       },
       errorsText: {
         name: [
@@ -288,6 +286,7 @@ export default {
     ]),
     ...mapActions('investors', [
       'checkInvestorById',
+      'getClientById',
     ]),
     save() {
       this.loading = true;
@@ -302,11 +301,11 @@ export default {
     cancel() {
       this.$router.go(-1);
     },
-    selectStatus(status) {
-      this.newData.status = status;
+    selectStatus(role) {
+      this.newData.role = role;
     },
     selectStatusGlobal(value) {
-      this.setValue(['status', value]);
+      this.setValue(['role', value]);
     },
     errorEmail(email) {
       this.myErrors.email = '';
@@ -334,11 +333,11 @@ export default {
     },
     getData() {
       Object.keys(this.newData).forEach((key) => {
-        this.newData[key] = this.getInvestorById[key];
+        this.newData[key] = this.client[key];
       });
     },
     redirectRoute() {
-      this.$router.push('/director/customers');
+      this.$router.push('/director/clients');
     },
     compareData(newData, oldData) {
       if (newData && oldData) {
@@ -356,13 +355,17 @@ export default {
       }
       return false;
     },
+    fetchData() {
+      this.getClientById(this.$route.params.id)
+        .then((resp) => {
+          console.log(resp);
+          this.getData();
+        })
+    },
   },
   computed: {
-    ...mapGetters('investors', [
-      'getInvestorById',
-    ]),
     ...mapState('investors', [
-      'investors',
+      'client',
     ]),
     readyName() {
       return validation.name(this.newData.name);
@@ -386,7 +389,7 @@ export default {
       return this.readyName && this.readyEmail && this.readyPhone && this.readyAge;
     },
     comparedData() {
-      const flag = this.compareData(this.newData, this.getInvestorById);
+      const flag = this.compareData(this.newData, this.client);
       return flag && this.allReady;
     },
   },
@@ -410,13 +413,8 @@ export default {
       if (value) this.myErrors.age = '';
     },
   },
-  beforeMount() {
-    const timer = setInterval(() => {
-      if (this.getInvestorById && this.newData) {
-        this.getData();
-        clearInterval(timer);
-      }
-    }, 10);
+  created() {
+    this.fetchData();
     this.formError = new InputError(this.errorsText);
   },
 };

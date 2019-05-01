@@ -20,6 +20,27 @@
   color: $color;
 }
 
+@mixin isTablet($display) {
+  display: none;
+  @media screen and (min-width: $screen-tablet) {
+    display: $display;
+  }
+}
+
+@mixin isDesktop($display) {
+  display: none;
+  @media screen and (min-width: $screen-desktop) {
+    display: $display;
+  }
+}
+
+@mixin isMobile($display) {
+  display: $display;
+  @media screen and (min-width: $screen-tablet) {
+    display: none;
+  }
+}
+
 @mixin button-loading($color) {
   color: transparent;
   position: relative;

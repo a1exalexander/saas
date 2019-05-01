@@ -1,0 +1,58 @@
+.director-tab {
+  background-color: $N13;
+  @include flex-col(stretch, stretch);
+  @media screen and (min-width: $screen-tablet) {
+    height: 100vh;
+    padding: 0;
+    flex: 1 1;
+  }
+  &__header {
+    background-color: $B12;
+    top: 56px;
+    position: sticky;
+    z-index: 3;
+    padding: 32px 28px 0;
+    @media screen and (min-width: $screen-tablet) {
+      top: 0;
+      padding: 27px 40px 0;
+    }
+  }
+  &__title {
+    display: none;
+    @media screen and (min-width: $screen-tablet) {
+      display: block;
+      font-size: $H900;
+      font-weight: 600;
+      margin-bottom: 32px;
+    }
+  }
+  &__nav-list {
+    @extend %inline-nav-list;
+  }
+  &__nav-item {
+    @extend %inline-nav-item;
+  }
+  &__nav-link {
+    @extend %inline-nav-link;
+    &--active {
+      border-color: $N2;
+      color: $N2;
+    }
+  }
+  &__main {
+    flex: 1 1;
+    @include flex-col(stretch, stretch);
+    overflow: auto;
+    @media screen and (min-width: $screen-tablet) {
+      overflow: hidden;
+    }
+  }
+  &__view {
+    flex: 1 1;
+    @include flex-col(stretch, stretch);
+    overflow: auto;
+    @media screen and (min-width: $screen-tablet) {
+      padding: 24px 40px;
+    }
+  }
+}

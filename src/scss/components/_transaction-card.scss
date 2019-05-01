@@ -10,9 +10,13 @@
     @include flex-row(space-between, center);
     @media screen and (min-width: $screen-tablet) {
       display: grid;
-      grid-template-columns: 2fr repeat(3, 1fr) 0.8fr 0.7fr;
-      grid-column-gap: 5%;
+      grid-template-columns: 3fr 1fr 1fr 3fr 1.5fr 1fr;
+      grid-column-gap: 20px;
       justify-content: space-between;	
+    }
+    @media screen and (min-width: $screen-desktop) {
+      grid-template-columns: 3fr 1fr 1fr 3fr 1.5fr 1fr;
+      grid-column-gap: 4%;
     }
   }
   &__item {
@@ -87,12 +91,29 @@
       color: $G1;
     }
     &--status {
+      font-weight: 400;
+      color: $N0;
       &::first-letter {
         text-transform: capitalize;
       }
     }
     &--white {
       color: $N0;
+    }
+    &--wallet {
+      color: $N0;
+      max-width: 80px;
+      overflow-y: hidden;
+      overflow-x: auto;
+      @media screen and (min-width: $screen-tablet-large) {
+        max-width: 100px;
+      }
+      @media screen and (min-width: $screen-desktop) {
+        max-width: 160px;
+      }
+      @media screen and (min-width: $screen-desktop-large) {
+        max-width: 200px;
+      }
     }
   }
   &__label {

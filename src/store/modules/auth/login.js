@@ -1,16 +1,10 @@
-/* eslint-disable */
-// Becouse 'no-shadow' and 'no-param-reassing' errors of state aren't errors
-import http from 'axios';
-import { directorAuth } from '@/api/api';
-
 const state = {
-  token: localStorage.getItem('user-token') || '',
+  token: 'demo-token',
   authStatus: '',
   userStatus: '',
   keepUser: false,
   offRecaptcha: false,
   resetMessage: false,
-  recaptcha: localStorage.getItem('recaptcha') || '',
 };
 
 const mutations = {
@@ -59,31 +53,10 @@ const getters = {
 
 const actions = {
   AUTH_REQUEST: ({ commit, dispatch, state }, user) => {
-    return new Promise((resolve, reject) => {
-      commit('AUTH_REQUEST');
-      http.post(directorAuth.signin, user)
-      .then((response) => {
-        const { auth_token: token } = response.data;
-        if (state.keepUser) {
-          localStorage.setItem('user-token', token);
-        }
-        http.defaults.headers.common['Authorization'] = token;
-        commit('AUTH_SUCCESS', token);
-        dispatch('USER_REQUEST');
-        resolve(response);
-      })
-      .catch((error) => {
-        commit('AUTH_ERROR');
-        reject(error);
-      })
-    });
+    
   },
   AUTH_LOGOUT: ({ commit }) => {
-    return new Promise(resolve => {
-      commit('AUTH_LOGOUT');
-      localStorage.removeItem('user-token');
-      resolve();
-    });
+    
   },
   USER_REQUEST: ({ commit }) => {
     commit('USER_REQUEST');

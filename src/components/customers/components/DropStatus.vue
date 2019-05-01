@@ -38,15 +38,11 @@
 </template>
 <script>
 import IconTriangle from '@/components/common/icons/IconTriangle.vue';
+import { setInterval } from 'timers';
+import { mapMutations } from 'vuex';
 
 export default {
   name: 'DropMenuCountry',
-  props: {
-    getStatus: {
-      type: String,
-      default: '',
-    },
-  },
   components: {
     IconTriangle,
   },
@@ -55,6 +51,7 @@ export default {
       rotateImage: false,
       dropMenu: false,
       statuses: [
+        'client',
         'investor',
         'lead',
         'contact',
@@ -62,17 +59,20 @@ export default {
     };
   },
   methods: {
+    ...mapMutations('investors', [
+      'setClientValue',
+    ]),
     select(value) {
-      this.$emit('select', value);
+      this.setClientValue(['role', value]);
     },
   },
   computed: {
     status: {
       get() {
-        return this.getStatus;
+        return this.$store.state.investors.client.role;
       },
       set(value) {
-        this.$emit('select', value);
+        this.setClientValue(['role', value]);
       },
     },
   },
@@ -93,6 +93,9 @@ export default {
     font-size: $H100;
     font-weight: 600;
     color: $N0;
+    &:hover {
+      border: none;
+    }
   }
   &__placeholder {
     padding-bottom: 2px;

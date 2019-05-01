@@ -1,0 +1,28 @@
+.buttons-wrapper {
+  flex: 1 1;
+  @include flex-col(flex-end, stretch);
+  @media screen and (min-width: $screen-tablet) {
+    flex-direction: row;
+    align-items: center;
+  }
+  &__button {
+    &--save {
+      margin-bottom: 20px;
+      @media screen and (min-width: $screen-tablet) {
+        margin: 0;
+      }
+    }
+    &--cancel-desktop {
+      display: none;
+      @media screen and (min-width: $screen-tablet) {
+        display: flex;
+        margin: 0 24px 0 0;
+      }
+    }
+    &--cancel {
+      @media screen and (min-width: $screen-tablet) {
+        display: none;
+      }
+    }
+  }
+}

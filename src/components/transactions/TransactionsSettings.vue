@@ -1,5 +1,5 @@
 <template>
-<div class="transactions-setting">
+<div class="transactions-setting" @click='closePopups'>
   <transition
     name="custom-classes-transition"
     enter-active-class="animated dur02 fadeIn"
@@ -23,8 +23,8 @@
         @click.native="popover = true"/>
       <transition
         name="custom-classes-transition"
-        enter-active-class="animated dur03 fadeIn"
-        leave-active-class="animated dur03 fadeOut"
+        enter-active-class="animated dur02 fadeIn"
+        leave-active-class="animated dur02 fadeOut"
         mode="out-in">
       <div class="transactions-setting__popover-wrapper" v-show='popover'>
         <div
@@ -45,6 +45,7 @@
       <method-card
         class='transactions-setting__card list-complete-item'
         v-for='method in methods'
+        ref='method'
         :key='method.id'
         :method='method'/>
         <a
@@ -65,7 +66,7 @@ import IconPlus from '@/components/common/icons/IconPlus.vue';
 import IconInfo from '@/components/common/icons/IconInfo.vue';
 import MethodCard from '@/components/transactions/components/MethodCard.vue';
 import AddMethodPopup from '@/components/transactions/components/AddMethodPopup.vue';
-import { mapState, mapGetters } from 'vuex';
+import { mapState, mapGetters, mapActions } from 'vuex';
 
 export default {
   name: 'TransactionsSettings',
@@ -81,6 +82,17 @@ export default {
       popover: false,
     };
   },
+  methods: {
+    ...mapActions('billing', [
+      'getMethods',
+      'getCurrencies',
+    ]),
+    closePopups() {
+      if (this.$refs.method && this.$refs.method.length) {
+        this.$refs.method.forEach(item => item.close());
+      }
+    },
+  },
   computed: {
     ...mapState('billing', [
       'methods',
@@ -88,6 +100,10 @@ export default {
     ...mapGetters('billing', [
       'isMethods',
     ]),
+  },
+  created() {
+    this.getCurrencies()
+      .then(() => this.getMethods())
   },
 };
 </script>

@@ -1,0 +1,164 @@
+@import 'card';
+@import 'table';
+
+$trading-card: trading-card;
+.#{$trading-card} {
+  @extend %card-desktop;
+  padding: 0;
+  position: relative;
+  padding-bottom: 24px;
+  @include flex-col(stretch, stretch);
+  &--between {
+    justify-content: space-between;
+  }
+  &__header {
+    @include flex-row(space-between, center);
+    padding: 24px;
+    background-color: $N13;
+    &--start {
+      justify-content: flex-start;
+      align-items: flex-end;
+    }
+    &--margin {
+      margin-bottom: 8px;
+    }
+    &--col {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+  &__inner {
+    padding: 0 24px;
+  }
+  &__search-label {
+    @extend %search-label;
+    min-height: 36px;
+    &--fix {
+      max-width: 260px;
+    }
+    &--margin {
+      margin-bottom: 12px;
+    }
+  }
+  &__search-icon {
+    @extend %search-icon;
+  }
+  &__search-input {
+    @extend %search-input;
+    min-height: 36px;
+    width: 100%;
+  }
+  &__tumbler {
+    margin-right: 50px;
+    margin-bottom: 2px;
+  }
+  &__order-tumbler {
+    margin-bottom: 16px;
+  }
+  &__row {
+    @include flex-row(flex-start, flex-end);
+  }
+  &__title {
+    @extend %card-title;
+    margin-right: 24px;
+    &--padding {
+      padding-bottom: 2px;
+    }
+  }
+  &__text {
+    @extend %card-text;
+    &--secondary {
+      color: $N6;
+    }
+  }
+  table.#{$trading-card}__table > tbody{
+    display:block;
+    max-height: 343px;
+    overflow-y:scroll;
+  }
+  table.#{$trading-card}__table > thead,
+  table.#{$trading-card}__table >  tbody tr {
+    display:table;
+    width:100%;
+    table-layout:fixed;
+  }
+  
+  table.#{$trading-card}__table > thead,
+  table.#{$trading-card}__table >  tbody {
+    width: calc( 100% );
+  }
+  
+  table.#{$trading-card}__table > tbody {
+    max-height: 330px; /*Customize your tbody height*/
+  }
+  &__table {
+    @extend %saas-table;
+    thead {
+      background-color: transparent;
+    }
+    th:last-child,
+    td:last-child {
+      padding-right: 4px !important;
+    }
+  }
+  &__table-button {
+    @include flex-row(flex-end, center);
+  }
+  th.#{$trading-card}__table-button-cell {
+    width: 122px;
+  }
+  td.#{$trading-card}__table-button-cell {
+    width: 120px;
+    padding-left: 2px !important;
+  }
+  table.#{$trading-card}__table--pairs > tbody {
+    max-height: 282px; /*Customize your tbody height*/
+  }
+  &__table-wrapper {
+    padding: 0 24px 8px;
+    flex: 1 1;
+    &--1-2 {
+      padding-bottom: 6px;
+      flex: 0 1 30%;
+      table.#{$trading-card}__table > tbody {
+        max-height: 135px; /*Customize your tbody height*/
+      }
+    }
+    &--holdings {
+      table.#{$trading-card}__table > tbody {
+        max-height: 767px; /*Customize your tbody height*/
+      }
+    }
+    &--terminal {
+      flex-basis: min-content;
+    }
+  }
+  &__stat-row {
+    margin: 0 24px 6px;
+    padding: 8px 16px;
+    @include flex-row(center, center);
+    background-color: $N10;
+    border-radius: 4px;
+  }
+  &__caption {
+    @include text($H400, 500);
+    margin-right: 6px;
+    @media screen and (min-width: $screen-tablet) {
+      font-size: $H500;
+      font-weight: 400;
+    }
+  }
+  &__secondary-text {
+    @include text($H200, 400, $N5);
+  }
+  &__star {
+    width: 12px;
+    height: 12px;
+    fill: $N10;
+    margin-right: 4px;
+    cursor: pointer;
+    &--select {
+      fill: $Y1;
+    }
+  }
+}

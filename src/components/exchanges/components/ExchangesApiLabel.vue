@@ -4,7 +4,11 @@
     <icon-plus class='exchanges-api-label__icon'/>
   </div>
   <div class="exchanges-api-label__logo-wrapper">
-    <img class="exchanges-api-label__logo" :src='apiImage' alt="logo">
+    <img
+      class="exchanges-api-label__logo"
+      :src='apiImage'
+      alt="logo"
+      v-if='apiImage'>
   </div>
   <p class="exchanges-api-label__name">{{ apiName }}</p>
 </div>
@@ -28,7 +32,7 @@ export default {
       'getImages',
     ]),
     apiImage() {
-      if (this.apiName) {
+      if (this.apiName in this.getImages) {
         const image = this.getImages[this.apiName];
         // eslint-disable-next-line
         return require(`@/assets/images/${image}`);
@@ -42,6 +46,8 @@ export default {
 .exchanges-api-label {
   background-color: $N12;
   border-radius: 2px;
+  flex-grow: 0;
+  flex-shrink: 0;
   border: 1px solid $N10;
   padding: 16px 24px;
   cursor: pointer;
@@ -51,6 +57,7 @@ export default {
   transition-timing-function: ease-in-out;
   @media screen and (min-width: $screen-tablet) {
     flex: 0 0 120px;
+    max-height: 120px;
     background-color: $N13;
     padding: 8px 16px 16px;
     border-width: 0.5px;

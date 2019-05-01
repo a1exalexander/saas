@@ -1,5 +1,5 @@
 <template>
-<form class="account-recovery-start">
+<div class="account-recovery-start" @keyup.enter="emailEntered">
   <p class="account-recovery-start__subtitle"
     >{{ $t('auth.text.restore') }}
   </p>
@@ -27,11 +27,12 @@
       </subtle-icon>
     </router-link>
     <button-primary
+      tabindex="1"
       :disabled='!emailReady'
       @click.prevent.native="emailEntered">{{ $t('auth.buttons.continue') }}
     </button-primary>
   </div>
-</form>
+</div>
 </template>
 <script>
 import ButtonPrimary from '@/components/common/buttons/ButtonPrimary.vue';
@@ -60,10 +61,13 @@ export default {
   },
   methods: {
     toLogin() {
-      this.$router.push('/auth');
+      this.$router.push('/auth/investor');
     },
     emailEntered() {
-      this.$emit('emailEntered', this.email);
+      if (this.emailReady) {
+        console.log(2);
+        this.$emit('emailEntered', this.email);
+      }
     },
     errorEmail() {
       const [error1, error2, error3, error4] = this.errorText;

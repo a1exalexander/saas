@@ -1,0 +1,48 @@
+%investor-screen {
+  padding: 0;
+  background-color: $N12;
+  height: 100vh;
+  @include flex-col(flex-start, center);
+  @media screen and (min-width: $screen-tablet) {
+    min-height: 100vh;
+    height: auto;
+    padding: 0 28px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  @media screen and (min-width: $screen-desktop) {
+    padding: 0 5% 20px;
+  }
+  @media screen and (min-width: $screen-fullhd) {
+    padding: 0 10% 20px;
+  }
+  @media screen and (min-width: $screen-retina) {
+    padding: 0 20% 20px;
+  }
+}
+%investor-main {
+  @media screen and (min-width: $screen-tablet) {
+    max-width: 100%;
+    padding: 0;
+    min-width: $screen-tablet;
+  }
+  @media screen and (min-width: $screen-desktop) {
+    padding: 0;
+  }
+  @media screen and (min-width: $screen-fullhd) {
+    padding: 0 10%;
+  }
+  @media screen and (min-width: $screen-retina) {
+    padding: 0 15%;
+  }
+}
+%investor-caption {
+  @include text($H600, 500, $N0);
+  @media screen and (min-width: $screen-tablet) {
+    font-size: $H700;
+  }
+}
+%investor-title {
+  @include text($H900, 600, $N0);
+}

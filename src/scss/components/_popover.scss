@@ -1,0 +1,116 @@
+.popover {
+  will-change: display, transform;
+  display: block;
+  padding: 28px 6px 6px;
+  position: absolute;
+  background-color: transparent;
+  &__inner {
+    will-change: transform;
+    position: relative;
+    @include flex-col(flex-start, stretch);
+    background-color: $N11;
+    box-shadow: 0 6px 12px 0 rgba(0,0,0,0.32);
+    border-radius: 2px;
+    list-style: none;
+    padding: 24px;
+    @media screen and (min-width: $screen-tablet) {
+      padding: 16px 20px 16px 16px;
+    }
+    &:before {
+      bottom: 100%;
+      border: solid transparent;
+      content: " ";
+      height: 0;
+      width: 0;
+      position: absolute;
+      pointer-events: none;
+      will-change: transform;
+    }
+    &:before {
+      border-color: transparent;
+      border-bottom-color: $N11;
+      border-width: 8px;
+      left: 12px;
+    }
+    &--pure {
+      &:before {
+        content: none;
+      }
+    }
+  }
+  &__item {
+    @include flex-row(space-between, baseline);
+    margin-bottom: 18px;
+    &--icon {
+      @include flex-row(flex-start, center);
+    }
+    @media screen and (min-width: $screen-tablet) {
+      margin-bottom: 6px;
+    }
+    &:last-child {
+      margin: 0;
+    }
+    &--start {
+      justify-content: flex-start;
+    }
+  }
+  &__icon {
+    fill: $N0;
+    width: 16px;
+    height: 16px;
+    margin-right: 12px;
+  }
+  &__text {
+    color: $N0;
+    font-weight: 500;
+    font-size: $H400;
+    white-space: nowrap;
+    transition: color ease-in-out 0.2s;
+    @media screen and (min-width: $screen-tablet) {
+      font-weight: 400;
+      font-size: $H100;
+    }
+    &--bold {
+      font-weight: 600;
+    }
+  }
+}
+%popover-wrapper {
+  will-change: display, transform;
+  display: block;
+  padding: 28px 6px 6px;
+  background-color: transparent;
+}
+%popover {
+  will-change: transform;
+  position: relative;
+  @include flex-col(flex-start, stretch);
+  background-color: $N11;
+  box-shadow: 0 6px 12px 0 rgba(0,0,0,0.32);
+  border-radius: 2px;
+  list-style: none;
+  padding: 16px 20px 16px 16px;
+  &:before {
+    bottom: 100%;
+    border: solid transparent;
+    content: " ";
+    height: 0;
+    width: 0;
+    position: absolute;
+    pointer-events: none;
+    will-change: transform;
+  }
+  &:before {
+    border-color: transparent;
+    border-bottom-color: $N11;
+    border-width: 8px;
+    left: 12px;
+  }
+}
+%popover-text {
+  color: $N0;
+  font-weight: 400;
+  font-size: $H100;
+  white-space: nowrap;
+  @extend %text-transition;
+}

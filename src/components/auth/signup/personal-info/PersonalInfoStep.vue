@@ -12,7 +12,7 @@
     >{{ $t('auth.links.login') }}
   </router-link>
 </div>
-<form class="personal-info-step__form">
+<div class="personal-info-step__form">
   <div
     class="personal-info-step__status-box
           personal-info-step__status-box--name"
@@ -79,46 +79,48 @@
       class="personal-info-step__image-wrapper"
       :class='{"personal-info-step__image-wrapper--active":
               nameStatus && emailStatus && getGender}'>
-      <span class="personal-info-step__step-number">4</span>
+      <span class="personal-info-step__step-number">3</span>
       <icon-check class="personal-info-step__image"/>
     </div>
-    <div
+    <!-- <div
       class="personal-info-step__line animated dur05 fadeIn"
       v-if='nameStatus && emailStatus && getGender'>
-    </div>
+    </div> -->
   </div>
-  <label class="personal-info-step__label personal-info-step__label--phone">
+  <div class="personal-info-step__label personal-info-step__label--phone">
     <p class="personal-info-step__input-name">{{ $t('auth.labels.phone') }}
       <span class="personal-info-step__input-optional">{{ $t('auth.labels.optional') }}</span>
     </p>
-    <input
-      type="text"
-      class="personal-info-step__input"
+    <vue-tel-input
+      placeholder=''
+      @onInput='onValidPhone'
+      class='personal-info-step__input only-mobile-none'
       :class='{"input-error": myErrors.phone,
               "only-mobile-flex": nameStatus && emailStatus && getGender}'
-      @blur='phoneError'
-      v-model.trim='phone'>
+      v-model="phone"
+      :preferredCountries="['gb', 'ua', 'ru', 'de', 'fr', 'pl', 'it', 'es']">
+    </vue-tel-input>
     <p
       class="input-text-error animated dur04 bounceIn"
       :class='{"only-mobile-none": !nameStatus && !emailStatus && !getGender && myErrors.phone}'
       v-show='myErrors.phone'>{{ myErrors.phone }}
     </p>
-  </label>
-  <div
+  </div>
+  <!-- <div
     class="personal-info-step__status-box
           personal-info-step__status-box--age"
     :class='{"personal-info-check": nameStatus && emailStatus && getGender}'>
     <div
     class="personal-info-step__image-wrapper">
-    <span class="personal-info-step__step-number">5</span>
+    <span class="personal-info-step__step-number">4</span>
     <icon-check class="personal-info-step__image"/>
     </div>
     <div
       class="personal-info-step__line animated dur05 fadeIn"
       v-if='nameStatus && emailStatus && getGender'>
     </div>
-  </div>
-  <label class="personal-info-step__label personal-info-step__label--age">
+  </div> -->
+  <!-- <label class="personal-info-step__label personal-info-step__label--age">
     <p class="personal-info-step__input-name">{{ $t('auth.labels.age') }}
       <span class="personal-info-step__input-optional">{{ $t('auth.labels.optional') }}</span>
     </p>
@@ -135,8 +137,8 @@
       :class='{"only-mobile-none": !nameStatus && !emailStatus && !getGender && myErrors.age}'
       v-show='myErrors.age'>{{ myErrors.age }}
     </p>
-  </label>
-  <div
+  </label> -->
+  <!-- <div
     class="personal-info-step__status-box
           personal-info-step__status-box--gender"
     :class='{"personal-info-check": nameStatus && emailStatus && getGender}'>
@@ -150,8 +152,8 @@
       class="personal-info-step__line animated dur05 fadeIn"
       v-if='nameStatus && emailStatus'>
     </div>
-  </div>
-  <div class="personal-info-step__radio-container">
+  </div> -->
+  <!-- <div class="personal-info-step__radio-container">
     <p class="personal-info-step__input-name">{{ $t('auth.labels.gender') }}</p>
     <div
       class="personal-info-step__radio-wrapper"
@@ -177,7 +179,7 @@
                     personal-info-step__radio-button--right">{{ $t('auth.buttons.female') }}</div>
       </label>
     </div>
-  </div>
+  </div> -->
   <div class="personal-info-step__button-wrapper">
     <button-primary-icon
       :disabled='showContinue'
@@ -193,7 +195,7 @@
       </router-link>
     </div>
   </div>
-</form>
+</div>
 </section>
 </template>
 <script>
@@ -202,6 +204,7 @@ import ButtonSecondary from '@/components/common/buttons/ButtonSecondary.vue';
 import IconLongArrowRight from '@/components/common/icons/IconLongArrowRight.vue';
 import IconCheck from '@/components/common/icons/IconCheck.vue';
 import Validation from '@/js/validation';
+import 'vue-tel-input/dist/vue-tel-input.css';
 import { mapState, mapMutations, mapActions } from 'vuex';
 
 export default {
@@ -240,6 +243,7 @@ export default {
         age: '',
       },
       loading: false,
+      telValid: false,
     };
   },
   methods: {
@@ -249,6 +253,17 @@ export default {
     ...mapActions('signup', [
       'stepOne',
     ]),
+    onValidPhone({ number, isValid, country }) {
+      if (!isValid && !number.length) {
+        this.telValid = false;
+        this.myErrors.phone = '';
+      } else if (!isValid) {
+        this.telValid = false;
+      } else {
+        this.telValid = true;
+        this.myErrors.phone = '';
+      }
+     },
     nameError() {
       const [error1, error2] = this.errorsText.name;
       this.myErrors.name = '';
@@ -281,7 +296,7 @@ export default {
     phoneError() {
       const error1 = this.errorsText.phone[0];
       const error2 = this.errorsText.phone[1];
-      const error3 = this.errorsText.phone[1];
+      const error3 = this.errorsText.phone[2];
       this.myErrors.phone = '';
       setTimeout(() => {
         if (this.getPhone && !Validation.onlyPhone(this.getPhone)) {
@@ -311,11 +326,15 @@ export default {
       }, 15);
     },
     nextStep() {
-      this.loading = true;
-      this.stepOne()
-        .then(() => {
-          this.loading = false;
-        });
+      if (!this.telValid && this.phone) {
+        this.myErrors.phone = this.errorsText.phone[2];
+      } else {
+        this.loading = true;
+        this.stepOne()
+          .then(() => {
+            this.loading = false;
+          });
+      }
     },
   },
   computed: {
@@ -509,6 +528,88 @@ export default {
     }
     &--age {
       grid-area: age;
+    }
+  }
+  &__input.vue-tel-input {
+    border: 1px solid $N9;
+    &:focus-within {
+      box-shadow: none;
+      border: 1px solid $B5;
+    }
+    .dropdown {
+      height: 42px;
+      background-color: $N13;
+      border: none;
+      @media screen and (min-width: $screen-tablet) {
+        height: 34px;
+      }
+      &:hover {
+        background-color: $N13;
+      }
+      &:focus {
+        background-color: $N13;
+        border: none;
+      }
+    }
+    .dropdown.open {
+      background-color: $N13;
+      border: none;
+      &:focus {
+        background-color: $N13;
+        border: none;
+      }
+    }
+    .open {
+      &:hover {
+        background-color: $N13;
+      }
+      &:focus {
+        background-color: $N13;
+        border: none;
+      }
+    }
+    .highlighted {
+      background-color: $N10;
+    }
+    .dropdown-item {
+      font-weight: 600;
+      color: $N6;
+      font-size: $H200;
+      @media screen and (min-width: $screen-tablet) {
+        &:hover {
+          background-color: $N10;
+          color: $N0;
+          & * {
+            color: $N0;
+          }
+        }
+      }
+    }
+    div, ul {
+      z-index: 5;
+    }
+    ul {
+      background-color: $N11;
+      box-shadow: 0 8px 10px 0 rgba(10,11,12,0.56);
+      border-radius: 2px;
+      border: none;
+      top: 115%;
+      @media screen and (max-width: $screen-tablet) {
+        width: 90vw;
+        left: -44px;
+      }
+    }
+    padding: 0;
+    input[type=tel] {
+      background-color: $N13;
+      font-size: $H550;
+      font-weight: 400;
+      color: $N2;
+      height: 42px;
+      @media screen and (min-width: $screen-tablet) {
+        font-size: $H300;
+        height: 34px;
+      }
     }
   }
   &__input {

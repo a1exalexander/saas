@@ -22,8 +22,7 @@
     >
     <router-view
       @hideMobileNav='hideMobileNav'
-      class="director__view"
-      :class='{"fixed": navVisible}'/>
+      class="director__view"/>
   </transition>
 </div>
 
@@ -32,6 +31,7 @@
 import NavigationMobile from '@/views/NavigationMobile.vue';
 import NavigationDesktop from '@/views/NavigationDesktop.vue';
 import MobileNavBar from '@/components/common/MobileNavBar.vue';
+import { mapMutations, mapState } from 'vuex';
 
 export default {
   name: 'Director',
@@ -42,8 +42,11 @@ export default {
   },
   data() {
     return {
+      routeCount: 0,
+      surveyD: false,
       navVisible: false,
       mobileNavVisible: true,
+      surveyMessage: 'Please let us know how to become more useful',
     };
   },
   methods: {
@@ -62,6 +65,7 @@ export default {
 <style lang="scss">
 .director {
   flex: 1 1;
+  min-height: 100vh;
   @media screen and (min-width: $screen-tablet) {
     display: flex;
     justify-content: center;

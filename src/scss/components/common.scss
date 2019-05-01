@@ -1,0 +1,125 @@
+.status-online {
+  background-color: $G1;
+}
+.status-offline {
+  background-color: $R1;
+}
+.image-rotate {
+  transition: transform ease-in-out 0.2s;
+	transform: rotateX(180deg);
+}
+.popup-layer {
+  background: $N13;
+  position: fixed;
+  pointer-events: none;
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  z-index: -1;
+  @media screen and (min-width: $screen-tablet) {
+    display: none;
+  }
+}
+.only-mobile-none {
+  @media screen and (max-width: $screen-tablet) {
+    display: none !important;
+  }
+}
+.only-mobile-flex {
+  @media screen and (max-width: $screen-tablet) {
+    display: flex !important; 
+  }
+}
+.only-mobile-block {
+  @media screen and (max-width: $screen-tablet) {
+    display: block;
+  }
+}
+.mobile-flex {
+  display: flex !important;
+  @media screen and (min-width: $screen-tablet) {
+    display: none !important;
+  }
+}
+.mobile-block {
+  display: block;
+  @media screen and (min-width: $screen-tablet) {
+    display: none;
+  }
+}
+.tablet-flex {
+  display: none !important;
+  @media screen and (min-width: $screen-tablet) {
+    display: flex !important;
+  }
+}
+.tablet-inline {
+  display: none;
+  @media screen and (min-width: $screen-tablet) {
+    display: inline-block;
+  }
+}
+.tablet-block {
+  display: none;
+  @media screen and (min-width: $screen-tablet) {
+    display: block;
+  }
+}
+.is-flex {
+  display: flex;
+}
+.is-block {
+  display: block;
+}
+.is-none {
+  display: none;
+}
+.is.inline-block {
+  display: inline-block;
+}
+.is-grid {
+  display: grid;
+}
+
+.no-margin {
+  margin: 0;
+}
+
+.fixed {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+}
+
+.opacity {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.disable {
+  pointer-events: none;
+}
+.status-bar-active {
+  background-color: $B4;
+}
+.status-bar-success {
+  color: $N0;
+  span, p {
+    color: $N0;
+  }
+}
+.inline-nav-link-active {
+  border-color: $N2;
+  color: $N2;
+}
+.default-ava {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 50%;
+  flex-shrink: 0;
+  fill: $N0;
+}

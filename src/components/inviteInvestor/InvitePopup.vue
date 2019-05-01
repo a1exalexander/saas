@@ -1,5 +1,20 @@
 <template>
   <div class="invite-popup">
+    <message-success-absolute
+      class='invite-popup__message'
+      v-if='message'
+      @click.native='message = false'>
+      <p
+        v-for='(item, index) in mySuccess'
+        :key='index'
+        >{{ item }} Email has been sent!</p>
+    </message-success-absolute>
+    <message-error-absolute
+      class='invite-popup__message'
+      v-if='messageError'
+      @click.native='messageError = false'>
+      <p v-for='(item, index) in myErrors' :key='index'>{{ item }}</p>
+    </message-error-absolute>
     <div class="invite-popup__card">
       <close-button
         class="invite-popup__close-button"
@@ -35,7 +50,7 @@
           <p class="invite-popup__label-text">Send invitations by e-mail</p>
           <tags-input
             class='invite-popup__input-badges'
-            v-model="selectedTags"
+            v-model="emails"
             :validate='validateEmail'
             :add-tags-on-comma='true'
             placeholder=''/>
@@ -47,7 +62,9 @@
           </button-secondary>
           <button-primary
             class="invite-popup__button invite-popup__button--primary"
-            :disabled='disabledSend'>Send
+            :disabled='disabledSend'
+            :class='{"button-loading": loading}'
+            @click.native='send'>Send
           </button-primary>
           <button-transparent
             class="invite-popup__button invite-popup__button--transparent">Cancel
@@ -59,6 +76,9 @@
           <p class="invite-popup__label-text">Copy this URL to invite</p>
           <input
             :value='url'
+            v-clipboard:copy="url"
+            v-clipboard:success="onCopy"
+            v-clipboard:error="onError"
             class='invite-popup__input'
             :class='{"invite-popup__input--success": successCopy,
                     "invite-popup__input--error": errorCopy}'
@@ -95,6 +115,11 @@ import ButtonTransparent from '@/components/common/buttons/ButtonTransparent.vue
 import CloseButton from '@/components/common/buttons/CloseButton.vue';
 import IconMail from '@/components/common/icons/IconMail.vue';
 import IconLink from '@/components/common/icons/IconLink.vue';
+import MessageErrorAbsolute from '@/components/common/messages/MessageErrorAbsolute.vue';
+import MessageSuccessAbsolute from '@/components/common/messages/MessageSuccessAbsolute.vue';
+import { mapGetters, mapActions } from 'vuex';
+import { setTimeout } from 'timers';
+import '@/scss/components/invite-popup.scss';
 
 export default {
   name: 'InvitePopup',
@@ -106,18 +131,80 @@ export default {
     CloseButton,
     IconMail,
     IconLink,
+    MessageSuccessAbsolute,
+    MessageErrorAbsolute,
   },
   data() {
     return {
-      selectedTags: [],
+      emails: [],
       toggleType: true,
-      possible: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',
-      url: '',
       successCopy: false,
       errorCopy: false,
+      loading: false,
+      message: false,
+      messageError: false,
+      myErrors: [],
+      mySuccess: [],
     };
   },
   methods: {
+    ...mapActions('profile', [
+      'getFundSync',
+    ]),
+    sendData(data) {
+      this.loading = true;
+      setTimeout(() => {
+        this.loading = false;
+        this.$store.dispatch('messages/showSuccessMessage');
+      }, 1500)
+    },
+    generateError(email, error) {
+      const text = `${email}: ${error}`;
+      this.myErrors.push(text);
+    },
+    generateSuccess(email) {
+      this.mySuccess.push(email);
+    },
+    send() {
+      this.myErrors = [];
+      this.mySuccess = [];
+      this.emails.forEach((item, index) => {
+        const data = Object.assign({}, this.token, { email: item });
+        this.sendData(data);
+      });
+    },
+    showMessageError() {
+      if (this.messageError) {
+        this.messageError = false;
+        setTimeout(() => {
+          this.messageError = true;
+          setTimeout(() => {
+            this.messageError = false;
+          }, 6000);
+        }, 15);
+      } else {
+        this.messageError = true;
+        setTimeout(() => {
+          this.messageError = false;
+        }, 6000);
+      }
+    },
+    showMessageSuccess() {
+      if (this.message) {
+        this.message = false;
+        setTimeout(() => {
+          this.message = true;
+          setTimeout(() => {
+            this.message = false;
+          }, 6000);
+        }, 15);
+      } else {
+        this.message = true;
+        setTimeout(() => {
+          this.message = false;
+        }, 6000);
+      }
+    },
     cancel() {
       this.$emit('cancel');
     },
@@ -142,213 +229,14 @@ export default {
     changeToEmail() {
       this.toggleType = true;
     },
-    generateUrl() {
-      const root = 'https://fund.com/';
-      const sum = this.possible.length;
-      const chars = this.possible.split('');
-      let newUrl = '';
-      let num = 0;
-      while (num < 11) {
-        const i = Math.floor(Math.random() * sum);
-        newUrl += chars[i];
-        num += 1;
-      }
-      this.url = `${root + newUrl}`;
-    },
   },
   computed: {
+    ...mapGetters({
+      url: 'profile/getUrl',
+    }),
     disabledSend() {
-      return !this.selectedTags.length;
+      return !this.emails.length;
     },
-  },
-  beforeMount() {
-    this.generateUrl();
   },
 };
 </script>
-<style lang="scss">
-.invite-popup {
-  position: fixed;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  overflow-y: auto;
-  z-index: 15;
-  @include flex-row(stretch, stretch);
-  @media screen and (min-width: $screen-tablet) {
-    justify-content: center;
-    align-items: center;
-    background: rgba(10,11,12,0.80);
-  }
-  &__card {
-    background-color: $N13;
-    padding: 56px 28px 28px;
-    flex: 1 1;
-    position: relative;
-    @include flex-col(stretch, stretch);
-    @media screen and (min-width: $screen-tablet) {
-      flex: 0 1 25%;
-      min-width: 360px;
-      padding: 0;
-      border: 1px solid $N11;
-      box-shadow: 0 20px 28px 0 rgba(0,0,0,0.32);
-    }
-  }
-  &__head {
-    margin-bottom: 32px;
-    @media screen and (min-width: $screen-tablet) {
-      padding: 32px 40px 0;
-      border-bottom: 1px solid $N11;
-      margin: 0;
-    }
-  }
-  &__title {
-    font-size: $H600;
-    font-weight: 500;
-    margin-bottom: 32px;
-    @media screen and (min-width: $screen-tablet) {
-      margin-bottom: 24px;
-    }
-  }
-  &__close-button {
-    position: absolute;
-    top: 14px;
-    right: 24px;
-    @media screen and (min-width: $screen-tablet) {
-      top: 12px;
-      right: 16px;
-      svg {
-        width: 14px;
-        height: 14px;
-      }
-    }
-  }
-  &__label {
-    margin-bottom: 32px;
-  }
-  &__input {
-    width: 100%;
-    @extend %input;
-    &:disabled {
-      background-color: transparent;
-    }
-    &--error {
-      border-color: $R1 !important;
-    }
-    &--success {
-      border-color: $G2 !important;
-    }
-  }
-  &__nav {
-    @include flex-row(center, center);
-  }
-  &__main {
-    @include flex-col(space-between, stretch);
-    flex: 1 1;
-    @media screen and (min-width: $screen-tablet) {
-      background-color: $N15;
-      padding: 24px 40px 32px;
-      min-height: 190px;
-    }
-  }
-  &__nav-button {
-    flex: 0 0 50%;
-    background-color: $N10;
-    @include flex-row(center, center);
-    padding: 10px 20px;
-    min-height: 44px;
-    cursor: pointer;
-    transition: background-color ease-in-out 0.2s;
-    &--left {
-      border-radius: 2px 0px 0px 2px;
-    }
-    &--right {
-      border-radius: 0 2px 2px 0;
-    }
-    &--active {
-      background-color: $B4;
-      .invite-popup {
-        &__nav-text {
-          color: $N0;
-        }
-      }
-    }
-    @media screen and (min-width: $screen-tablet) {
-      flex: 0 1 auto;
-      padding: 4px 0 10px;
-      margin-right: 16px;
-      border-bottom: 1px solid transparent;
-      position: relative;
-      bottom: -1px;
-      background-color: transparent;
-      min-height: auto;
-      &--active {
-        background-color: transparent;
-        border-color: $N1;
-        .invite-popup {
-          &__nav-icon {
-            fill: $B4;
-          }
-        }
-      }
-      &:last-child {
-        margin: 0;
-      }
-    }
-  }
-   &__nav-icon {
-    display: none;
-    @media screen and (min-width: $screen-tablet) {
-      display: block;
-      fill: $B8;
-      width: 14px;
-      height: 14px;
-      transition: fill ease-in-out 0.2s;
-      margin-right: 8px;
-    }
-  }
-  &__nav-text {
-    font-size: $H500;
-    color: $N8;
-    transition: color ease-in-out 0.2s;
-    @media screen and (min-width: $screen-tablet) {
-      font-size: $H200;
-      color: $N8;
-    }
-  }
-  &__label-text {
-    @extend %input-label-text;
-  }
-  &__buttons {
-    @media screen and (min-width: $screen-tablet) {
-      @include flex-row(flex-end, center);
-    }
-  }
-  &__button {
-    width: 100%;
-    @media screen and (min-width: $screen-tablet) {
-      width: auto;
-    }
-    &--primary {
-      margin-bottom: 20px;
-      @media screen and (min-width: $screen-tablet) {
-        margin: 0;
-      }
-    }
-    &--transparent {
-      margin-bottom: 20px;
-      @media screen and (min-width: $screen-tablet) {
-        display: none;
-      }
-    }
-    &--secondary {
-      display: none;
-      @media screen and (min-width: $screen-tablet) {
-        display: flex;
-        margin-right: 16px;
-      }
-    }
-  }
-}
-</style>

@@ -34,18 +34,23 @@
           </div>
         </li>
         <li class="transaction-card__item tablet-flex">
-          <p class="transaction-card__text transaction-card__text--white">{{ deposit.currency }}</p>
+          <p
+            class="transaction-card__text transaction-card__text--white"
+            >{{ currency }}</p>
         </li>
         <li class="transaction-card__item tablet-flex">
           <icon-wallet class='transaction-card__item-icon'/>
-          <p class="transaction-card__text transaction-card__text--white">{{ deposit.recieved }}</p>
+          <p
+            class="transaction-card__text transaction-card__text--wallet"
+            >{{ deposit.wallet }}</p>
         </li>
         <li class="transaction-card__item transaction-card__item--end">
           <p
             class="transaction-card__text transaction-card__text--balance"
             :class='{"transaction-card__text--rejected": deposit.status === "rejected",
-                    "transaction-card__text--successful": deposit.status === "successful"}'
-            >{{ deposit.balance | numeral('0,0') }} $
+                    "transaction-card__text--successful": deposit.status === "approved"
+                    || deposit.status === "successful" || deposit.status === "successfull"}'
+            >$ {{ deposit.balance | numeral('0,0.[000000]')}}
           </p>
           <icon-info
             class='transaction-card__item-icon
@@ -63,7 +68,8 @@
           <p
           class="transaction-card__text transaction-card__text--status"
           :class='{"transaction-card__text--rejected": deposit.status === "rejected",
-                  "transaction-card__text--successful": deposit.status === "successful"}'
+                    "transaction-card__text--successful": deposit.status === "approved"
+                    || deposit.status === "successful" || deposit.status === "successfull"}'
           >{{ deposit.status }}
         </p>
           <icon-info
@@ -74,19 +80,19 @@
     </div>
     <transition
       name="custom-classes-transition"
-      enter-active-class="animated dur03 fadeIn"
+      enter-active-class="animated dur02 fadeIn"
       leave-active-class="animated dur02 fadeOut"
       mode="out-in">
     <div class="transaction-card__drop-menu" v-if='dropMenu'>
       <div class="transaction-card__drop-item">
         <p class="transaction-card__label">Currency</p>
-        <p class="transaction-card__text">{{ deposit.currency }}</p>
+        <p class="transaction-card__text">{{ currency }}</p>
       </div>
       <div class="transaction-card__drop-item">
         <p class="transaction-card__label">Recieved on</p>
         <div class="transaction-card__row transaction-card__row--end">
           <icon-wallet class='transaction-card__drop-icon'/>
-          <p class="transaction-card__text">{{ deposit.recieved }}</p>
+          <p class="transaction-card__text">{{ wallet }}</p>
         </div>
       </div>
       <div class="transaction-card__drop-item">
@@ -119,6 +125,7 @@ import IconArrowDown from '@/components/common/icons/IconArrowDown.vue';
 import IconWallet from '@/components/common/icons/IconWallet.vue';
 import IconInfo from '@/components/common/icons/IconInfo.vue';
 import IconAva from '@/components/common/icons/IconAva.vue';
+import { mapState, mapGetters, mapActions } from 'vuex';
 
 export default {
   name: 'TransactionCard',
@@ -137,6 +144,26 @@ export default {
     return {
       dropMenu: false,
     };
+  },
+  computed: {
+    ...mapState({
+      methods: state => state.billing.methods,
+      currencies: state => state.billing.currencies,
+      cost: state => state.transactions.cost,
+    }),
+    currency() {
+      const { currency } = this.deposit;
+      if (currency === 'ETH') {
+        return 'Ethereum';
+      } else if (currency === 'BTC') {
+        return 'Bitcoin';
+      } else {
+        return currency;
+      }
+    },
+    balance() {
+      return Number(this.cost[this.deposit.currency] * this.deposit.balance).toFixed(6);
+    },
   },
 };
 </script>

@@ -34,17 +34,19 @@
       v-if='step.email'/>
     <investor-recovery-send-email
       class='account-recovery__field'
-      :email='data.hiddenEmail'
+      :hidden='data.hiddenEmail'
+      :email='data.email'
       @sendEmail='sendEmail'
       v-else-if="step.enteredEmail"/>
     <investor-recovery-confirm
       class='account-recovery__field'
       :email='data.hiddenEmail'
-      @confirmCode='confirmCode'
+      @token='confirmToken'
       v-else-if="step.confirm"/>
     <investor-recovery-password
       class='account-recovery__field'
       :email='data.email'
+      :token='data.token'
       v-else/>
     </transition>
   </article>
@@ -83,12 +85,13 @@ export default {
       data: {
         email: '',
         hiddenEmail: '',
+        token: '',
       },
     };
   },
   methods: {
     toLogin() {
-      this.$router.push('/auth');
+      this.$router.push('/auth/investor');
     },
     nextStep(type) {
       Object.keys(this.step).forEach((key) => {
@@ -107,7 +110,8 @@ export default {
     sendEmail() {
       this.nextStep('confirm');
     },
-    confirmCode() {
+    confirmToken(token) {
+      this.data.token = token;
       this.nextStep('password');
     },
     back() {

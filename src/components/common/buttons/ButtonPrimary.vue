@@ -1,18 +1,29 @@
 <template>
-  <button class='button-primary' :disabled='disabled'>
+  <button
+    @click="onClick"
+    class='button-primary'
+    :class='{"button-loading": loading}'>
     <div class="button-primary__border"></div>
     <slot/>
+    <span v-if='label'>{{ label }}</span>
   </button>
 </template>
 <script>
 export default {
   name: 'ButtonPrimary',
   props: {
-    disabled: {
+    label: {
+      type: String,
+      default: '',
+    },
+    loading: {
       type: Boolean,
       default: false,
     },
   },
+  methods:{
+    onClick(){ this.$emit('click'); },
+  }
 };
 </script>
 <style lang="scss">
@@ -27,13 +38,8 @@ export default {
   line-height: 1;
   transition-property: color, background-color, min-height, font-size, opacity;
   transition-duration: 0.2s;
-  transition-timing-function: ease-in-out;
+  transition-timing-function: ease;
   position: relative;
-  p, span {
-    transition-property: color, background-color, min-height, font-size, opacity;
-    transition-duration: 0.2s;
-    transition-timing-function: ease-in-out;
-  }
   @media screen and (min-width: $screen-tablet) {
     padding: 10px 20px;
     font-size: $H200;

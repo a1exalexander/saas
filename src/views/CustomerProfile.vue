@@ -20,15 +20,15 @@
       <div class="customer-profile__item customer-profile__item--name">
         <h2
           class="customer-profile__text customer-profile__text--name"
-          >{{ getInvestorById.name }}</h2>
+          >{{ client.name_first }}</h2>
         <div class="customer-profile__status">
           <p
             class="customer-profile__status-name"
-            >{{ getInvestorById.status?'Online':'Offline' }}
+            >{{ client.status?'Online':'Offline' }}
           </p>
           <span
             class="customer-profile__status-dot"
-            :class='{"status-offline": !getInvestorById.status}'>
+            :class='{"status-offline": !client.status}'>
           </span>
         </div>
       </div>
@@ -36,11 +36,11 @@
         <p
           class="customer-profile__text customer-profile__text--label"
           >ID</p>
-        <p class="customer-profile__text">{{ getInvestorById.id }}</p>
+        <p class="customer-profile__text">{{ client.id }}</p>
       </div>
       <div class="customer-profile__item customer-profile__item--balance">
         <p class="customer-profile__text customer-profile__text--label">Total balance</p>
-        <p class="customer-profile__text">$ {{ getInvestorById.balance }}</p>
+        <p class="customer-profile__text">$ {{ client.balance }}</p>
       </div>
       <a
         href='#'
@@ -66,9 +66,23 @@
     <div class="customer-profile__card-tablet">
       <div class="customer-profile__image-wrapper" @click='closeInlineMenu'>
         <img
-          src="@/assets/images/ava.jpg"
+          :src="client.ava"
           alt=""
-          class="customer-profile__image" >
+          class="customer-profile__image"
+          v-if='client.ava'>
+        <icon-ava
+          class="default-ava"
+          v-else/>
+          <div
+            class="customer-profile__check-wrapper"
+            :class='{"customer-profile__check-wrapper--verify": client.email_verified}'>
+          <icon-check2
+            class='customer-profile__check-icon'
+            v-if='client.email_verified'/>
+          <icon-question
+            class='customer-profile__icon-question'
+            v-else/>
+          </div>
       </div>
       <div class="customer-profile__inner-row">
         <div
@@ -76,53 +90,57 @@
           @click='closeInlineMenu'>
           <h2
             class="customer-profile__text customer-profile__text--name"
-            >{{ getInvestorById.name }}</h2>
+            >{{ client.name_first }} {{ client.name_last }}</h2>
           <div class="customer-profile__status">
             <p
               class="customer-profile__status-name"
-              >{{ getInvestorById.online?'Online':'Offline' }}
+              >{{ client.online?'Online':'Offline' }}
             </p>
             <span
               class="customer-profile__status-dot"
-              :class='{"status-offline": !getInvestorById.online}'>
+              :class='{"status-offline": !client.status}'>
             </span>
           </div>
         </div>
         <a
           href='#'
           class='customer-profile__button'
-          @click.prevent='inlineMenu = !inlineMenu'>
+          @mouseover.prevent='inlineMenu = true'>
           <icon-dots class='customer-profile__icon-dots'/>
           <transition
             name="custom-classes-transition"
             enter-active-class="animated dur06 fadeIn"
             leave-active-class="animated dur04 fadeOut"
             mode="out-in">
-          <div class="customer-profile__inline-menu" v-if='inlineMenu'>
-            <a href="#" class="customer-profile__inline-menu-link">Change photo</a>
-            <a
-              href="#"
-              @click.prevent='openRemovePopup'
-              class="customer-profile__inline-menu-link">Remove
-            </a>
-          </div>
+            <div
+              class="customer-profile__inline-menu-wrapper"
+              @mouseleave="inlineMenu = false">
+              <div class="customer-profile__inline-menu" v-if='inlineMenu'>
+                <a href="#" class="customer-profile__inline-menu-link">Change photo</a>
+                <a
+                  href="#"
+                  @click.prevent='openRemovePopup'
+                  class="customer-profile__inline-menu-link">Remove
+                </a>
+              </div>
+            </div>
           </transition>
         </a>
         <div class="customer-profile__item customer-profile__item--id" @click='closeInlineMenu'>
           <p
             class="customer-profile__text customer-profile__text--label"
             >ID</p>
-          <p class="customer-profile__text">{{ getInvestorById.id }}</p>
+          <p class="customer-profile__text">{{ client.id }}</p>
         </div>
         <div class="customer-profile__item customer-profile__item--phone" @click='closeInlineMenu'>
           <p class="customer-profile__text customer-profile__text--label">Phone</p>
-          <p class="customer-profile__text">{{ getInvestorById.phone }}</p>
+          <p class="customer-profile__text">{{ client.phone }}</p>
         </div>
         <div class="customer-profile__item customer-profile__item--email" @click='closeInlineMenu'>
           <p class="customer-profile__text customer-profile__text--label">Email</p>
-          <p class="customer-profile__text">{{ getInvestorById.email }}</p>
+          <p class="customer-profile__text">{{ client.email }}</p>
         </div>
-        <div
+        <!-- <div
           class="customer-profile__item customer-profile__item--manager"
           @click='closeInlineMenu'>
           <p class="customer-profile__text customer-profile__text--label">Relationship manager</p>
@@ -132,7 +150,7 @@
             </div>
             <p class="customer-profile__text">{{ getInvestorById.manager }}</p>
           </div>
-        </div>
+        </div> -->
       </div>
     </div>
     <nav class="customer-profile__nav" @click='closeInlineMenu'>
@@ -141,7 +159,7 @@
           <router-link
             to=''
             class="customer-profile__nav-link"
-            :class='{"inline-nav-link-active": routeName === "customer-introduction"}'
+            :class='{"inline-nav-link-active": routeName === "introduction"}'
             >Introduction
           </router-link>
         </li>
@@ -178,8 +196,11 @@
 <script>
 import IconDots from '@/components/common/icons/IconDots.vue';
 import RemovePopup from '@/components/customers/RemovePopup.vue';
+import IconCheck2 from '@/components/common/icons/IconCheck2.vue';
 import ButtonBack from '@/components/common/buttons/ButtonBack.vue';
-import { mapGetters, mapActions, mapMutations } from 'vuex';
+import IconAva from '@/components/common/icons/IconAva.vue';
+import IconQuestion from '@/components/common/icons/IconQuestion.vue';
+import { mapGetters, mapActions, mapMutations, mapState } from 'vuex';
 
 export default {
   name: 'CustomerProfile',
@@ -187,6 +208,9 @@ export default {
     RemovePopup,
     IconDots,
     ButtonBack,
+    IconCheck2,
+    IconAva,
+    IconQuestion,
   },
   data() {
     return {
@@ -195,16 +219,19 @@ export default {
     };
   },
   computed: {
-    ...mapGetters('investors', [
-      'getInvestorById',
+    ...mapState('investors', [
+      'client',
     ]),
+    id() {
+      return this.$route.params.id;
+    },
     routeName() {
       return this.$route.name;
     },
   },
   methods: {
     ...mapActions('investors', [
-      'checkInvestorById',
+      'getClientById',
     ]),
     ...mapMutations('investors', [
       'removeInvestor',
@@ -215,7 +242,7 @@ export default {
       }
     },
     backToList() {
-      this.$router.push('/customers');
+      this.$router.push('/director/clients');
     },
     openRemovePopup() {
       this.showRemovePopup = true;
@@ -224,21 +251,9 @@ export default {
       this.$router.push(path);
     },
   },
-  beforeRouteEnter(to, from, next) {
-    const { id } = to.params;
-    next((vm) => {
-      vm.checkInvestorById(Number(id)).then().catch(() => {
-        vm.redirectRoute('/customers');
-      });
-    });
-  },
-  beforeRouteUpdate(to, from, next) {
-    const { id } = to.params;
-    this.checkInvestorById(Number(id)).then(() => {
-      next();
-    }).catch(() => {
-      next(false);
-    });
+  beforeRouteUpdate (to, from, next) {
+    this.getClientById(to.params.id)
+      .then((resp) => next())
   },
 };
 </script>
@@ -270,8 +285,8 @@ export default {
     flex-shrink: 0;
     flex-grow: 0;
     border-radius: 50%;
-    overflow: hidden;
     grid-area: photo;
+    position: relative;
     @media screen and (min-width: $screen-tablet) {
       margin-right: 20px;
     }
@@ -285,6 +300,33 @@ export default {
   &__image {
     width: 100%;
     height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  &__check-wrapper {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 3px solid $B12;
+    background-color: $N10;
+    @include flex-row(center, center);
+    position: absolute;
+    z-index: 10000;
+    bottom: 0;
+    right: 0;
+    &--verify {
+      background-color: $B4;
+    }
+  }
+  &__icon-question {
+    width: 8px;
+    height: 8px;
+    fill: $N5;
+  }
+  &__check-icon {
+    width: 12px;
+    height: 12px;
+    fill: $N0;
   }
   &__card {
     display: grid;
@@ -410,12 +452,16 @@ export default {
   &__nav-link {
     @extend %inline-nav-link;
   }
-  &__inline-menu {
-    @extend %inline-menu;
+  &__inline-menu-wrapper {
     position: absolute;
-    top: 100%;
+    top: 0;
     right: -4px;
     z-index: 2;
+    padding: 28px 6px 6px;
+    background-color: transparent;
+  }
+  &__inline-menu {
+    @extend %inline-menu;
     padding: 20px 24px;
   }
   &__inline-menu-link {

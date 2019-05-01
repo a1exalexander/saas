@@ -1,0 +1,99 @@
+%popup {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  min-height: 100vh;
+  z-index: 11;
+  background: $N13;
+  @include flex-col(flex-start, stretch);
+  @media screen and (min-width: $screen-tablet) {
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    background: rgba(10,11,12,0.80);
+  }
+}
+
+%popup-card {
+  background-color: $N13;
+  flex: 1 1;
+  @include flex-col(stretch, stretch);
+  padding: 24px 28px 48px 24px;
+  overflow-y: auto;
+  position: relative;
+  @media screen and (min-width: $screen-tablet) {
+    flex: 0 1 27%;
+    min-width: 460px;
+    padding: 28px 40px 32px;
+    border: 1px solid $N11;
+    box-shadow: 0 20px 28px 0 rgba(0,0,0,0.32);
+    position: relative;
+    max-height: 80vh;
+  }
+}
+
+%popup-header {
+  padding-top: 18px;
+  margin-bottom: 24px;
+  @include flex-row(flex-start, center);
+  @media screen and (min-width: $screen-tablet) {
+    padding: 0;
+    margin-bottom: 32px;
+  }
+}
+
+
+%popup-title {
+  font-size: $H700;
+  font-weight: 500;
+  @media screen and (min-width: $screen-tablet) {
+    font-size: $H800;
+  }
+}
+
+%popup-close-button {
+  align-self: flex-end;
+  padding: 6px;
+  position: relative;
+  top: 18px;
+  right: 18px;
+  position: absolute;
+  svg {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+%popup-button-wrapper {
+  width: 100%;
+  flex: 1 1;
+  @include flex-col(flex-end, flex-end);
+  .button-secondary {
+    display: none;;
+  }
+  .button-primary {
+    margin-bottom: 20px; 
+  }
+  a, button {
+    width: 100%;
+  }
+  @media screen and (min-width: $screen-tablet) {
+    .button-secondary {
+      display: flex;
+      margin-right: 20px;
+    }
+    .button-transparent {
+      display: none;
+    }
+    .button-primary {
+      margin-bottom: 0;
+      margin-right: 20px;
+    }
+    flex-direction: row;
+    a, button {
+      width: auto;
+    }
+  }
+}

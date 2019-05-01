@@ -1,7 +1,8 @@
 <template>
-  <button class='button-secondary' :disabled='disabled'>
+  <button @click="onClick" class='button-secondary' :disabled='disabled'>
     <div class="button-secondary__border"></div>
     <slot/>
+    <span v-if='label'>{{ label }}</span>
   </button>
 </template>
 <script>
@@ -12,6 +13,13 @@ export default {
       type: Boolean,
       default: false,
     },
+    label: {
+      type: String,
+      default: '',
+    },
+  },
+  methods:{
+    onClick(){ this.$emit('click'); },
   },
 };
 </script>

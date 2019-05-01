@@ -11,17 +11,32 @@ import Login from '@/components/auth/login/Login.vue';
 import SignUp from '@/components/auth/signup/SignUp.vue';
 import AccountRecovery from '@/components/auth/recovery/AccountRecovery.vue';
 
+// Dashboard
+import Dashboard from '@/views/Dashboard.vue';
+
+
+// Portfolio
+import Portfolio from '@/views/Portfolio.vue';
+
 // Transactions
 import Transactions from '@/views/Transactions.vue';
 import Payouts from '@/components/transactions/Payouts.vue';
 import Deposits from '@/components/transactions/Deposits.vue';
 import TransactionsSettings from '@/components/transactions/TransactionsSettings.vue';
 
+// Trading
+import Trading from '@/views/Trading.vue';
+import TradingDashboard from '@/components/trading/TradingDashboard.vue';
+import TradingTrading from '@/components/trading/TradingTrading.vue';
+
 // Profile
 import Profile from '@/views/Profile.vue';
 
 // Exchanges
 import Exchanges from '@/views/Exchanges.vue';
+
+// Strategies
+import Strategies from '@/views/Strategies.vue';
 
 // Customers
 import Customers from '@/views/Customers.vue';
@@ -31,81 +46,105 @@ import CustomerIntroduction from '@/components/customers/CustomerIntroduction.vu
 
 // Investor
 import Investor from '@/views/Investor.vue';
+import InvestorMain from '@/components/investor/InvestorMain.vue';
 import InvestorDashboard from '@/components/investor/dashboard/InvestorDashboard.vue';
 import InvestorProfile from '@/components/investor/profile/InvestorProfile.vue';
 import InvestorSignup from '@/components/investor/auth/InvestorSignup.vue';
 import InvestorLogin from '@/components/investor/auth/InvestorLogin.vue';
 import InvestorRecovery from '@/components/investor/auth/recovery/InvestorRecovery.vue';
+import InvestorHistory from '@/components/investor/history/InvestorHistory.vue';
+import InvestorReferrals from '@/components/investor/referrals/InvestorReferrals.vue';
 
 Vue.use(Router);
 
-const ifNotAuthenticated = (to, from, next) => {
-  if (!store.getters['login/isAuthenticated']) {
-    next();
-  } else {
-    next('/');
-  }
-};
-
-const ifAuthenticated = (to, from, next) => {
-  if (store.getters['login/isAuthenticated']) {
-    next();
-  } else {
-    next('/auth');
-  }
-};
-
-export default new Router({
+const router = new Router({
   mode: 'history',
   base: process.env.NODE_ENV === 'production' ? '/saas' : '/',
   routes: [
     {
       path: '*',
-      redirect: '/director/transactions',
+      redirect: { name: 'payouts' },
     },
     {
       path: '/',
       name: 'home',
-      redirect: '/director/transactions',
+      redirect: { name: 'payouts' },
     },
     {
       path: '/director',
       component: Director,
+      redirect: { name: 'payouts' },
       children: [
         {
-          path: '',
-          name: 'director',
-          component: Transactions,
-          redirect: '/director/transactions',
-          beforeEnter: ifAuthenticated,
+          path: 'clients/profile/:id',
+          component: CustomerProfile,
+          children: [
+            {
+              path: '',
+              name: 'introduction',
+              component: CustomerIntroduction,
+            },
+          ],
+        },
+        {
+          path: 'dashboard',
+          name: 'Dashboard',
+          component: Dashboard,
+
+        },
+        {
+          path: 'strategies',
+          name: 'Strategies',
+          component: Strategies,
+
+        },
+        {
+          path: 'portfolio',
+          name: 'Portfolio',
+          component: Portfolio,
+
+        },
+        {
+          path: 'trading',
+          component: Trading,
+          redirect: { name: 'payouts' },
+          children: [
+            {
+              path: 'dashboard',
+              name: 'trading-dashboard',
+              component: TradingDashboard,
+    
+            },
+            {
+              path: 'trading',
+              name: 'trading',
+              component: TradingTrading,
+    
+            },
+          ],
         },
         {
           path: 'transactions',
           component: Transactions,
+          redirect: { name: 'payouts' },
           children: [
-            {
-              path: '',
-              name: 'transactions',
-              component: Payouts,
-              beforeEnter: ifAuthenticated,
-            },
             {
               path: 'payouts',
               name: 'payouts',
               component: Payouts,
-              beforeEnter: ifAuthenticated,
+    
             },
             {
               path: 'deposits',
               name: 'deposits',
               component: Deposits,
-              beforeEnter: ifAuthenticated,
+    
             },
             {
               path: 'settings',
               name: 'methods',
               component: TransactionsSettings,
-              beforeEnter: ifAuthenticated,
+    
             },
           ],
         },
@@ -113,63 +152,57 @@ export default new Router({
           path: 'profile',
           name: 'Profile',
           component: Profile,
-          beforeEnter: ifAuthenticated,
+
         },
         {
           path: 'exchanges',
           name: 'Exchanges',
           component: Exchanges,
-          beforeEnter: ifAuthenticated,
+        
         },
         {
-          path: 'customers',
+          path: 'clients',
           component: Customers,
+          redirect: { name: 'Investors' },
           children: [
-            {
-              path: '',
-              name: 'Customers',
-              component: Investors,
-              beforeEnter: ifAuthenticated,
-            },
             {
               path: 'investors',
               name: 'Investors',
               component: Investors,
-              beforeEnter: ifAuthenticated,
-            },
-          ],
-        },
-        {
-          path: 'customer-profile/:id',
-          component: CustomerProfile,
-          alias: '/director/customers/profile/:id',
-          children: [
-            {
-              path: '',
-              name: 'customer-introduction',
-              component: CustomerIntroduction,
+            
             },
           ],
         },
       ],
     },
     {
+      path: '/investor/profile',
+      name: 'investor-profile',
+      component: InvestorProfile,
+      
+    },
+    {
       path: '/investor',
       component: Investor,
+      redirect: { name: 'investor-dashboard' },
       children: [
-        {
-          path: '',
-          component: InvestorDashboard,
-        },
         {
           path: 'dashboard',
           name: 'investor-dashboard',
           component: InvestorDashboard,
+          
         },
         {
-          path: 'profile',
-          name: 'investor-profile',
-          component: InvestorProfile,
+          path: 'history',
+          name: 'investor-history',
+          component: InvestorHistory,
+          
+        },
+        {
+          path: 'referrals',
+          name: 'investor-referrals',
+          component: InvestorReferrals,
+          
         },
       ],
     },
@@ -179,9 +212,14 @@ export default new Router({
       children: [
         {
           path: '',
-          name: 'login',
+          name: 'auth',
           component: Login,
-          beforeEnter: ifNotAuthenticated,
+          props: route => ({
+            query: route.query.code,
+            message: route.query.message,
+            token: route.query.token,
+          }),
+          
         },
         {
           path: 'signup',
@@ -196,11 +234,14 @@ export default new Router({
         {
           path: 'investor',
           name: 'investor-login',
+          props: route => ({ query: route.query.code, message: route.query.message }),
           component: InvestorLogin,
+      
         },
         {
           path: 'investor/signup',
           name: 'investor-signup',
+          props: route => ({ query: route.query.invite }),
           component: InvestorSignup,
         },
         {
@@ -212,3 +253,6 @@ export default new Router({
     },
   ],
 });
+
+
+export default router;

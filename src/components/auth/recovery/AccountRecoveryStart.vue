@@ -10,6 +10,7 @@
       type="email"
       class="account-recovery-start__input"
       @blur='errorEmail'
+      tabindex="1"
       :class='{"input-error": error}'
       v-model.trim="email">
     <p
@@ -27,6 +28,7 @@
       </subtle-icon>
     </router-link>
     <button-primary
+      tabindex="2"
       :disabled='!emailReady'
       @click.prevent.native="emailEntered">{{ $t('auth.buttons.continue') }}
     </button-primary>

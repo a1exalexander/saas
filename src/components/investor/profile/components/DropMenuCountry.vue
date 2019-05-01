@@ -49,13 +49,13 @@
 import IconTriangle from '@/components/common/icons/IconTriangle.vue';
 import countryList from '@/js/countries';
 import { mapState, mapMutations } from 'vuex';
+import { setTimeout } from 'timers';
 
 export default {
   name: 'DropMenuCountry',
   props: {
     getCountry: {
       type: String,
-      default: '',
     },
   },
   components: {
@@ -82,6 +82,9 @@ export default {
     setCountry(value) {
       this.$emit('select', value);
     },
+    searchSelect() {
+      this.search = getCountry;;
+    },
     select(item) {
       this.search = item;
       this.setCountry(item);
@@ -92,6 +95,9 @@ export default {
       this.setCountry(item);
       this.$refs.country.blur();
       this.close();
+    },
+    forceSelect(country) {
+      this.search = country;
     },
   },
   computed: {
@@ -118,8 +124,16 @@ export default {
       return !!chars;
     },
   },
-  beforeMount() {
-    this.search = this.country;
+  mounted() {
+    const timer = setInterval(() => {
+      if (this.getCountry) {
+        this.search = this.getCountry;
+        clearInterval(timer);
+      }
+    }, 10);
+  },
+  beforeDestroy() {
+    this.search = this.getCountry;
   },
   watch: {
     search(value) {
@@ -153,6 +167,9 @@ export default {
     @include text($H550, 400, $N2);
     @media screen and (min-width: $screen-tablet) {
       font-size: $H300;
+      &::placeholder {
+        color: $N0;
+      }
     }
   }
   &__wrapper {

@@ -83,15 +83,6 @@
         </p>
       </div>
     </label>
-    <vue-recaptcha
-      class="recovery-password__recaptcha"
-      @click.stop
-      ref="recaptcha"
-      theme='dark'
-      :sitekey="recaptchaSiteKey"
-      @verify="onVerify"
-      @expired="onExpired">
-    </vue-recaptcha>
     <div class="recovery-password__buttons-wrapper">
       <button-secondary
         @click.prevent.native='cancel'
@@ -114,10 +105,7 @@ import IconView from '@/components/common/icons/IconView.vue';
 import IconCheck from '@/components/common/icons/IconCheck.vue';
 import PasswordError from '@/components/common/PasswordError.vue';
 import Validation from '@/js/validation';
-import VueRecaptcha from 'vue-recaptcha';
-import { siteKey, directorAuth } from '@/api/api';
 import { mapState, mapMutations } from 'vuex';
-import http from 'axios';
 
 export default {
   name: 'AccountRecoveryPassword',
@@ -138,7 +126,6 @@ export default {
     ButtonSecondary,
     ButtonPrimary,
     PasswordError,
-    VueRecaptcha,
   },
   data() {
     return {
@@ -154,14 +141,13 @@ export default {
       },
       showPasswordStatus: false,
       recaptchaSiteKey: siteKey,
-      recaptchaToken: '',
+      recaptchaToken: 'token',
       loading: '',
     };
   },
   methods: {
     ...mapMutations('login', [
       'toggleRecaptcha',
-      'toggleResetMessage',
     ]),
     onVerify(response) {
       this.recaptchaToken = response;
@@ -203,17 +189,7 @@ export default {
         'password-2': this.passwordConfirm,
         auth_token: this.token,
       };
-      http.post(directorAuth.changePassword, data)
-        .then((response) => {
-          console.log(response);
-          this.loading = false;
-          this.toggleResetMessage(true);
-          this.$router.push('/auth');
-        }).catch((error) => {
-          this.loading = false;
-          console.log(error);
-          this.$router.push('/auth');
-        });
+      this.$router.push({ path: '/auth', query: { message: 'password' } });
     },
   },
   computed: {
@@ -250,7 +226,7 @@ export default {
     },
   },
   watch: {
-    password(value) {
+    passwordReady(value) {
       if (value) this.myErrors.password = '';
     },
     passwordConfirm(value) {
@@ -260,58 +236,5 @@ export default {
 };
 </script>
 <style lang="scss">
-.recovery-password {
-  &__button-image {
-    width: 18px;
-    height: 18px;
-  }
-  &__email {
-    pointer-events: none;
-    margin-bottom: 20px;
-  }
-  &__label-wrapper {
-    @include flex-row(space-between, flex-end);
-    margin-bottom: 8px;
-  }
-  &__label-text {
-    @extend %auth-label-text;
-    &--no-margin {
-      margin: 0;
-    }
-  }
-  &__label {
-    display: block;
-    margin-bottom: 24px;
-  }
-  &__input {
-    @extend %input;
-    width: 100%;
-  }
-  &__input-wrapper {
-    margin-bottom: 16px;
-    position: relative;
-    &--confirm {
-      margin: 0;
-    }
-  }
-  &__icon {
-    @extend %input-icon;
-    fill: $G1;
-  }
-  &__conditions {
-    margin-bottom: 24px;
-  }
-  &__recaptcha {
-    margin-bottom: 32px;
-    div {
-      width: 268px !important;
-    }
-  }
-  &__buttons-wrapper {
-    @include flex-row(flex-end, center);
-  }
-  &__button {
-    margin-right: 24px;
-  }
-}
+@import '~@/scss/components/recovery-password';
 </style>

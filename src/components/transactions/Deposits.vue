@@ -62,7 +62,7 @@
         <p class="transaction-box__text">Recieved on</p>
         <icon-dropdown class='transaction-box__item-icon'/>
       </li>
-      <li class="transaction-box__item">
+      <li class="transaction-box__item transaction-box__item--end">
         <p class="transaction-box__text">Amount</p>
         <icon-dropdown class='transaction-box__item-icon'/>
       </li>
@@ -76,8 +76,8 @@
     <transition-group name="list-complete" tag="div">
       <deposit-card
         class='list-complete-item'
-        v-for='deposit in deposits'
-        :key='deposit.id'
+        v-for='(deposit, index) in deposits'
+        :key='`${index}${deposit.id}`'
         :deposit='deposit'/>
     </transition-group>
   </div>
@@ -87,7 +87,7 @@
 import IconSearch from '@/components/common/icons/IconSearch.vue';
 import DepositCard from '@/components/transactions/components/DepositCard.vue';
 import IconDropdown from '@/components/common/icons/IconDropdown.vue';
-import { mapState, mapMutations, mapGetters } from 'vuex';
+import { mapState, mapMutations, mapGetters, mapActions } from 'vuex';
 
 export default {
   name: 'Deposits',
@@ -101,19 +101,25 @@ export default {
       visible: {
         search: false,
       },
-      searchChars: '',
     };
   },
   methods: {
-    ...mapMutations('deposits', [
-      'setSearch',
-    ]),
+    ...mapMutations('transactions', {
+      setSearch: 'setDepositSearch',
+      clearSearch: 'clearSearch',
+    }),
+    ...mapActions({
+      getDeposits: 'transactions/getDeposits',
+      getMethods: 'billing/getMethods',
+      getCurrencies: 'billing/getCurrencies',
+      getCost: 'transactions/getCost',
+    }),
   },
   computed: {
-    ...mapState('deposits', {
-      getSearch: state => state.search,
+    ...mapState('transactions', {
+      getSearch: state => state.searchDeposits,
     }),
-    ...mapGetters('deposits', {
+    ...mapGetters('transactions', {
       deposits: 'getDeposits',
     }),
     search: {
@@ -124,6 +130,19 @@ export default {
         this.setSearch(chars);
       },
     },
+  },
+  beforeDestroy() {
+    this.clearSearch();
+  },
+  created() {
+    this.getCost();
+    this.getDeposits()
+      .then((resp) => {
+        console.log("DEPOSITS=>", resp)
+        this.getCurrencies()
+          .then(() => this.getMethods());
+      })
+      .catch(error => console.log(error))
   },
 };
 </script>

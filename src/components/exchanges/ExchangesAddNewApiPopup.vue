@@ -1,5 +1,13 @@
 <template>
 <div class="exchanges-add-new-api">
+<div class="popup-layer"></div>
+  <!--[<message-info-absolute
+      v-if='isMessage.info'
+      @click.native='isMessage.info = false'
+      :key="message">
+      {{ message }}
+    </message-info-absolute>]-->
+
   <div class="exchanges-add-new-api__card">
     <close-button
       class="exchanges-add-new-api__close-button"
@@ -130,7 +138,8 @@ import ButtonSecondary from '@/components/common/buttons/ButtonSecondary.vue';
 import ButtonTransparent from '@/components/common/buttons/ButtonTransparent.vue';
 import CloseButton from '@/components/common/buttons/CloseButton.vue';
 import StepImage from '@/components/common/StepImage.vue';
-import { mapMutations, mapGetters, mapState } from 'vuex';
+// import MessageInfoAbsolute from '@/components/common/messages/MessageInfoAbsolute.vue';
+import { mapActions, mapGetters, mapState } from 'vuex';
 
 export default {
   name: 'ExchangesAddNewApi',
@@ -140,6 +149,7 @@ export default {
     ButtonSecondary,
     CloseButton,
     StepImage,
+    // MessageInfoAbsolute,
   },
   data() {
     return {
@@ -147,6 +157,8 @@ export default {
       secretKey: '',
       name: '',
       loading: false,
+      // message:'',
+      // isMessage:{ info: false },
     };
   },
   computed: {
@@ -161,8 +173,8 @@ export default {
     },
   },
   methods: {
-    ...mapMutations('exchanges', [
-      'addApi',
+    ...mapActions('exchanges', [
+      'addExchange',
     ]),
     close() {
       this.$emit('close');
@@ -170,19 +182,29 @@ export default {
     // TODO: change save func to http request
     add() {
       this.loading = true;
-      const formatBalance = Math.floor(Math.random() * 1000000);
-      const api = {
-        name: this.name,
-        apiKey: this.apiKey,
-        secretKey: this.secretKey,
-        balance: formatBalance,
-        status: false,
+      const data = {
+        id: Math.floor(Math.random() * (10000 - 1)) + 1,
+        name: this.name.toLowerCase(),
+        type: this.name.toLowerCase(),
+        api_key: this.apiKey,
+        sec_key: this.secretKey,
+        status: true,
+        balance: Math.random() * (10000 - 1) + 1,
+        balance_ardor: Math.random() * (10000 - 1) + 1,
+        balance_btc: Math.random() * (10000 - 1) + 1,
+        api_extra: '',
       };
-      setTimeout(() => {
-        this.addApi(api);
-        this.loading = false;
-        this.close();
-      }, 1000);
+      this.addExchange(data)
+        .then((resp) => {
+          console.log(resp);
+          this.loading = false;
+          this.close();
+        })
+        .catch((error) => {
+          console.log(error);
+          this.loading = false;
+          this.close();
+        })
     },
   },
 };
@@ -190,7 +212,7 @@ export default {
 <style lang="scss">
 .exchanges-add-new-api {
   position: absolute;
-  top: 0;
+  top: -56px;
   right: 0;
   left: 0;
   min-height: 100vh;

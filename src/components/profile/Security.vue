@@ -1,5 +1,15 @@
 <template>
 <main class="security">
+  <message-success-absolute
+    @click.native='message.success = false'
+    v-if='message.success'
+    >Your password has been changed
+  </message-success-absolute>
+  <message-error-absolute
+    @click.native='message.error = false'
+    v-if='message.error'
+    >Your password hasn't been changed
+  </message-error-absolute>
 <div class="security__section security__section--password">
   <div class="security__heading">
     <p class="security__title">Password</p>
@@ -22,6 +32,8 @@
     <password-form
       class="security__password-form"
       @cancel='toggleWindow("button")'
+      @success='passwordSuccess'
+      @error='passwordError'
       @code='toggleWindow("code")'
       v-else-if='visible.changeForm' key='form'/>
     <change-password-code
@@ -40,7 +52,12 @@
       enter-active-class="animated dur03 fadeIn"
       leave-active-class="animated dur03 fadeOut"
       mode="out-in">
-    <password-form @code='togglePopup("code")' v-if='popup.changeForm' key='form'/>
+    <password-form
+      @success='passwordSuccess'
+      @error='passwordError'
+      @code='togglePopup("code")'
+      v-if='popup.changeForm'
+      key='form'/>
     <change-password-code :verifycode='1234' v-else @cancel='cancel' key='code'/>
     </transition>
   </div>
@@ -52,7 +69,9 @@ import ButtonSecondary from '@/components/common/buttons/ButtonSecondary.vue';
 import CloseButton from '@/components/common/buttons/CloseButton.vue';
 import ChangePasswordCode from '@/components/profile/components/ChangePasswordCode.vue';
 import PasswordForm from '@/components/profile/components/PasswordForm.vue';
-import { mapState } from 'vuex';
+import MessageSuccessAbsolute from '@/components/common/messages/MessageSuccessAbsolute.vue';
+import MessageErrorAbsolute from '@/components/common/messages/MessageErrorAbsolute.vue';
+import { mapState, mapGetters } from 'vuex';
 
 export default {
   name: 'Security',
@@ -61,6 +80,8 @@ export default {
     CloseButton,
     ChangePasswordCode,
     PasswordForm,
+    MessageErrorAbsolute,
+    MessageSuccessAbsolute,
   },
   data() {
     return {
@@ -72,6 +93,10 @@ export default {
         button: true,
         changeForm: false,
         code: false,
+      },
+      message: {
+        success: false,
+        error: false,
       },
     };
   },
@@ -88,12 +113,36 @@ export default {
         this.popup[key] = key === type;
       });
     },
+    passwordError() {
+      this.toggleWindow("button");
+      this.showMessage('error');
+    },
+    passwordSuccess() {
+      this.toggleWindow("button");
+      this.showMessage('success');
+    },
+    showMessage(type) {
+      if (this.message[type]) {
+        this.message[type] = false;
+        setTimeout(() => {
+          this.message[type] = true;
+          setTimeout(() => {
+            this.message[type] = false;
+          }, 3000);
+        }, 15);
+      } else {
+        this.message[type] = true;
+          setTimeout(() => {
+            this.message[type] = false;
+          }, 3000);
+      }
+    },
     cancel() {
       this.$emit('cancel');
     },
   },
   computed: {
-    ...mapState('profile', [
+    ...mapGetters('profile', [
       'lastChangePassword',
     ]),
   },

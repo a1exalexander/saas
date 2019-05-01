@@ -1,6 +1,6 @@
 <template>
-<section class='account-recovery-confirm'>
-  <form class="account-recovery-confirm__form">
+<section class='account-recovery-confirm' @keypress.enter="confirmCode">
+  <div class="account-recovery-confirm__form">
     <p
       class="account-recovery-confirm__subtitle"
       v-html="`${$t('auth.text.sent code')} ${email}`"></p>
@@ -8,17 +8,18 @@
       <label class="account-recovery-confirm__label-wrapper">
         <p class="account-recovery-confirm__label-text">{{ $t('auth.labels.code') }}</p>
         <input
-          type="password"
+          type="text"
           class="account-recovery-confirm__input"
           v-model='code'>
       </label>
       <button-primary
         @click.prevent.native='confirmCode'
+        :class='{"button-loading": loading}'
         :disabled='!code'
         class='account-recovery-confirm__button'>{{ $t('auth.buttons.send') }}
       </button-primary>
     </div>
-  </form>
+  </div>
 </section>
 </template>
 <script>
@@ -35,6 +36,7 @@ export default {
   data() {
     return {
       code: '',
+      loading: '',
     };
   },
   components: {
@@ -42,7 +44,11 @@ export default {
   },
   methods: {
     confirmCode() {
-      this.$emit('confirmCode');
+      if (this.code) {
+        this.loading = true;
+        const data = {code: this.code};
+        this.$emit('token', '2f0aea34-00a0-5695-85fe-e02c0a0cc8d6');
+      }
     },
   },
 };

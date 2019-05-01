@@ -20,6 +20,8 @@
 }
 
 .icon-button-left {
+  width: 13px;
+  height: 13px;
   margin-right: 8px;
   margin-left: 0;
   order: -1;
@@ -36,38 +38,27 @@
   }
 }
 .icon-small, svg.icon-small {
+  width: 12px;
+  height: 12px;
+}
+.icon-large, svg.icon-large {
   width: 16px;
   height: 16px;
 }
-.icon-large, svg.icon-large {
-  width: 18px;
-  height: 18px;
+.icon-larger, svg.icon-larger {
+  width: 20px;
+  height: 20px;
+}
+.icon-largest, svg.icon-largest {
+  width: 28px;
+  height: 28px;
 }
 .icon-button-right {
+  width: 13px;
+  height: 13px;
   order: 2;
   margin-left: 8px;
   margin-right: 0;
-}
-
-%link {
-  color: $B2;
-  font-size: $H400;
-  font-weight: 500;
-  transition: color ease-in-out 0.2s;
-  @media screen and (min-width: $screen-tablet) {
-    font-size: $H200;
-    &:hover {
-      color: $B1;
-    }
-  }
-  &:active {
-    color: $B5;
-  }
-}
-
-%button-image {
-  width: 16px;
-  height: 16px;
 }
 
 .rotate-180 {

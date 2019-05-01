@@ -1,12 +1,23 @@
 <template>
-  <button class='subtle'>
+  <button @click="onClick" class='subtle'>
     <div class="subtle__border"></div>
     <slot/>
+    <span v-if='label'>{{ label }}</span>
   </button>
 </template>
 <script>
 export default {
   name: 'Subtle',
+  props: {
+    label: {
+      type: String,
+      default: '',
+    },
+  },
+  methods:{
+    onClick(){ this.$emit('click'); },
+  }
+
 };
 </script>
 <style lang="scss">

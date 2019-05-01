@@ -34,7 +34,7 @@
           </div>
         </li>
         <li class="transaction-card__item tablet-flex">
-          <p class="transaction-card__text transaction-card__text--white">{{ payout.currency }}</p>
+          <p class="transaction-card__text transaction-card__text--white">{{ currency }}</p>
         </li>
         <li class="transaction-card__item tablet-flex">
           <icon-wallet class='transaction-card__item-icon'/>
@@ -47,8 +47,10 @@
           <p
             class="transaction-card__text transaction-card__text--balance"
             :class='{"transaction-card__text--rejected": payout.status === "rejected",
-                    "transaction-card__text--successful": payout.status === "successful"}'
-            >{{ payout.balance | numeral('0,0') }} $
+                    "transaction-card__text--successful": payout.status === "approved",
+                    "transaction-card__text--successful": payout.status === "successful",
+                    "transaction-card__text--successful": payout.status === "successfull"}'
+            >{{ payout.balance | numeral('0,0.0000') }} $
           </p>
           <icon-info
             class='transaction-card__item-icon
@@ -64,11 +66,13 @@
         </li>
         <li class="transaction-card__item tablet-flex">
           <p
-          class="transaction-card__text transaction-card__text--status"
-          :class='{"transaction-card__text--rejected": payout.status === "rejected",
-                  "transaction-card__text--successful": payout.status === "successful"}'
-          >{{ payout.status }}
-        </p>
+            class="transaction-card__text transaction-card__text--status"
+            :class='{"transaction-card__text--rejected": payout.status === "rejected",
+                    "transaction-card__text--successful": payout.status === "approved",
+                    "transaction-card__text--successful": payout.status === "successful",
+                    "transaction-card__text--successful": payout.status === "successfull"}'
+            >{{ payout.status }}
+          </p>
           <icon-info
             class='transaction-card__item-icon transaction-card__item-icon--small-right'
             v-if='payout.status === "rejected"'/>
@@ -76,14 +80,14 @@
       </ul>
     </div>
     <transition
-    name="custom-classes-transition"
-    enter-active-class="animated dur03 fadeIn"
-    leave-active-class="animated dur02 fadeOut"
-    mode="out-in">
+      name="custom-classes-transition"
+      enter-active-class="animated dur02 fadeIn"
+      leave-active-class="animated dur02 fadeOut"
+      mode="out-in">
     <div class="transaction-card__drop-menu" v-if='dropMenu'>
       <div class="transaction-card__drop-item">
         <p class="transaction-card__label">Currency</p>
-        <p class="transaction-card__text">{{ payout.currency }}</p>
+        <p class="transaction-card__text">{{ currency }}</p>
       </div>
       <div class="transaction-card__drop-item">
         <p class="transaction-card__label">Payout adress</p>
@@ -136,6 +140,18 @@ export default {
     return {
       dropMenu: false,
     };
+  },
+  computed: {
+    currency() {
+      const { currency } = this.payout;
+      if (currency === 'ETH') {
+        return 'Ethereum';
+      } else if (currency === 'BTC') {
+        return 'Bitcoin';
+      } else {
+        return currency;
+      }
+    },
   },
 };
 </script>

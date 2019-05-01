@@ -12,10 +12,13 @@
     <header class="customers__header">
       <div class="customers__header-inner">
         <div class="customers__title-wrapper">
-          <h1 class="customers__title">Customers</h1>
+          <h1 class="customers__title">Clients</h1>
           <label class="customers__search-label" v-if='isInvestors'>
             <icon-search class="customers__search-icon"/>
-            <input type="text" class="customers__search-input">
+            <input
+              type="text"
+              class="customers__search-input"
+              v-model='search'>
           </label>
         </div>
         <!-- TODO: coming soon -->
@@ -28,24 +31,10 @@
         <ul class="customers__nav-list">
           <li class="customers__nav-item">
             <router-link
-              to='/director/customers'
-              class="customers__nav-link"
-              :class='{"inline-nav-link-active": routeName === "Leads"}'>Leads
-            </router-link>
-          </li>
-          <li class="customers__nav-item">
-            <router-link
-              to='/director/customers'
-              class="customers__nav-link"
-              :class='{"inline-nav-link-active": routeName === "Contacts"}'>Contacts
-            </router-link>
-          </li>
-          <li class="customers__nav-item">
-            <router-link
-              to='/director/customers/investors'
+              to='/director/clients/investors'
               class="customers__nav-link"
               :class='{"inline-nav-link-active": routeName === "Investors"
-                || routeName === "Customers"}'
+                || routeName === "Clients"}'
               >Investors
             </router-link>
           </li>
@@ -68,7 +57,7 @@ import ButtonPrimaryIcon from '@/components/common/buttons/ButtonPrimaryIcon.vue
 import IconPlus from '@/components/common/icons/IconPlus.vue';
 import AddInvestorPopup from '@/components/customers/AddInvestorPopup.vue';
 import IconSearch from '@/components/common/icons/IconSearch.vue';
-import { mapGetters } from 'vuex';
+import { mapGetters, mapState, mapMutations } from 'vuex';
 
 export default {
   name: 'Customers',
@@ -88,11 +77,25 @@ export default {
     ...mapGetters('investors', [
       'isInvestors',
     ]),
+    ...mapState('investors', {
+      getSearch: state => state.search,
+    }),
     routeName() {
       return this.$route.name;
     },
+    search: {
+      get() {
+        return this.getSearch;
+      },
+      set(value) {
+        this.setSearch(value);
+      },
+    }
   },
   methods: {
+    ...mapMutations('investors', [
+      'setSearch',
+    ]),
     addCustomer() {
       this.addCustomerPopup = true;
     },
@@ -105,17 +108,20 @@ export default {
 <style lang="scss">
 .customers {
   background-color: $N13;
-  padding: 56px 0;
-  height: 100vh;
   @include flex-col(stretch, stretch);
   @media screen and (min-width: $screen-tablet) {
+    height: 100vh;
     padding: 0;
     flex: 1 1;
   }
   &__header {
+    top: 56px;
+    position: sticky;
+    z-index: 3;
     background-color: $B12;
     padding: 32px 28px 0;
     @media screen and (min-width: $screen-tablet) {
+      top: 0;
       padding: 27px 40px 0;
     }
   }
@@ -134,9 +140,9 @@ export default {
   }
   &__main {
     flex: 1 1;
-    overflow: auto;
+    overflow-y: auto;
     @media screen and (min-width: $screen-tablet) {
-      overflow: hidden;
+      overflow-y: hidden;
       display: flex;
       flex-flow: column nowrap;
       justify-content: stretch;

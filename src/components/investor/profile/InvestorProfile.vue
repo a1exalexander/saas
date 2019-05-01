@@ -1,16 +1,26 @@
 <template>
 <div class="profile-investor" @click='closeDrop'>
-   <message-success-absolute
-    @click.native='messageSuccess = false'
-    v-if='messageSuccess'
-    >Your changes have been saved
+  <message-success-absolute
+    @click.native='message.success = false'
+    v-if='message.success'
+    >{{ textMessage.success }}
   </message-success-absolute>
+  <message-info-absolute
+    @click.native='message.info = false'
+    v-if='message.info'
+    >{{ textMessage.info }}
+  </message-info-absolute>
+  <message-error-absolute
+    @click.native='message.error = false'
+    v-if='message.error'
+    >{{ textMessage.error }}
+  </message-error-absolute>
   <header class="profile-investor__header">
     <a
       @click.prevent='cancel'
       class="profile-investor__router-link-wrapper">
       <subtle-icon class="profile-investor__router-link">
-        <div class="profile-investor__icon-wrapper icon-button-left">
+        <div class="profile-investor__icon-wrapper icon-button-left icon-large">
           <icon-long-arrow-left class="profile-investor__icon"/>
         </div>
         <span>Back to Dashboard</span>
@@ -40,12 +50,12 @@
       </div>
       <div class="profile-investor__col">
         <div class="profile-investor__row profile-investor__row--name-margin">
-          <p class="profile-investor__name">Elisabeth Gud</p>
-          <span class="profile-investor__status">Investor</span>
+          <p class="profile-investor__name">{{ fullName }}</p>
+          <span class="profile-investor__status">{{ profile.role }}</span>
         </div>
         <div class="profile-investor__row">
           <p class="profile-investor__state">User ID: </p>
-          <p class="profile-investor__user-id">1285033665</p>
+          <p class="profile-investor__user-id">{{ profile.id }}</p>
         </div>
       </div>
     </div>
@@ -58,7 +68,7 @@
           <subtle-icon
             class="profile-investor__button-photo-field"
             >Change photo
-            <icon-pencil class='icon-button-right'/>
+            <icon-pencil class='icon-button-right icon-small'/>
           </subtle-icon>
           <input
             type="file"
@@ -175,14 +185,14 @@
           <input
             type="text"
             class="profile-investor__input"
-            v-model.trim='newData.house'>
+            v-model.trim='newData.house_number'>
         </label>
         <label class="profile-investor__label profile-investor__label--apt">
           <p class="profile-investor__label-text">Apt, Suit, etc</p>
           <input
             type="text"
             class="profile-investor__input"
-            v-model.trim='newData.apt'>
+            v-model.trim='newData.extra_address'>
         </label>
         <label class="profile-investor__label profile-investor__label--postal">
           <p class="profile-investor__label-text">Postal code</p>
@@ -190,7 +200,7 @@
             type="text"
             class="profile-investor__input"
             maxlength="5"
-            v-model.trim='newData.postal'>
+            v-model.trim='newData.zip'>
         </label>
       </div>
       <transition
@@ -212,7 +222,7 @@
         </button-primary>
         <button-secondary
           class='profile-investor__button'
-          @click.prevent.native='cancelAddress'
+          @click.native='cancelAddress'
           >Cancel
         </button-secondary>
       </div>
@@ -234,6 +244,7 @@
       <button-secondary
         class='profile-investor__button profile-investor__button--delete'
         @click.native='deleteAccount'
+        :class='{"button-loading": loading.delete}'
         >Delete account
       </button-secondary>
       <p
@@ -265,6 +276,8 @@
     leave-active-class="animated dur03 fadeOut"
     mode="out-in">
   <password-form
+    @error='passwordError'
+    @success='passwordSuccess'
     @cancel='changePasswordPopup = false'
     v-if='changePasswordPopup'
     key='form'/>
@@ -282,8 +295,11 @@ import IconAva from '@/components/common/icons/IconAva.vue';
 import Validation from '@/js/validation';
 import DropMenuCountry from '@/components/investor/profile/components/DropMenuCountry.vue';
 import MessageSuccessAbsolute from '@/components/common/messages/MessageSuccessAbsolute.vue';
+import MessageErrorAbsolute from '@/components/common/messages/MessageErrorAbsolute.vue';
+import MessageInfoAbsolute from '@/components/common/messages/MessageInfoAbsolute.vue';
 import PasswordForm from '@/components/investor/profile/PasswordForm.vue';
-import { mapGetters, mapState, mapMutations } from 'vuex';
+import { mapGetters, mapActions, mapState, mapMutations } from 'vuex';
+import { setTimeout } from 'timers';
 
 export default {
   name: 'InvestorProfile',
@@ -297,7 +313,9 @@ export default {
     ButtonSecondary,
     ButtonTransparent,
     MessageSuccessAbsolute,
+    MessageErrorAbsolute,
     PasswordForm,
+    MessageInfoAbsolute,
   },
   data() {
     return {
@@ -308,11 +326,11 @@ export default {
         country: '',
         city: '',
         street: '',
-        house: '',
-        apt: '',
-        postal: '',
+        house_number: '',
+        extra_address: '',
+        zip: '',
         ava: '',
-        userId: '',
+        id: '',
       },
       errorsText: {
         name: [
@@ -328,14 +346,37 @@ export default {
         all: false,
         general: false,
         address: false,
+        delete: false,
       },
-      messageSuccess: false,
+      textMessage: {
+        success: '',
+        error: '',
+        info: '',
+      },
+      message: {
+        success: false,
+        error: false,
+        info: false,
+      },
     };
   },
   methods: {
-    ...mapMutations('investorProfile', [
-      'updateProfile',
-    ]),
+    ...mapActions({
+      getProfile: 'investorProfile/getProfile',
+      updateProfile: 'investorProfile/updateProfile',
+      getProfileAsync: 'investorProfile/getProfileAsync',
+      deleteProfile: 'investorProfile/deleteProfile',
+    }),
+    passwordError() {
+      this.changePasswordPopup = false;
+      this.textMessage.error = 'Your password hasn\'t been changed';
+      this.showMessage('error');
+    },
+    passwordSuccess() {
+      this.textMessage.success = 'Your password has been changed';
+      this.changePasswordPopup = false;
+      this.showMessage('success');
+    },
     getImage() {
       this.newData.ava = this.$refs.ava.files[0];
     },
@@ -346,61 +387,97 @@ export default {
       this.newData.country = value;
     },
     deleteAccount() {
-      console.log('delete');
+      this.loading.delete = true;
+      this.textMessage.info = 'Your account has been deleted';
+      this.deleteProfile()
+        .then((resp) => {
+          console.log(resp);
+          this.loading.delete = false;
+          this.showMessage('info');
+          setTimeout(() => {
+            this.AUTH_LOGOUT()
+              .then(() => this.$router.push('/auth/investor'))
+          })
+        })
+        .catch((error) => {
+          this.loading.delete = false;
+          console.log(error);
+        })
     },
     closeDrop() {
       if (this.$refs.dropMenu) {
         this.$refs.dropMenu.close();
       }
     },
-    save() {
-      this.loading.all = true;
-      setTimeout(() => {
-        this.loading.all = false;
-        this.updateProfile(this.newData);
-        this.messageSuccess = true;
+    showMessage(type) {
+      if (this.message[type]) {
+        this.message[type] = false;
         setTimeout(() => {
-          this.messageSuccess = false;
-        }, 3000);
-      }, 1000);
+          this.message[type] = true;
+          setTimeout(() => {
+            this.message[type] = false;
+          }, 3000);
+        }, 15);
+      } else {
+        this.message[type] = true;
+          setTimeout(() => {
+            this.message[type] = false;
+          }, 3000);
+      }
+    },
+    sendData(type, formData) {
+      this.loading[type] = true;
+      this.updateProfile(formData)
+        .then((resp) => {
+          this.loading[type] = false;
+          this.textMessage.success = 'Your changes have been saved';
+          this.showMessage('success');
+          console.log(resp);
+        })
+        .catch((error) => {
+          this.loading[type] = false;
+          console.log(error);
+          this.textMessage.error = 'An error occurred while saving';
+          this.showMessage('error');
+        });
+    },
+    save() {
+      this.sendData('all', this.newData);
     },
     saveGeneral() {
-      this.loading.general = true;
-      const newData = {
+      const formData = {
         name_first: this.newData.name_first,
         name_last: this.newData.name_last,
         gender: this.newData.gender,
       };
-      setTimeout(() => {
-        this.loading.general = false;
-        this.updateProfile(newData);
-        this.messageSuccess = true;
-        setTimeout(() => {
-          this.messageSuccess = false;
-        }, 3000);
-      }, 1000);
+      this.sendData('general', formData);
     },
     saveAddress() {
-      this.loading.address = true;
-      const newData = {
+      const formData = {
         country: this.newData.country,
         city: this.newData.city,
         street: this.newData.street,
-        house: this.newData.house,
-        apt: this.newData.apt,
-        postal: this.newData.postal,
+        house_number: this.newData.house_number,
+        extra_address: this.newData.extra_address,
+        zip: this.newData.zip,
       };
-      setTimeout(() => {
-        this.loading.address = false;
-        this.updateProfile(newData);
-        this.messageSuccess = true;
-        setTimeout(() => {
-          this.messageSuccess = false;
-        }, 3000);
-      }, 1000);
+      this.sendData('address', formData);
     },
     cancel() {
       this.$router.push('/investor');
+    },
+    cancelGeneral() {
+      const formData = ['name_first', 'name_last', 'gender'];
+      Object.keys(formData).forEach((key) => {
+        this.newData[key] = this.profile[key];
+      });
+    },
+    cancelAddress() {
+      this.$refs.dropMenu.forceSelect(this.profile.country);
+      const formData = ['country', 'city', 'street', 'house_number', 'extra_address', 'zip'];
+      formData.forEach((key) => {
+        this.newData[key] = this.profile[key];
+      });
     },
     getData() {
       Object.keys(this.newData).forEach((key) => {
@@ -426,14 +503,17 @@ export default {
   },
   computed: {
     ...mapState('investorProfile', [
-      'lastChangePassword',
       'profile',
     ]),
     ...mapGetters('investorProfile', [
       'getProfileToEdit',
+      'lastChangePassword',
     ]),
     nameStatus() {
       return Validation.name(this.newData.name_first);
+    },
+    fullName() {
+      return `${this.profile.name_first} ${this.profile.name_last?this.profile.name_last:''}`;
     },
     comparedGeneralData() {
       let flag = false;
@@ -458,9 +538,9 @@ export default {
         country: this.newData.country,
         city: this.newData.city,
         street: this.newData.street,
-        house: this.newData.house,
-        apt: this.newData.apt,
-        postal: this.newData.postal,
+        house_number: this.newData.house_number,
+        extra_address: this.newData.extra_address,
+        zip: this.newData.zip,
       };
       const oldData = this.profile;
       Object.entries(newData).forEach((newItem) => {
@@ -486,8 +566,13 @@ export default {
       return flag && this.nameStatus;
     },
   },
-  beforeMount() {
-    this.getData();
+  created() {
+    this.getProfileAsync()
+      .then((resp) => {
+        console.log(resp);
+        this.getData();
+      })
+      .catch(error => console.log(error));
   },
   watch: {
     nameStatus(value) {
@@ -519,7 +604,7 @@ $investor-profile: profile-investor;
   &__router-link-wrapper {
     @include flex-row(flex-start, center);
     padding: 20px 28px;
-    @media screen and (min-width: $screen-desktop) {
+    @media screen and (min-width: $screen-tablet) {
       display: inline-block;
       padding: 32px 0 0 0;
     }
@@ -691,6 +776,7 @@ $investor-profile: profile-investor;
     @include text($H400, 400, $N0);
   }
   &__status {
+    text-transform: capitalize;
     background-color: $N9;
     border-radius: 3px;
     padding: 2px 6px 4px;

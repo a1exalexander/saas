@@ -31,10 +31,14 @@
      @media screen and (min-width: $screen-tablet) {
       list-style: none;
       display: grid;
-      grid-template-columns: 2fr repeat(3, 1fr) 0.8fr 0.7fr;
-      grid-column-gap: 5%;
+      grid-template-columns: 3fr 1fr 1fr 3fr 1.5fr 1fr;
+      grid-column-gap: 20px;
       justify-content: space-between;	
       padding-bottom: 9px;
+    }
+    @media screen and (min-width: $screen-desktop) {
+      grid-template-columns: 3fr 1fr 1fr 3fr 1.5fr 1fr;
+      grid-column-gap: 4%;
     }
   }
   &__title {
@@ -90,6 +94,11 @@
     @include flex-row(flex-start, center);
     &--end {
       justify-self: end;
+    }
+    &--amount {
+      @media screen and (min-width: $screen-desktop-large) {
+        justify-self: end;
+      }
     }
   }
 }

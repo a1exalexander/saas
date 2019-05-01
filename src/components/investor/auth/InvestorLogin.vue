@@ -1,11 +1,25 @@
 <template>
 <main class="auth__wrapper">
-  <message-success
+  <message-success-absolute
     class='auth__message'
-    v-if='emailConfirmMessage'
-    @click.native='toggleEmailConfirmedMessage(false)'>
-    Your email address has been confirmed!
-  </message-success>
+    v-if='message.confirm'
+    @click.native='message.confirm = false'
+    key='confirm'>
+    {{ messageConfirmText }}
+  </message-success-absolute>
+   <message-info-absolute
+    class='auth__message'
+    v-if='message.info'
+    @click.native='message.info = false'
+    key='info'>
+    {{ messageInfoText }}
+  </message-info-absolute>
+  <message-error-absolute
+    class='auth__message'
+    v-if='message.error'
+    @click.native='message.error = false'>
+    {{ messageErrorText }}
+  </message-error-absolute>
   <icon-logo class='auth__logo'/>
   <section class="auth animated dur09 fadeIn">
     <div class="auth__mobile-header">
@@ -14,7 +28,7 @@
         class="auth__close-button"
         @click.native='close'/>
     </div>
-    <div class="auth__reset-message" v-if='resetMessage'>
+    <div class="auth__reset-message" v-if='message.reset'>
       <p class="auth__title auth__title--message">{{ $t('auth.messages.success') }}</p>
       <p class="auth__text">
         <span class="auth__image-wrapper">
@@ -38,7 +52,7 @@
           class="auth__input"
           @blur='errorEmail'
           :class='{"input-error": myErrors.email}'
-          v-model.trim="email">
+          v-model.trim="form.email">
         <p
           class="input-text-error animated dur04 bounceIn"
           v-show='myErrors.email'
@@ -69,7 +83,7 @@
         class="auth__input auth__input--password"
         :class='{"input-error": myErrors.password}'
         @blur='errorPassword'
-        v-model.trim="password">
+        v-model.trim="form.password">
         <p
           class="input-text-error animated dur04 bounceIn"
           v-show='myErrors.password'
@@ -120,8 +134,10 @@ import IconLogo from '@/components/common/icons/IconLogo.vue';
 import Validation from '@/js/validation';
 import IconEyeOff from '@/components/common/icons/IconEyeOff.vue';
 import CloseButton from '@/components/common/buttons/CloseButton.vue';
-import MessageSuccess from '@/components/common/messages/MessageSuccess.vue';
-import { mapMutations, mapState } from 'vuex';
+import MessageSuccessAbsolute from '@/components/common/messages/MessageSuccessAbsolute.vue';
+import MessageInfoAbsolute from '@/components/common/messages/MessageInfoAbsolute.vue';
+import MessageErrorAbsolute from '@/components/common/messages/MessageErrorAbsolute.vue';
+import { mapMutations, mapState, mapActions } from 'vuex';
 
 export default {
   name: 'Login',
@@ -136,12 +152,16 @@ export default {
     IconEyeOff,
     CloseButton,
     IconCheck2,
-    MessageSuccess,
+    MessageSuccessAbsolute,
+    MessageInfoAbsolute,
+    MessageErrorAbsolute,
   },
   data() {
     return {
-      password: '',
-      email: '',
+      form: {
+        password: '',
+        email: '',
+      },
       showPasswordStatus: false,
       myErrors: {
         password: '',
@@ -155,19 +175,65 @@ export default {
           this.$t('auth.errors.email.valid'),
         ],
       },
+      message: {
+        info: false,
+        confirm: false,
+        reset: false,
+        error: false,
+      },
+      messageErrorText: '',
+      messageConfirmText: '',
+      messageInfoText: '',
     };
   },
   methods: {
     ...mapMutations({
       toggleKeepingUser: 'investorLogin/toggleKeepingUser',
-      toggleEmailConfirmedMessage: 'investorSignup/toggleEmailConfirmedMessage',
-      toggleResetMessage: 'investorLogin/toggleResetMessage',
+      setSurvey: 'investorProfile/setSurvey',
+    }),
+    ...mapActions({
+      AUTH_REQUEST: 'investorLogin/AUTH_REQUEST',
+      getProfile: 'investorProfile/getProfile',
+      getProfileAsync: 'investorProfile/getProfileAsync',
+      getFund: 'investorProfile/getFund',
     }),
     close() {
       this.$router.push('/investor');
     },
     login() {
-      this.$router.push('/investor');
+      this.AUTH_REQUEST(this.form).then((response) => {
+        console.log(response);
+        this.getProfileAsync()
+          .then(() => {
+            this.$router.push('/investor');
+          })
+          .catch((error) => {
+            this.messageErrorText = 'Error';
+            this.showMessage('error');
+            console.log(error);
+          })
+      }).catch((error) => {
+        this.messageErrorText = 'Sorry, that password isn\'t right. We can help you recover your password';
+        this.showMessage('error');
+        console.log(error);
+      });
+      if (this.$dev) this.$router.push('/investor');
+    },
+    showMessage(type) {
+      if (this.message[type]) {
+        this.message[type] = false;
+        setTimeout(() => {
+          this.message[type] = true;
+          setTimeout(() => {
+            this.message[type] = false;
+          }, 3000);
+        }, 15);
+      } else {
+        this.message[type] = true;
+        setTimeout(() => {
+          this.message[type] = false;
+        }, 3000);
+      }
     },
     showPassword() {
       const element = document.getElementById('login-password');
@@ -195,7 +261,7 @@ export default {
       const error3 = this.errorsText.email[2];
       this.myErrors.email = '';
       setTimeout(() => {
-        if (!this.email) {
+        if (!this.form.email) {
           this.myErrors.email = error1;
         } else if (!this.checkEmail) {
           this.myErrors.email = error3;
@@ -208,8 +274,7 @@ export default {
   computed: {
     ...mapState({
       keepUser: state => state.investorLogin.keepUser,
-      resetMessage: state => state.investorLogin.resetMessage,
-      emailConfirmMessage: state => state.investorSignup.emailConfirmMessage,
+      subdomain: state => state.subdomain,
     }),
     keepMe: {
       get() {
@@ -220,10 +285,10 @@ export default {
       },
     },
     checkPassword() {
-      return Validation.password(this.password);
+      return Validation.password(this.form.password);
     },
     checkEmail() {
-      return Validation.email(this.email);
+      return Validation.email(this.form.email);
     },
     loginDisabled() {
       return this.checkPassword && this.checkEmail;
@@ -231,15 +296,57 @@ export default {
   },
   watch: {
     checkPassword(value) {
-      if (value) this.myErros.password = '';
+      if (value) this.myErrors.password = '';
     },
     checkEmail(value) {
-      if (value) this.myErros.email = '';
+      if (value) this.myErrors.email = '';
     },
   },
-  beforeDestroy() {
-    this.toggleEmailConfirmedMessage(false);
-    this.toggleResetMessage(false);
+  created() {
+    if (this.$route.query.message) {
+      const { message } = this.$route.query;
+      if (message === 'verify') {
+        this.messageInfoText = 'Registration completed. Please verify your email address!';
+        this.message.info = true;
+        this.setSurvey();
+      } else if (message === 'confirm') {
+        this.messageConfirmText = 'Your email address has been confirmed!';
+        this.message.confirm = true;
+      } else if (message === 'reset') {
+        this.message.reset = true;
+      } else if (message === 'reset-error') {
+        this.messageErrorText = 'Your password has not been changed. Please try again to restore.';
+        this.message.error = true;
+      } else if (message === 'alias-error') {
+        this.messageErrorText = 'You aren\'t registered in this fund.';
+        this.message.error = true;
+      } else if (message === 'email-send') {
+        this.messageInfoText = 'Activation email has been sent to Email address';
+        this.message.info = true;
+        this.setSurvey();
+      }
+      this.$router.replace('/auth/investor');
+    }
+    if (this.$route.query.code) {
+      this.messageConfirmText = 'Your email address has been confirmed!';
+      this.message.confirm = true;
+      this.setSurvey();
+      this.$router.replace('/auth/investor');
+    }
+  },
+  beforeRouteUpdate(to, from, next) {
+    if (to.query.message) {
+      const { message } = to.query;
+      if (message === 'alias-error') {
+        this.messageErrorText = 'You aren\'t registered in this fund.';
+        this.message.error = true;
+        next({ path: '/auth/investor', replace: true });
+      } else {
+        next();
+      }
+    } else {
+      next();
+    }
   },
 };
 </script>

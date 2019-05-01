@@ -139,11 +139,11 @@
       >{{ $t('auth.buttons.cancel') }}
     </button-secondary>
     <button-primary
-      @click.prevent.native='send'
+      @click.prevent.native='change'
       :disabled='!allReady'
       :class='{"button-loading": loading.send}'
       class="password-form__button password-form__button--send"
-      >Send verification code
+      >Change password
     </button-primary>
   </div>
 </form>
@@ -157,7 +157,7 @@ import IconView from '@/components/common/icons/IconView.vue';
 import PasswordError from '@/components/common/PasswordError.vue';
 import Validation from '@/js/validation';
 import IconCheck2 from '@/components/common/icons/IconCheck.vue';
-import { mapState } from 'vuex';
+import { mapState, mapGetters } from 'vuex';
 
 export default {
   name: 'PasswordForm',
@@ -238,6 +238,18 @@ export default {
     cancel() {
       this.$emit('cancel');
     },
+    change() {
+      this.loading.send = true;
+        const data = {
+          currentpassword: this.password.current,
+          newpassword: this.password.new,
+        };
+        Object.assign(data, this.token);
+      setTimeout(() => {
+        this.loading.send = false;
+        this.$emit('success');
+      }, 1500)
+    },
     send() {
       this.loading.send = true;
       setTimeout(() => {
@@ -250,6 +262,9 @@ export default {
     ...mapState('profile', [
       'lastChangePassword',
     ]),
+    ...mapGetters({
+      token: 'token',
+    }),
     passwordReadyCurrent() {
       return Validation.password(this.password.current);
     },

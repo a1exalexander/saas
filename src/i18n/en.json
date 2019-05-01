@@ -115,5 +115,9 @@
       "password": "Password",
       "email": "Email confirm"
     }
+  },
+  "exchangeApi":{
+    "api-key-added": "We are in the process of updating your trading history, it will be available within 5 minutes"
   }
+
 }

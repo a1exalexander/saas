@@ -1,92 +1,100 @@
 <template>
 <div
-  class="investor-card"
-  :class='{"investor-card--open": dropMenu}'>
-  <div class="investor-card__card">
-    <ul class="investor-card__list">
-      <li class="investor-card__item investor-card__item--name">
-        <div class="investor-card__image-wrapper">
+  class="investor">
+  <div class="investor__card">
+    <ul class="investor__list">
+      <li class="investor__item investor__item--name">
+        <div class="investor__image-wrapper">
           <!-- TODO: change to image URL by API -->
           <img
-            class="investor-card__image"
+            class="investor__image"
             :src="investor.ava"
             alt=""
             v-if='investor.ava'>
           <icon-ava
             class="default-ava"
             v-else/>
+            <div
+              class="investor__check-wrapper"
+              :class='{"investor__check-wrapper--verify": investor.email_verified}'>
+            <icon-check2
+              class='investor__check-icon'
+              v-if='investor.email_verified'/>
+            <icon-question
+              class='investor__icon-question'
+              v-else/>
+            </div>
         </div>
-        <div class="investor-card__name-wrapper">
-          <p class="investor-card__text investor-card__text--name">{{ investor.name }}</p>
-          <div class="investor-card__status">
+        <div class="investor__name-wrapper">
+          <p class="investor__text investor__text--name">{{ investor.name }}</p>
+          <div class="investor__status">
             <p
-              class="investor-card__status-name"
+              class="investor__status-name"
               >{{ investor.status?'Online':'Offline' }}
             </p>
             <span
-              class="investor-card__status-dot"
+              class="investor__status-dot"
               :class='{"status-offline": !investor.status}'>
             </span>
           </div>
         </div>
       </li>
-      <li class="investor-card__item">
+      <li class="investor__item">
         <a
           :href="`mailto:${investor.email}`"
-          class="investor-card__text investor-card__text--email">{{ investor.email }}</a>
+          class="investor__text investor__text--email">{{ investor.email }}</a>
       </li>
-      <li class="investor-card__item investor-card__item--phone investors-card__head-item--end">
+      <li class="investor__item investor__item--phone investors__head-item--end">
         <a
           :href="`mailto:${investor.phone}`"
-          class="investor-card__text">{{ investor.phone }}</a>
+          class="investor__text">{{ investor.phone }}</a>
       </li>
-      <li class="investor-card__item">
-        <div class="investor-card__image-wrapper investor-card__image-wrapper--small">
-          <!-- TODO: change to image URL by API -->
-          <img class="investor-card__image" src="@/assets/images/ava.jpg" alt="">
+      <!-- <li class="investor__item">
+        <div class="investor__image-wrapper investor__image-wrapper--small">
+          <img class="investor__image" src="@/assets/images/ava.jpg" alt="">
         </div>
-        <p class="investor-card__text">{{ investor.manager }}</p>
-      </li>
-      <li class="investor-card__item investor-card__item--balance investors-card__head-item--end">
-        <p class="investor-card__text">$ {{ investor.balance | numeral('0,0') }}</p>
+        <p class="investor__text">{{ investor.manager }}</p>
+      </li> -->
+      <li class="investor__item investor__item--balance">
+        <p class="investor__text">$ {{ investor.totalBalance | numeral('0,0.[00000000]') }}</p>
         <button
-          class="investor-card__icon-arrow-button"
+          class="investor__icon-arrow-button"
           @click.stop.prevent='dropMenu = !dropMenu'>
         <icon-arrow-down
-          class='investor-card__icon-arrow'
+          class='investor__icon-arrow'
           :class='{"rotate-180": dropMenu}'/>
         </button>
       </li>
-      <li class="investor-card__item investor-card__item--tokens investors-card__head-item--end">
-        <p class="investor-card__text">{{ investor.tokens }}</p>
+      <!-- <li class="investor__item investor__item--tokens investors__head-item--end">
+        <p class="investor__text">{{ investor.tokens }}</p>
       </li>
-      <li class="investor-card__item">
-        <span class="investor-card__request-label">Dividend withdrawal</span>
-      </li>
-      <li class="investor-card__item investor-card__item--dots">
-        <a href='#' @click.prevent='openProfile(investor.id)' class="investor-card__button">
-          <icon-dots class='investor-card__icon-dots'/>
+      <li class="investor__item">
+        <span class="investor__request-label">Dividend withdrawal</span>
+      </li> -->
+      <li class="investor__item investor__item--dots">
+        <a href='#' @click.prevent='openProfile(investor.id)' class="investor__button">
+          <icon-dots class='investor__icon-dots'/>
         </a>
       </li>
     </ul>
   </div>
   <transition
     name="custom-classes-transition"
-    enter-active-class="animated dur04 fadeIn"
-    leave-active-class="animated dur03 fadeOut"
+    enter-active-class="animated dur02 fadeIn"
+    leave-active-class="animated dur02 fadeOut"
     mode="out-in">
-  <div class="investor-card__drop-menu" v-if='dropMenu'>
-    <div class="investor-card__drop-item">
-      <p class="investor-card__drop-label">User ID</p>
-      <p class="investor-card__drop-text">{{ investor.id }}</p>
+  <div class="investor__drop-menu" v-if='dropMenu'>
+    <div class="investor__drop-item">
+      <p class="investor__drop-label">User ID</p>
+      <p class="investor__drop-text">{{ investor.id }}</p>
     </div>
-    <div class="investor-card__drop-item">
-      <p class="investor-card__drop-label">Email</p>
-      <p class="investor-card__drop-text">{{ investor.email }}</p>
+    <div class="investor__drop-item">
+      <p class="investor__drop-label">Email</p>
+      <p class="investor__drop-text">{{ investor.email }}</p>
     </div>
-    <div class="investor-card__drop-item">
-      <p class="investor-card__drop-label">Phone</p>
-      <p class="investor-card__drop-text">{{ investor.phone }}</p>
+    <div class="investor__drop-item">
+      <p class="investor__drop-label">Phone</p>
+      <p class="investor__drop-text">{{ investor.phone }}</p>
     </div>
   </div>
   </transition>
@@ -96,6 +104,8 @@
 import IconDots from '@/components/common/icons/IconDots.vue';
 import IconArrowDown from '@/components/common/icons/IconArrowDown.vue';
 import IconAva from '@/components/common/icons/IconAva.vue';
+import IconQuestion from '@/components/common/icons/IconQuestion.vue';
+import IconCheck2 from '@/components/common/icons/IconCheck2.vue';
 
 export default {
   name: 'Customer',
@@ -108,6 +118,8 @@ export default {
     IconArrowDown,
     IconDots,
     IconAva,
+    IconQuestion,
+    IconCheck2,
   },
   data() {
     return {
@@ -116,23 +128,16 @@ export default {
   },
   methods: {
     openProfile(id) {
-      this.$router.push({ path: `/director/customers/profile/${id}` });
+      this.$router.push({ path: `/director/clients/profile/${id}` });
     },
   },
 };
 </script>
 <style lang="scss">
-.investor-card {
+.investor {
   transition-property: height, max-height, flex;
   transition-duration: 0.2s;
   transition-timing-function: linear;
-  max-height: 80px;
-  &--open {
-    max-height: 220px;
-  }
-  @media screen and (min-width: $screen-tablet) {
-    max-height: auto;
-  }
   &__card {
     padding: 18px 20px 18px 28px;
     border-bottom: 1px solid $N10;
@@ -146,7 +151,7 @@ export default {
     @include flex-row(space-between, center);
     @media screen and (min-width: $screen-tablet) {
       display: grid;
-      grid-template-columns: 3fr 2.5fr 2fr 2.2fr 1.4fr 1fr 2fr 0.5fr;
+      grid-template-columns: 3.5fr 2.2fr 1.2fr 2.4fr 0.5fr;
       justify-content: space-between;
       grid-column-gap: 10px;
     }
@@ -173,9 +178,9 @@ export default {
     height: 28px;
     flex-shrink: 0;
     flex-grow: 0;
-    overflow: hidden;
     border-radius: 50%;
     margin-right: 12px;
+    position: relative;
     @media screen and (min-width: $screen-tablet) {
       width: 40px;
       height: 40px;
@@ -190,6 +195,7 @@ export default {
   &__image {
     width: 100%;
     height: 100%;
+    border-radius: 50%;
     background-color: white;
     object-fit: cover;
   }
@@ -282,6 +288,36 @@ export default {
     width: 24px;
     height: 24px;
     fill: $B3;
+  }
+  &__check-wrapper {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 1px solid $B12;
+    background-color: $N10;
+    @include flex-row(center, center);
+    position: absolute;
+    z-index: 4;
+    bottom: -3px;
+    right: -3px;
+    @media screen and (min-width: $screen-tablet) {
+      border-width: 3px;
+      width: 20px;
+      height: 20px;
+    }
+    &--verify {
+      background-color: $B4;
+    }
+  }
+  &__icon-question {
+    width: 8px;
+    height: 8px;
+    fill: $N5;
+  }
+  &__check-icon {
+    width: 12px;
+    height: 12px;
+    fill: $N0;
   }
 }
 </style>

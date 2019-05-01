@@ -11,27 +11,44 @@
     <section class="navigation__header">
       <div class="navigation__header-inner">
         <div class="navigation__logo-wrapper">
-          <img
-            class="navigation__logo" 
-            :src="getlogo"
-            alt="logo">
+          <icon-fund-platform class="navigation__logo"/>
         </div>
-        <p class="navigation__title">Initial Index Fund</p>
+        <p class="navigation__title">{{ getFund }}</p>
       </div>
     </section>
     <ul class="navigation__list">
+      <li
+        class="navigation__item"
+        :class='{"navigation__item--active": $route.name === "Dashboard" }'>
+        <icon-analytics class='navigation__item-icon'/>
+        <router-link :to='{ name: "Dashboard" }' class="navigation__item-text">Dashboard</router-link>
+      </li>
+      <li class="navigation__item" :class='{"navigation__item--active": routeTrading }'>
+        <icon-trading class='navigation__item-icon'/>
+        <router-link :to='{ name: "trading-dashboard" }' class="navigation__item-text">Trading</router-link>
+      </li>
+      <li
+        class="navigation__item"
+        :class='{"navigation__item--active": $route.name === "Portfolio" }'>
+        <icon-analytics class='navigation__item-icon'/>
+        <router-link :to='{ name: "Portfolio" }' class="navigation__item-text">Portfolio</router-link>
+      </li>
       <li class="navigation__item" :class='{"navigation__item--active": routeCustomers }'>
         <icon-investor class='navigation__item-icon'/>
-        <router-link to='/director/customers' class="navigation__item-text">Customers</router-link>
+        <router-link :to='{ name: "Investors" }' class="navigation__item-text">Clients</router-link>
       </li>
       <li class="navigation__item" :class='{"navigation__item--active": routeExchanges }'>
         <icon-exchanges class='navigation__item-icon'/>
-        <router-link to='/director/exchanges' class="navigation__item-text">Exchanges</router-link>
+        <router-link :to='{ name: "Exchanges" }' class="navigation__item-text">Exchanges</router-link>
+      </li>
+      <li class="navigation__item" :class='{"navigation__item--active": $route.name === "Strategies" }'>
+        <icon-exchanges class='navigation__item-icon'/>
+        <router-link :to='{ name: "Strategies" }' class="navigation__item-text">Strategies</router-link>
       </li>
       <li class="navigation__item" :class='{"navigation__item--active": routeTransactions }'>
         <icon-billing class='navigation__item-icon'/>
         <router-link
-          to='/director/transactions'
+          :to='{ name: "payouts" }'
           class="navigation__item-text">Transactions
         </router-link>
       </li>
@@ -53,7 +70,9 @@
             class="default-ava"
             v-else/>
         </div>
-        <p class="navigation__profile-name">{{ getName }}</p>
+        <p class="navigation__profile-name"
+          >{{ `${getName} ${lastName}` }}
+        </p>
       </div>
       <div
         class="navigation__popover-wrapper"
@@ -81,13 +100,16 @@
 </template>
 <script>
 import IconInvestor from '@/components/common/icons/IconInvestor.vue';
+import IconTrading from '@/components/common/icons/IconTrading.vue';
 import IconBilling from '@/components/common/icons/IconBilling.vue';
+import IconAnalytics from '@/components/common/icons/IconAnalytics.vue';
 import IconExchanges from '@/components/common/icons/IconExchanges.vue';
+import IconFundPlatform from '@/components/common/icons/IconFundPlatform.vue';
 import PopoverNavigation from '@/components/common/PopoverNavigation.vue';
 import InviteButton from '@/components/inviteInvestor/InviteButton.vue';
 import InvitePopup from '@/components/inviteInvestor/InvitePopup.vue';
 import IconAva from '@/components/common/icons/IconAva.vue';
-import { mapState } from 'vuex';
+import { mapState, mapActions } from 'vuex';
 
 export default {
   name: 'Navigation',
@@ -99,6 +121,9 @@ export default {
     InviteButton,
     InvitePopup,
     IconAva,
+    IconFundPlatform,
+    IconAnalytics,
+    IconTrading,
   },
   data() {
     return {
@@ -107,6 +132,9 @@ export default {
     };
   },
   methods: {
+    ...mapActions('profile', [
+      'getProfile',
+    ]),
     closePopover() {
       this.popover = false;
     },
@@ -119,13 +147,23 @@ export default {
   },
   computed: {
     ...mapState('profile', {
-      getName: state => state.profile.name,
+      getName: state => state.profile.name_first,
+      getLastName: state => state.profile.name_last,
       getAva: state => state.profile.ava,
       getlogo: state => state.profile.fundLogo,
+      getFund: state => state.profile.business_name,
     }),
+    lastName() {
+      return this.getLastName?this.getLastName:'';
+    },
+    routeTrading() {
+      const { path } = this.$route;
+      const re = /(trading)/g;
+      return re.test(path);
+    },
     routeCustomers() {
       const { path } = this.$route;
-      const re = /(customers)/g;
+      const re = /(clients)/g;
       return re.test(path);
     },
     routeExchanges() {
@@ -138,6 +176,9 @@ export default {
       const re = /(transactions)/g;
       return re.test(path);
     },
+  },
+  created() {
+    this.getProfile();
   },
 };
 </script>
@@ -165,8 +206,9 @@ export default {
     }
   }
   &__logo {
-    width: 100%;
-    height: auto;
+    width: 90%;
+    height: 100%;
+    fill: $N0;
   }
   &__header {
     width: 100%;

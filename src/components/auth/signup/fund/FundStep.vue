@@ -1,5 +1,10 @@
 <template>
-<form class="fund-step" @click.self='closeDropMenus'>
+<div class="fund-step" @click.self='closeDropMenus'>
+  <message-error-absolute
+    v-if='message.error'
+    @close='message.error = false'
+    >{{ messageText }}
+  </message-error-absolute>
   <div
     class="fund-step__image-wrapper
               fund-step__image-wrapper--name
@@ -49,11 +54,6 @@
     :class='{"is-block": nameStatus}'
     @click='closeDropMenus'>{{ $t('auth.labels.country') }}
   </label>
-  <div
-    class="fund-step__line fund-step__line--country animated dur05 fadeIn"
-    :class='{"fund-step__line--checked": countryStatus}'
-    v-if='nameStatus'
-    @click='closeDropMenus'></div>
   <drop-menu-country
     class='fund-step__drop-menu fund-step__drop-menu--country animated dur05 fadeIn'
     v-if='nameStatus'/>
@@ -63,15 +63,16 @@
     v-if='countryStatus'
     :disabled='!countryStatus'
     @click.stop.prevent.native='nextStep'>{{ $t('auth.buttons.continue') }}
-    <icon-long-arrow-right class='icon-button-right'/>
+    <icon-long-arrow-right class='icon-button-right icon-small'/>
   </button-primary-icon>
-</form>
+</div>
 </template>
 <script>
 import ButtonPrimaryIcon from '@/components/common/buttons/ButtonPrimaryIcon.vue';
 import IconCheck from '@/components/common/icons/IconCheck.vue';
 import IconLongArrowRight from '@/components/common/icons/IconLongArrowRight.vue';
 import DropMenuCountry from '@/components/auth/signup/fund/DropMenuCountry.vue';
+import MessageErrorAbsolute from '@/components/common/messages/MessageErrorAbsolute.vue';
 import { mapState, mapMutations, mapActions } from 'vuex';
 
 export default {
@@ -81,6 +82,7 @@ export default {
     IconCheck,
     DropMenuCountry,
     IconLongArrowRight,
+    MessageErrorAbsolute,
   },
   data() {
     return {
@@ -88,13 +90,16 @@ export default {
         name: '',
       },
       loading: false,
+      message: {
+        error: false,
+      },
+      messageText: '',
     };
   },
   computed: {
     ...mapState('signup', {
       getName: state => state.fund.business_name,
       getCountry: state => state.fund.country,
-      getOperation: state => state.fund.business_type,
       token: state => state.token,
     }),
     name: {
@@ -103,6 +108,7 @@ export default {
       },
       set(value) {
         this.setFund(['business_name', value]);
+        this.setPassword(['fund_name', value]);
       },
     },
     country: {
@@ -111,14 +117,6 @@ export default {
       },
       set(value) {
         this.setFund(['country', value]);
-      },
-    },
-    operation: {
-      get() {
-        return this.getOperation;
-      },
-      set(value) {
-        this.setFund(['business_type', value]);
       },
     },
     nameStatus() {
@@ -131,6 +129,7 @@ export default {
   methods: {
     ...mapMutations('signup', [
       'setFund',
+      'setPassword',
       'setStepStatus',
       'closeDropMenus',
       'closeDropMenu',
@@ -151,8 +150,30 @@ export default {
         })
         .catch((error) => {
           this.loading = false;
-          console.log(error);
+          let message = 'Try Again Later. Something happened.';
+          if (error.data && error.data.msg) {
+            message = error.data.msg;
+          } else if (error.msg) {
+            message = error.msg;
+          }
+          this.$store.dispatch('messages/showErrorMessage', message);
         });
+    },
+    showMessage(type) {
+      if (this.message[type]) {
+        this.message[type] = false;
+        setTimeout(() => {
+          this.message[type] = true;
+          setTimeout(() => {
+            this.message[type] = false;
+          }, 4000);
+        }, 15);
+      } else {
+        this.message[type] = true;
+        setTimeout(() => {
+          this.message[type] = false;
+        }, 4000);
+      }
     },
     nameError() {
       this.myErrors.name = '';
@@ -168,7 +189,6 @@ export default {
       this.setFund(['country', item]);
     },
     toggleCountryDrop() {
-      this.showOperationsDrop = false;
       this.showCountryDrop = !this.showCountryDrop;
     },
     closeAll() {

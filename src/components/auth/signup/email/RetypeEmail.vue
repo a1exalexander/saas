@@ -62,7 +62,7 @@
         <p
           class="input-text-error animated dur04 bounceIn"
           v-show='myErrors.email.new'
-          v-html="errors.email.new">
+          v-html="myErrors.email.new">
         </p>
       </div>
       <label
@@ -258,19 +258,21 @@ export default {
       if (value) this.myErrors.email.confirm = '';
     },
     passwordReady(value) {
-      if (value) this.errors.password = '';
+      if (value) this.myErrors.password = '';
     },
   },
 };
 </script>
 <style lang="scss">
 .retype-email {
-  z-index: 1000;
-  position: absolute;
+  z-index: 10;
+  position: fixed;
   top: 0;
   left: 0;
   right: 0;
+  bottom: 0;
   min-height: 100vh;
+  overflow-y: hidden;
   @include flex-row(stretch, stretch);
   @media screen and (min-width: $screen-tablet) {
     align-items: center;

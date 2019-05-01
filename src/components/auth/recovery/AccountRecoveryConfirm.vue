@@ -8,7 +8,7 @@
       <label class="account-recovery-confirm__label-wrapper">
         <p class="account-recovery-confirm__label-text">{{ $t('auth.labels.code') }}</p>
         <input
-          type="password"
+          type="text"
           class="account-recovery-confirm__input"
           v-model.trim='code'>
       </label>
@@ -24,8 +24,6 @@
 </template>
 <script>
 import ButtonPrimary from '@/components/common/buttons/ButtonPrimary.vue';
-import { directorAuth } from '@/api/api';
-import http from 'axios';
 
 export default {
   name: 'AccountRecoveryConfirm',
@@ -47,17 +45,8 @@ export default {
   methods: {
     confirmCode() {
       this.loading = true;
-      http.get(directorAuth.recoveryVerify, this.code)
-        .then((response) => {
-          console.log(response);
-          this.loading = false;
-          this.$emit('confirmCode', response.data.user_token);
-        }).catch((error) => {
-          this.loading = false;
-          console.log(error);
-          // TODO: change to error
-          this.$emit('confirmCode');
-        });
+      const data = {code: this.code};
+      this.$emit('token', '2a5496d7-6664-5d35-b893-a6b1aaf834cf');
     },
   },
 };

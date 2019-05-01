@@ -48,7 +48,7 @@
     </div>
     <span class="email-step__text email-step__text--center">{{ $t('auth.text.or') }}</span>
     <subtle
-      @click.native='retypeEmail = true'
+      @click.prevent.native='retypeEmail = true'
       class="email-step__link email-step__link--retype">{{ $t('auth.buttons.retype') }}
     </subtle>
   </div>
@@ -99,20 +99,22 @@ export default {
   computed: {
     ...mapState('signup', {
       email: state => state.personalInfo.email,
+      alias: state => state.password.fund_alias,
+      password: state => state.password.value,
     }),
   },
   methods: {
     ...mapMutations('signup', [
       'toggleEmailConfirmedMessage',
+      'cleanData',
     ]),
-    ...mapActions('signup', {
-      resendMyEmail: 'resendEmail',
+    ...mapActions({
+      resendMyEmail: 'signup/resendEmail',
+      AUTH_REQUEST: 'login/AUTH_REQUEST',
+      getFundAsync: 'profile/getFundAsync',
     }),
     start() {
-      this.loading.next = true;
-      this.$router.push('/auth', () => {
-        this.loading.next = false;
-      });
+      this.$router.push('/director');
     },
     saveEmail() {
       this.retypeEmail = false;
@@ -127,7 +129,7 @@ export default {
             this.resendMessageStatus = true;
             setTimeout(() => {
               this.resendMessageStatus = false;
-            }, 6000);
+            }, 3000);
             this.count += 1;
             this.loading.resend = false;
             console.log(resp);
@@ -144,6 +146,9 @@ export default {
     closeResendMessage() {
       this.resendMessageStatus = false;
     },
+  },
+  beforeDestroy() {
+    this.cleanData();
   },
 };
 </script>

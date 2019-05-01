@@ -2,11 +2,18 @@
   <button class='subtle-icon'>
     <div class="subtle-icon__border"></div>
     <slot/>
+    <span v-if='label'>{{ label }}</span>
   </button>
 </template>
 <script>
 export default {
   name: 'SubtleIcon',
+  props: {
+    label: {
+      type: String,
+      default: '',
+    },
+  },
 };
 </script>
 <style lang="scss">

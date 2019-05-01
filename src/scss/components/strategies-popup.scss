@@ -1,0 +1,144 @@
+$strategies-popup: strategies-popup;
+@mixin strategies-grid-area($type) {
+  &--symbol {
+    grid-area: #{$type}-symbol;
+  }
+  &--price {
+    grid-area: #{$type}-price;
+  }
+  &--balance {
+     grid-area: #{$type}-balance;
+  }
+  &--description {
+    grid-area: #{$type}-description;
+  }
+}
+
+.#{$request-payout} {
+  &__form {
+    grid-template-areas:
+    'image-symbol label-symbol'
+    'line-symbol input-symbol'
+    'image-price label-price'
+    'line-price input-price'
+    'image-balance label-balance'
+    'line-balance input-balance'
+    'image-description label-description'
+    'line-description input-description';
+    margin-bottom: 32px;
+  }
+  &__input-box {
+    width: 100%;
+    @include strategies-grid-area(input);
+  }
+  &__input-label {
+    display: block;
+    flex: 0 0 45%;
+  }
+  &__label-text {
+    @extend %input-label-text;
+    margin-bottom: 8px;
+  }
+  &__input {
+    @extend %input;
+    background-color: $N13;
+    width: 100%;
+  }
+  &__equally {
+    margin: 0 8px 18px;
+    @media screen and (min-width:$screen-tablet) {
+      margin-bottom: 12px;
+    }
+  }
+  &__tumbler {
+    @include flex-row(flex-start, center);
+    padding: 0 2px;
+    border-radius: 3px;
+    background-color: $N10;
+    padding-bottom: 1px;
+    margin-bottom: 20px;
+  }
+  &__tumbler-button {
+    padding: 6px 10px;
+    @include text($H300, 500, $N8);
+    transition: color ease-in-out 0.2s;
+    &--active {
+      color: $N0;
+    }
+  }
+  &__label {
+    @include strategies-grid-area(label);
+  }
+  &__step-image {
+    @include strategies-grid-area(image);
+  }
+  &__line {
+    @extend %status-bar-line-new;
+    @include strategies-grid-area(line);
+  }
+  &__radio {
+    @extend %radio-button-label;
+    flex: 0 0 45%;
+  }
+  &__radio-input {
+    @extend %radio-button-input;
+    &:checked + .#{$strategies-popup}__radio-button {
+      background-color: $N14;
+      color: $B3;
+      border-color: $B3;
+    }
+  }
+  &__radio-button {
+    @extend %radio-button;
+    @media screen and (min-width: $screen-tablet) {
+      background-color: transparent;
+      border: 1px solid $N7;
+      border-radius: 2px;
+      color: $N7;
+    }
+  }
+  &__qr-wrapper {
+    width: 216px;
+    height: 216px;
+    flex-shrink: 0;
+    overflow: hidden;
+    margin-bottom: 32px;
+  }
+  &__qr {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+  &__qr-button {
+    @include flex-row(flex-start, center);
+    width: 216px;
+  }
+  &__qr-text {
+    @include text($H500, 500, $N0);
+    white-space: nowrap;
+    overflow-y: hidden;
+    flex: 0 0 calc(100% - 24px - 28px);
+  }
+  &__qr-etc {
+    @include text($H500, 500, $N0);
+    flex: 0 0 14px;
+    padding-right: 14px;
+  }
+  &__icon {
+    flex: 0 0 24px;
+    height: 24px;
+    fill: $B4;
+    pointer-events: none;
+  }
+  &__warning {
+    padding-top: 10px;
+    @include text($H200, 500, $Y1);
+    line-height: 1.3;
+  }
+  &__button-wrapper {
+    @media screen and (min-width: $screen-tablet) {
+      display: flex;
+      justify-content: flex-end;
+    }
+  }
+}

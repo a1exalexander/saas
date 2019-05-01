@@ -1,0 +1,74 @@
+%tumbler {
+  @include flex-row(flex-start, center);
+  padding: 0 0 1px 0;
+  border-radius: 3px;
+  background-color: $N10;
+  position: relative;
+  padding: 0 4px 2px 4px;
+}
+%tumbler-label {
+  padding: 1px 5px;
+  position: relative;
+  z-index: 3;
+  cursor: pointer;
+}
+%tumbler-text {
+  @include text($H200, 500, $N8);
+  @extend %text-transition;
+}
+$tumbler: tumbler;
+.#{$tumbler} {
+  @extend %tumbler;
+  &__label {
+    @extend %tumbler-label;
+  }
+  &__input {
+    position: absolute;
+    z-index: -1;
+    opacity: 0;
+    visibility: hidden;
+    &:checked + .#{$tumbler}__text {
+      color: $N0;
+    }
+  }
+  &__text {
+    @extend %tumbler-text;
+  }
+}
+$tumbler-drop: tumbler-drop;
+.#{$tumbler-drop} {
+  @extend %tumbler;
+  width: 52px;
+  justify-content: space-between;
+  padding: 4px 6px 5px 8px;
+  cursor: pointer;
+  &__placeholder {
+    @extend %tumbler-label;
+    @extend %tumbler-text;
+    padding: 0;
+    color: $N0;
+    font-weight: 400;
+  }
+  &__icon {
+    width: 12px;
+    height: 12px;
+    fill: $N0;
+    transition: transform ease-in-out 0.2s;
+  }
+  &__drop-wrapper {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: transparent;
+    z-index: 2;
+  }
+  &__drop-list {
+    @extend %drop-menu-list;
+    z-index: 4;
+  }
+  &__drop-item {
+    @extend %drop-menu-item;
+  }
+}

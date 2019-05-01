@@ -1,0 +1,68 @@
+.market-orders {
+  @include flex-row(stretch, stretch);
+  &__form {
+    flex: 0 0 50%;
+    background-color: $N12;
+    border-radius: 4px;
+    padding: 16px;
+    @include flex-col(stretch, stretch);
+    &:first-child {
+      margin-right: 8px;
+    }
+  }
+  &__button {
+    width: 100%;
+  }
+  &__balance {
+    @include text($H300, 500, $N6);
+    margin-right: 6px;
+  }
+  &__balance-value {
+    @include text($H400, 500, $N0);
+  }
+  &__row {
+    @include flex-row(flex-start, baseline);
+    margin-bottom: 18px;
+  }
+  &__label {
+    @include flex-row(space-between, center);
+    margin-bottom: 8px;
+    &--margin {
+      margin-bottom: 18px;
+    }
+  }
+  &__label-text {
+    @extend %input-label-text;
+    margin: 0;
+    margin-right: 16px;
+  }
+  &__input {
+    @extend %input;
+    min-width: 120px;
+    width: calc(100% - 80px);
+    flex: 0 1 calc(100% - 60px);
+  }
+  &__features {
+    width: calc(100% - 60px);
+    min-width: 140px;
+    align-self: flex-end;
+    @include flex-row(flex-start, baseline);
+    margin-bottom: 18px;
+    &--balance {
+      min-width: 120px;
+    }
+  }
+  &__feature-label {
+    @include text($H200, 500, $N6);
+    margin-right: 6px;
+  }
+  &__feature-value {
+    @include text($H300, 400, $B1);
+  }
+  &__subtle {
+    & * {
+      border: none;
+    }
+    margin-right: 6px;
+  }
+}

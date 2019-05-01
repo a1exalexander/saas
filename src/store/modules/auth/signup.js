@@ -1,8 +1,4 @@
-/* eslint-disable */
-// Becouse 'no-shadow' and 'no-param-reassing' errors of state aren't errors
 import Validation from '@/js/validation';
-import http from 'axios';
-import { directorAuth } from '@/api/api';
 
 const state = {
   personalInfo: {
@@ -10,15 +6,16 @@ const state = {
     name_last: '',
     email: '',
     phone: '',
-    age: '',
-    gender: '',
+    age: 25,
+    gender: 'male',
   },
   fund: {
     business_name: '',
     country: '',
-    business_type: '',
   },
   password: {
+    fund_name: '',
+    fund_alias: '',
     value: '',
     agree: false,
   },
@@ -36,7 +33,6 @@ const state = {
   },
   dropMenu: {
     countries: false,
-    operations: false,
   },
   emailConfirmMessage: false,
   token: {
@@ -46,6 +42,23 @@ const state = {
 };
 
 const mutations = {
+  cleanData(state) {
+    Object.keys(state.personalInfo).forEach((key) => {
+      state.personalInfo[key] = key !== 'gender' ? '' : 'male';
+    });
+    Object.keys(state.fund).forEach((key) => {
+      state.fund[key] = '';
+    });
+    Object.keys(state.password).forEach((key) => {
+      state.password[key] = '';
+    });
+    Object.keys(state.signUpStatus).forEach((key) => {
+      state.signUpStatus[key] = false;
+    });
+    Object.keys(state.routerStatus).forEach((key) => {
+      state.routerStatus[key] = key !== 'personalInfo' ? false : true;;
+    });
+  },
   toggleEmailConfirmedMessage(state, value) {
     state.emailConfirmMessage = !!value;
   },
@@ -58,8 +71,8 @@ const mutations = {
   setFund(state, [type, value]) {
     state.fund[type] = value;
   },
-  setPassword(state, value) {
-    state.password.value = value;
+  setPassword(state, [type, value]) {
+    state.password[type] = value;
   },
   togglePasswordAgree(state) {
     state.password.agree = !state.password.agree;
@@ -79,7 +92,6 @@ const mutations = {
   },
   closeDropMenus(state) {
     state.dropMenu.countries = false;
-    state.dropMenu.operations = false;
   },
   toggleDropMenu(state, type) {
     Object.keys(state.dropMenu).forEach( (key) => {
@@ -105,18 +117,18 @@ const getters = {
   readyPersonalInfoStep: (state) => {
     return Validation.name(state.personalInfo.name_first)
       && Validation.email(state.personalInfo.email)
-      && state.personalInfo.gender;
+      && !!state.personalInfo.gender;
   },
   readyFundStep: (state) => {
-    return state.fund.business_name && state.fund.country && state.fund.business_type;
+    return !!state.fund.business_name && !!state.fund.country;
   },
   readyPasswordStep: state => Validation.password(state.password.value) && state.password.agree,
-  activePersonalInfoStep: state => state.routerStatus.personalInfo,
-  activeFundStep: (state, getters) => getters.readyPersonalInfoStep && state.routerStatus.fund,
+  activePersonalInfoStep: state => !!state.routerStatus.personalInfo,
+  activeFundStep: (state, getters) => getters.readyPersonalInfoStep && !!state.routerStatus.fund,
   activePasswordStep: (state, getters) => {
     return getters.readyPersonalInfoStep
           && getters.readyFundStep
-          && state.routerStatus.password;
+          && !!state.routerStatus.password;
   },
   activeEmailStep: (state, getters) => getters.allReady && state.routerStatus.email,
   getPasswordStatus: state => !!state.password.value,
@@ -128,6 +140,12 @@ const getters = {
 };
 
 const actions = {
+  generateAlias({ state, commit }) {
+    const name = state.fund.business_name;
+    const re = /^([!@#\:\.\+\-\~\$%\^&\*\_\s\=\"\~])/;
+    const alias = name.toLowerCase().split('').filter(item => !re.test(item)).join('');
+    commit('setPassword', ['fund_alias', alias]);
+  },
   changeRouterStatus({ state, commit, getters }, type) {
     if (type === 'personalInfo') {
       commit('setRouterStatus', type);
@@ -150,47 +168,21 @@ const actions = {
       resolve();
     });
   },
-  stepTwo({ commit, state }) {
-    const data = Object.assign(state.personalInfo, state.fund);
+  stepTwo({ commit, state, dispatch }) {
     return new Promise((resolve, reject) => {
-      http.post(directorAuth.signUp1, data)
-        .then((response) => {
-          const { auth_token: token } = response.data;
-          commit('setToken', ['stepOne', token]);
-          resolve(response);
-        })
-        .catch((error) => {
-          reject(error);
-        });
-    });
+      commit('setToken', ['stepOne', '786e540b-d88f-5149-836f-fc20c959b939']);
+      dispatch('generateAlias');
+      setTimeout(() => resolve(), 1500);
+    })
   },
   stepThree({ commit, state }) {
-    const data = {
-      'password-1': state.password.value,
-      'password-2': state.password.value,
-      auth_token: state.token.stepOne,
-    };
     return new Promise((resolve, reject) => {
-      http.post(directorAuth.signUp2, data)
-        .then((response) => {
-          resolve(response);
-        })
-        .catch((error) => {
-          reject(error);
-        });
+      setTimeout(() => resolve(), 1500);
     });
   },
   resendEmail({ state }) {
     return new Promise((resolve, reject) => {
-      http.post(directorAuth.resendEmail, state.personalInfo.email)
-        .then((response) => {
-          const { auth_token: token } = response.data;
-          commit('setToken', ['resendEmail', token]);
-          resolve(response);
-        })
-        .catch((error) => {
-          reject(error);
-        });
+      setTimeout(() => resolve(), 1500);
     });
   },
 };

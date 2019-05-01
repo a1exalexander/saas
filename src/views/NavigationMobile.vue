@@ -17,22 +17,38 @@
       <section class="nav__header">
         <div class="nav__header-inner">
           <div class="nav__logo-wrapper">
-            <img class="nav__logo" :src="getlogo" alt="logo">
+            <icon-fund-platform class="nav__logo"/>
           </div>
-          <p class="nav__title">Initial Index Fund</p>
+          <p class="nav__title">{{ getFund }}</p>
         </div>
       </section>
       <ul @click='hideNavDelay' class="nav__list">
         <router-link
-          to='/director/customers'
+          :to='{ name: "Dashboard" }'
+          tag='li'
+          class="nav__item"
+          :class='{"nav__item--active": $route.name === "Dashboard" }'>
+          <icon-analytics class='nav__item-icon'/>
+          <p class="nav__item-text">Dashboard</p>
+        </router-link>
+        <router-link
+          :to='{ name: "trading-dashboard" }'
+          tag='li'
+          class="nav__item"
+          :class='{"nav__item--active": routeTrading }'>
+          <icon-trading class='nav__item-icon'/>
+          <p class="nav__item-text">Trading</p>
+        </router-link>
+        <router-link
+          :to='{ name: "Investors" }'
           tag='li'
           class="nav__item"
           :class='{"nav__item--active": routeCustomers }'>
           <icon-investor class='nav__item-icon'/>
-          <p class="nav__item-text">Customers</p>
+          <p class="nav__item-text">Clients</p>
         </router-link>
         <router-link
-          to='/director/exchanges'
+          :to='{ name: "Exchanges" }'
           tag='li'
           class="nav__item"
           :class='{"nav__item--active": routeExchanges }'>
@@ -40,7 +56,15 @@
           <p class="nav__item-text">Exchanges</p>
         </router-link>
         <router-link
-          to='/director/transactions'
+          :to='{ name: "Strategies" }'
+          tag='li'
+          class="nav__item"
+          :class='{"nav__item--active": $route.name === "strategies" }'>
+          <icon-exchanges class='nav__item-icon'/>
+          <p class="nav__item-text">Srategies</p>
+        </router-link>
+        <router-link
+          :to='{ name: "payouts" }'
           tag='li'
           class="nav__item"
           :class='{"nav__item--active": routeTransactions }'>
@@ -56,9 +80,18 @@
       <section class="nav__profile">
         <div class="nav__profile-card">
           <div class="nav__ava-wrapper">
-            <img class="nav__ava" :src="getAva" alt="avatar">
+            <img
+              class="nav__ava"
+              :src="getAva"
+              alt="avatar"
+              v-if='getAva'>
+            <icon-ava
+              class="default-ava"
+              v-else/>
           </div>
-          <p class="nav__profile-name">{{ getName }}</p>
+          <p class="nav__profile-name"
+            >{{ `${getName} ${lastName}` }}
+          </p>
         </div>
         <div
           class="nav__popover-wrapper">
@@ -97,12 +130,17 @@
 <script>
 import CloseButton from '@/components/common/buttons/CloseButton.vue';
 import IconInvestor from '@/components/common/icons/IconInvestor.vue';
+import IconTrading from '@/components/common/icons/IconTrading.vue';
+import IconAnalytics from '@/components/common/icons/IconAnalytics.vue';
 import IconBilling from '@/components/common/icons/IconBilling.vue';
 import IconExchanges from '@/components/common/icons/IconExchanges.vue';
+import IconFundPlatform from '@/components/common/icons/IconFundPlatform.vue';
+import IconAva from '@/components/common/icons/IconAva.vue';
 import PopoverNavigation from '@/components/common/PopoverNavigation.vue';
 import InviteButton from '@/components/inviteInvestor/InviteButton.vue';
 import InvitePopup from '@/components/inviteInvestor/InvitePopup.vue';
-import { mapState } from 'vuex';
+import { mapState, mapActions } from 'vuex';
+import '@/scss/components/nav.scss';
 
 export default {
   name: 'NavigationMobile',
@@ -114,6 +152,10 @@ export default {
     InviteButton,
     InvitePopup,
     PopoverNavigation,
+    IconAva,
+    IconFundPlatform,
+    IconAnalytics,
+    IconTrading,
   },
   data() {
     return {
@@ -129,6 +171,9 @@ export default {
     };
   },
   methods: {
+    ...mapActions('profile', [
+      'getProfile',
+    ]),
     hideNav() {
       this.visible = false;
       this.$emit('hideNav');
@@ -150,13 +195,23 @@ export default {
   },
   computed: {
     ...mapState('profile', {
-      getName: state => state.profile.name,
+      getName: state => state.profile.name_first,
+      getLastName: state => state.profile.name_last,
       getAva: state => state.profile.ava,
       getlogo: state => state.profile.fundLogo,
+      getFund: state => state.profile.business_name,
     }),
+    lastName() {
+      return this.getLastName?this.getLastName:'';
+    },
+    routeTrading() {
+      const { path } = this.$route;
+      const re = /(trading)/g;
+      return re.test(path);
+    },
     routeCustomers() {
       const { path } = this.$route;
-      const re = /(customers)/g;
+      const re = /(clients)/g;
       return re.test(path);
     },
     routeExchanges() {
@@ -170,139 +225,11 @@ export default {
       return re.test(path);
     },
   },
+  created() {
+    this.getProfile();
+  },
   mounted() {
     this.visible = true;
   },
 };
 </script>
-<style lang="scss">
-.nav {
-  position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  height: 100vh;
-  width: 100vw;
-  z-index: 11;
-  background-color: transparent;
-  @include flex-row(stretch, stretch);
-  @media screen and (min-width: $screen-tablet) {
-    display: none;
-  }
-  &__bg-inner {
-    position: fixed;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    z-index: 12;
-    flex: 1 1;
-    background-color: $NAV-BG-WRAPPER-COLOR;
-    @include flex-col(flex-start, flex-end);
-    padding: 24px;
-  }
-  &__logo-wrapper {
-    width: 30px;
-    height: 30px;
-    margin-right: 20px;
-  }
-  &__logo {
-    width: 100%;
-    height: auto;
-  }
-  &__menu {
-    flex: 0 0 280px;
-    height: 100%;
-    background-color: $N13;
-    position: relative;
-    z-index: 13;
-    padding: 32px 28px;
-    @include flex-col(space-between, stretch);
-  }
-  &__header {
-    width: 100%;
-    @include flex-row(flex-start, center);
-    margin-bottom: 54px;
-  }
-  &__header-inner {
-    @include flex-row(flex-start, center);
-  }
-  &__title {
-    font-size: $H550;
-  }
-  &__profile {
-    @include flex-row(space-between, center);
-  }
-  &__profile-card {
-    @include flex-row(flex-start, center);
-  }
-  &__profile-button {
-    color: $N9;
-    padding-bottom: 4px;
-  }
-  &__profile-name {
-    font-size: $H500;
-    font-weight: 500;
-  }
-  &__list {
-    list-style: none;
-  }
-  &__item {
-    @include flex-row(flex-start, center);
-    margin-bottom: 26px;
-    cursor: pointer;
-    &--active {
-      .nav {
-        &__item-icon {
-          fill: $N0;
-        }
-        &__item-text {
-          color: $N0;
-        }
-      }
-    }
-  }
-  &__item-icon {
-    fill: $N6;
-    width: 22px;
-    height: 22px;
-    margin-right: 10px;
-    pointer-events: none;
-    transition-property: color, fill, opacity;
-    transition-duration: 0.2s;
-    transition-timing-function: ease-in-out;
-  }
-  &__item-text {
-    font-size: $H500;
-    color: $N6;
-    transition-property: color, fill, opacity;
-    transition-duration: 0.2s;
-    transition-timing-function: ease-in-out;
-  }
-  &__ava-wrapper {
-    width: 32px;
-    height: 32px;
-    overflow: hidden;
-    border-radius: 50%;
-    margin-right: 16px;
-  }
-  &__ava {
-    width: 100%;
-    height: 100%;
-  }
-  &__invite-button {
-    width: 100%;
-    margin-bottom: 20px;
-  }
-  &__popover-wrapper {
-    position: relative;
-    padding: 5px 0;
-  }
-  &__popover {
-    position: absolute;
-    bottom: 12px;
-    right: -14px;
-    z-index: 22;
-  }
-}
-</style>

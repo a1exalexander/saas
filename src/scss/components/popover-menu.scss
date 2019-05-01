@@ -1,0 +1,60 @@
+$popover-menu: popover-menu;
+.#{$popover-menu} {
+  will-change: display, transform;
+  display: block;
+  padding: 28px 6px 6px;
+  position: absolute;
+  background-color: transparent;
+  &__inner {
+    will-change: transform;
+    position: relative;
+    @include flex-col(flex-start, stretch);
+    background-color: $N11;
+    box-shadow: 0 6px 12px 0 rgba(0, 0, 0, 0.32);
+    border-radius: 2px;
+    list-style: none;
+		padding: 24px;
+		border: 0.5px solid $N10;
+    @media screen and (min-width: $screen-tablet) {
+      padding: 16px 20px 16px 16px;
+    }
+  }
+  &__item {
+    @include flex-row(flex-start, center);
+    margin-bottom: 18px;
+    @media screen and (min-width: $screen-tablet) {
+      margin-bottom: 12px;
+    }
+    &:last-child {
+      margin: 0;
+    }
+    @media screen and (min-width: $screen-desktop) {
+      &:hover {
+        .#{$popover-menu}__text {
+          color: $N3;
+        }
+        .#{$popover-menu}__icon {
+          fill: $N3;
+        }
+      }
+    }
+  }
+  &__icon {
+    fill: $N0;
+    width: 14px;
+    height: 14px;
+    margin-right: 12px;
+    transition: fill ease-in-out 0.2s;
+  }
+  &__text {
+    color: $N0;
+    font-weight: 500;
+    font-size: $H400;
+    white-space: nowrap;
+    transition: color ease-in-out 0.2s;
+    @media screen and (min-width: $screen-tablet) {
+      font-weight: 400;
+      font-size: $H200;
+    }
+  }
+}

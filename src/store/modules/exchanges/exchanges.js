@@ -1,6 +1,4 @@
-/* eslint-disable */
-// Becouse 'no-shadow' and 'no-param-reassing' errors of state aren't errors
-import apiCall from '@/helpers/api/exchanges';
+import { exchanges } from '@/helpers/exchanges';
 
 const state = {
   myApi: [],
@@ -8,17 +6,18 @@ const state = {
 };
 
 const mutations = {
+  updateExhanges(state, data) {
+    state.myApi = [...data]; 
+  },
   setApi(state, data) {
-    state.api = data; 
+    state.api = [...data]; 
   },
   addApi(state, api) {
     state.myApi.unshift(api);
   },
   removeApi(state, key) {
-    const index = state.myApi.findIndex((item) => {
-      return item.apiKey === key;
-    });
-    state.myApi.splice(index, 1);
+    const idx = state.myApi.findIndex((item) => item.apiKey === key);
+    state.myApi.splice(idx, 1);
   },
 };
 
@@ -38,13 +37,19 @@ const getters = {
 // TODO: Promis functions must be replaced by Http requests
 const actions = {
   downloadApi({ commit }) {
-    apiCall('api')
-      .then((response) => {
-        commit('setApi', response);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    commit('setApi', exchanges);
+  },
+  addExchange({ dispatch, commit }, data) {
+    return new Promise((resolve, reject) => {
+      const newData = Object.assign({}, data);
+      commit('addApi', newData);
+      dispatch('messages/showSuccessMessage', undefined, {root: true});
+      resolve();
+    })
+  },
+  deleteExchange({ commit }, key) {
+    commit('removeApi', key);
+    dispatch('messages/showInfoMessage', undefined, {root: true});
   },
 };
 

@@ -41,13 +41,15 @@
         v-for='(item, index) in api'
         :key='index'
         :api-name='item.name'
-        @click.native.once='addApi(item.name)'/>
+        @click.native='addApi(item.name)'/>
     </div>
   </div>
   <div class='exchanges__container' v-else>
     <div class="exchanges__subheader exchanges__subheader--row">
       <p class="exchanges__heading">Exchanges list</p>
-      <subtle-icon @click.native='addNewApiPopup = true'>
+      <subtle-icon
+        class='exchanges__add-button'
+        @click.native='addNewApiPopup = true'>
         <icon-plus class='icon-large icon-button-left'/>
         <span>Add new exchange</span>
       </subtle-icon>
@@ -74,8 +76,9 @@
       <exchanges-api
         class='exchanges__api-label list-complete-item'
         v-for='item in myApi'
-        :key='item.apiKey'
-        :api='item'/>
+        :key='`n${item.id}`'
+        :api='item'
+        :balance="77.4878783"/>
       </transition-group>
     </div>
   </div>
@@ -116,6 +119,9 @@ export default {
       'api',
       'myApi',
     ]),
+    ...mapState('trading', [
+      'allBalances',
+    ]),
     ...mapGetters('exchanges', [
       'isApi',
     ]),
@@ -129,10 +135,7 @@ export default {
       this.addApiPopup.visible = true;
     },
   },
-  beforeMount() {
-    this.downloadApi();
-  },
-  beforeUpdate() {
+  created() {
     this.downloadApi();
   },
 };
@@ -140,8 +143,10 @@ export default {
 <style lang="scss">
 .exchanges {
   flex: 1 1;
-  padding: 80px 0 88px 0;
+  padding: 24px 0 88px 0;
+  @include flex-col(stretch, stretch);
   @media screen and (min-width: $screen-tablet) {
+    height: 100vh;
     padding: 27px 0;
     background-color: $N12;
   }
@@ -153,6 +158,9 @@ export default {
       justify-content: space-between;
       align-items: center;
       margin-bottom: 20px;
+      position: sticky;
+      top: 24px;
+      z-index: 3;
     }
   }
   &__heading {
@@ -171,8 +179,9 @@ export default {
   &__subheader {
     padding: 0 28px;
     margin-bottom: 24px;
-    position: relative;
-    z-index: 2;
+    top: 80px;
+    position: sticky;
+    z-index: 3;
     background-color: $N13;
     @media screen and (min-width: $screen-tablet) {
       padding: 0 40px;
@@ -192,8 +201,14 @@ export default {
     letter-spacing: 0.48px;
     line-height: 1.4;
   }
+  &__container {
+    flex: 1 1;
+    @include flex-col(stretch, stretch);
+  }
   &__api-box {
     position: relative;
+    flex: 1 1;
+    overflow-y: auto;
     @media screen and (min-width: $screen-tablet) {
       padding: 0 40px;
     }
@@ -224,6 +239,9 @@ export default {
       list-style: none;
       border-bottom: 1px solid $N9;
       padding: 0 40px 12px;
+      position: sticky;
+      top: 58px;
+      z-index: 3;
     }
     @media screen and (min-width: $screen-desktop) {
       grid-template-columns: 1.5fr 2fr 1.2fr repeat(3, 1fr);
@@ -244,6 +262,9 @@ export default {
         display: flex;
       }
     }
+  }
+  &__add-button {
+    margin-bottom: 4px;
   }
 }
 </style>

@@ -1,5 +1,15 @@
 <template>
 <div class="method-popup">
+  <message-error-absolute
+    v-if='isMessage.error'
+    @click.native='isMessage.error = false'>
+    {{ message }}
+  </message-error-absolute>
+  <message-info-absolute
+    v-if='isMessage.info'
+    @close='isMessage.info = false'
+    >{{ message }}
+  </message-info-absolute>
   <div class="method-popup__card">
     <close-button
       class='method-popup__close'
@@ -18,8 +28,8 @@
                 type="radio"
                 name='methods'
                 class="method-popup__radio-input"
-                value='Bitcoin'
-                v-model='method.name'>
+                value='BTC'
+                v-model='method.currency'>
               <div class="method-popup__radio-button method-popup__radio-button--left">Bitcoin</div>
             </label>
             <label class="method-popup__radio">
@@ -27,8 +37,8 @@
                 type="radio"
                 name='methods'
                 class="method-popup__radio-input"
-                value='Ethereum'
-                v-model='method.name'>
+                value='ETH'
+                v-model='method.currency'>
               <div
                 class="method-popup__radio-button method-popup__radio-button--right"
                 >Ethereum
@@ -68,20 +78,27 @@ import ButtonPrimary from '@/components/common/buttons/ButtonPrimary.vue';
 import ButtonSecondary from '@/components/common/buttons/ButtonSecondary.vue';
 import ButtonTransparent from '@/components/common/buttons/ButtonTransparent.vue';
 import CloseButton from '@/components/common/buttons/CloseButton.vue';
-import { mapActions } from 'vuex';
+import MessageErrorAbsolute from '@/components/common/messages/MessageErrorAbsolute.vue';
+import MessageInfoAbsolute from '@/components/common/messages/MessageInfoAbsolute.vue';
+import { mapActions, mapState } from 'vuex';
+import messageMixin from '@/mixins/message';
 
 export default {
   name: 'AddMethodPopup',
+  mixins: [messageMixin],
   components: {
     ButtonPrimary,
     ButtonTransparent,
     CloseButton,
     ButtonSecondary,
+    MessageInfoAbsolute,
+    MessageErrorAbsolute,
+    MessageInfoAbsolute,
   },
   data() {
     return {
       method: {
-        name: '',
+        currency: '',
         address: '',
       },
     };
@@ -91,19 +108,34 @@ export default {
       'addMethod',
     ]),
     addNewMethod() {
-      this.addMethod(this.method);
-      this.close();
+      const id = this.currencies.find(item => this.method.currency === item.short).id;
+      let wallet = null;
+      if (id) {
+        wallet = this.methods.some(item => id === item.currencyId);
+      } else {
+        this.showError('Try Again Later. Something happened.')
+      } 
+      if (wallet) {
+        this.showInfo('This token has already been added.');
+      } else {
+        this.addMethod(this.method);
+        this.close();
+      }
     },
     close() {
       this.$emit('close');
     },
   },
   computed: {
+    ...mapState('billing', [
+      'methods',
+      'currencies',
+    ]),
     ready() {
-      return this.method.name && this.readyAddress;
+      return this.method.currency && this.readyAddress;
     },
     readyAddress() {
-      return this.method.address.length > 25 && this.method.address.length < 36;
+      return this.method.address.length > 20 && this.method.address.length < 200;
     },
   },
 };

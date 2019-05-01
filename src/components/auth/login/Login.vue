@@ -1,20 +1,26 @@
 <template>
 <main class="auth__wrapper">
-  <message-success
+  <message-success-absolute
     class='auth__message'
-    v-if='emailConfirmMessage'
-    @click.native='toggleEmailConfirmedMessage(false)'>
-    Your email address has been confirmed!
-  </message-success>
+    v-if='message.confirm'
+    @click.native='message.confirm = false'>
+    {{ messageConfirmText }}
+  </message-success-absolute>
+  <message-error-absolute
+    class='auth__message'
+    v-if='message.error'
+    @click.native='message.error = false'>
+    {{ messageErrorText }}
+  </message-error-absolute>
   <icon-logo class='auth__logo'/>
-  <section class="auth animated dur09 fadeIn">
+  <section class="auth auth--login animated dur09 fadeIn">
     <div class="auth__mobile-header">
       <icon-logo class="auth__mobile-logo"/>
       <close-button
         class="auth__close-button"
         @click.native='close'/>
     </div>
-    <div class="auth__reset-message" v-if='resetMessage'>
+    <div class="auth__reset-message" v-if='message.reset'>
       <p class="auth__title auth__title--message">{{ $t('auth.messages.success') }}</p>
       <p class="auth__text">
         <span class="auth__image-wrapper">
@@ -107,7 +113,7 @@
     <router-link to='/auth/signup'>
       <button-secondary>{{ $t('auth.buttons.signup') }}</button-secondary>
     </router-link>
-  </footer>
+  </footer>    
 </main>
 </template>
 <script>
@@ -122,7 +128,8 @@ import IconLogo from '@/components/common/icons/IconLogo.vue';
 import Validation from '@/js/validation';
 import IconEyeOff from '@/components/common/icons/IconEyeOff.vue';
 import CloseButton from '@/components/common/buttons/CloseButton.vue';
-import MessageSuccess from '@/components/common/messages/MessageSuccess.vue';
+import MessageSuccessAbsolute from '@/components/common/messages/MessageSuccessAbsolute.vue';
+import MessageErrorAbsolute from '@/components/common/messages/MessageErrorAbsolute.vue';
 import { mapMutations, mapState, mapActions } from 'vuex';
 
 export default {
@@ -136,16 +143,20 @@ export default {
     IconLogo,
     ButtonSecondary,
     IconEyeOff,
-    MessageSuccess,
+    MessageSuccessAbsolute,
+    MessageErrorAbsolute,
     CloseButton,
     IconCheck2,
   },
+  // ch3ll0v3k@yandex.com
+  // SDFsdf@@@111
   data() {
     return {
       form: {
-        password: 'testPassword2019&',
-        email: 'test@test.dot',
+        password: '',
+        email: '',
       },
+      recaptchaToken: 'token',
       showPasswordStatus: false,
       myErrors: {
         password: '',
@@ -159,25 +170,55 @@ export default {
           this.$t('auth.errors.email.valid'),
         ],
       },
+      message: {
+        confirm: false,
+        error: false,
+        reset: false,
+      },
+      messageErrorText: '',
+      messageConfirmText: '',
     };
   },
   methods: {
     ...mapMutations({
       toggleKeepingUser: 'login/toggleKeepingUser',
-      toggleEmailConfirmedMessage: 'signup/toggleEmailConfirmedMessage',
-      toggleResetMessage: 'login/toggleResetMessage',
       AUTH_SUCCESS: 'login/AUTH_SUCCESS',
+      setSurvey: 'profile/setSurvey',
     }),
-    ...mapActions('login', [
-      'AUTH_REQUEST',
-    ]),
+    ...mapActions({
+      AUTH_REQUEST: 'login/AUTH_REQUEST',
+      getFundAsync: 'profile/getFundAsync',
+      showInfoMessage: 'messages/showInfoMessage',
+      showSuccessMessage: 'messages/showSuccessMessage',
+      showErrorMessage: 'messages/showErrorMessage',
+    }),
+    onVerify(response) {
+      this.recaptchaToken = response;
+    },
+    onExpired() {
+      this.recaptchaToken = '';
+    },
     close() {
       this.$router.push('/auth');
     },
     login() {
-      localStorage.setItem('user-token', 'test-token');
-      this.AUTH_SUCCESS('test-token');
       this.$router.push('/director');
+    },
+    showMessage(type) {
+      if (this.message[type]) {
+        this.message[type] = false;
+        setTimeout(() => {
+          this.message[type] = true;
+          setTimeout(() => {
+            this.message[type] = false;
+          }, 3000);
+        }, 15);
+      } else {
+        this.message[type] = true;
+        setTimeout(() => {
+          this.message[type] = false;
+        }, 3000);
+      }
     },
     showPassword() {
       const element = document.getElementById('login-password');
@@ -219,7 +260,6 @@ export default {
     ...mapState({
       keepUser: state => state.login.keepUser,
       emailConfirmMessage: state => state.signup.emailConfirmMessage,
-      resetMessage: state => state.login.resetMessage,
       authStatus: state => state.login.authStatus,
     }),
     keepMe: {
@@ -237,25 +277,64 @@ export default {
       return Validation.email(this.form.email);
     },
     loginDisabled() {
-      return this.checkPassword && this.checkEmail;
+      return this.checkPassword && this.checkEmail && this.recaptchaToken;
     },
   },
   watch: {
     checkEmail(value) {
-      if (value) this.myErrors.email = '';
+      if (value && this.myErrors) this.myErrors.email = '';
     },
     checkPassword(value) {
-      if (value) this.myErrors.password = '';
+      if (value && this.myErrors) this.myErrors.password = '';
     },
   },
-  beforeDestroy() {
-    this.toggleEmailConfirmedMessage(false);
-    this.toggleResetMessage(false);
+  created() {
+    if (this.$route.query.message) {
+      const { message } = this.$route.query;
+      if (message === 'password') {
+        this.message.reset = true;
+      } else if (message === 'password-error') {
+        this.showErrorMessage('Your password has not been changed. Please try again to restore.');
+      } else if (message === 'alias-error') {
+        this.showErrorMessage(`This isn't your fund.`);
+      } else if (message === 'email-send') {
+        this.showSuccessMessage('Registration has been completed. Please verify your email address');
+        this.setSurvey();
+      } else if (message === 'alias-login') {
+        this.showInfoMessage('Please login with user and pass');
+      }
+      this.$router.replace('/auth');
+    }
+    if (this.$route.query.code) {
+      this.showSuccessMessage('Your email address has been confirmed!');
+      this.setSurvey();
+      this.$router.replace('/auth');
+    }
+  },
+  beforeRouteUpdate(to, from, next) {
+    if (to.query.message) {
+      const { message } = to.query;
+      if (message === 'alias-error') {
+        this.messageErrorText = 'This isn\'t your fund.';
+        this.message.error = true;
+        next({ replace: true, path: '/auth' });
+      } else {
+        next();
+      }
+    } else {
+      next();
+    }
   },
 };
 </script>
 <style lang="scss">
+@import '~@/scss/components/auth-card';
 .login-recaptcha {
+  margin: 0;
   margin-bottom: 32px;
+  width: 100%;
+  div {
+    margin: 0;
+  }
 }
 </style>

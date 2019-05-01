@@ -1,0 +1,62 @@
+$graph-filter: graph-filter;
+.#{$graph-filter} {
+  border-bottom: 1px solid $N10;
+  margin-bottom: 16px;
+  &__caption {
+    @include text($H500, 400);
+  }
+  &__text {
+    @include text($H400, 500, $N6);
+    @extend %text-transition;
+  }
+  &__placeholder {
+    @include flex-row(space-between, center);
+    background-color: $N12;
+    padding: 12px 28px;
+  }
+  &__icon-wrapper {
+    @include flex-row(center, center);
+  }
+  &__icon {
+    margin-left: 20px;
+    width: 22px;
+    height: 22px;
+    fill: $N6;
+    @extend %icon-transition;
+    &--selected {
+      display: none;
+      width: 20px;
+      height: 20px;
+      fill: $B2;
+    }
+  }
+  &__list {
+    list-style: none;
+    padding: 0 28px;
+  }
+  &__item {
+    border-bottom: 1px solid $N10;
+    &:last-child {
+      border: none;
+    }
+  }
+  &__label {
+    @include flex-row(space-between, center);
+    min-height: 46px;
+    padding: 12px 0;
+    position: relative;
+    z-index: 2;
+  }
+  &__input {
+    position: absolute;
+    z-index: -1;
+    visibility: hidden;
+    opacity: 0;
+    &:checked + .#{$graph-filter}__text {
+      color: $B2;
+    }
+    &:checked ~ .#{$graph-filter}__icon {
+      display: block;
+    }
+  }
+}

@@ -24,7 +24,7 @@
         class="profile-personal__input"
         :class='{"input-error": myErrors.name}'
         @blur='nameError'
-        v-model.trim='newData.name'>
+        v-model.trim='newData.name_first'>
         <p
           class="input-text-error animated dur04 bounceIn"
           v-show='myErrors.name'>{{ myErrors.name }}
@@ -81,13 +81,13 @@
           v-model.trim='newData.street'>
       </div>
       <div class="profile-personal__input-wrapper profile-personal__input-wrapper--post">
-        <label for="profile-post" class="profile-personal__label">Postat code</label>
+        <label for="profile-post" class="profile-personal__label">Postal code</label>
         <input
           id='profile-post'
           type="text"
           class="profile-personal__input"
           maxlength="5"
-          v-model.trim='newData.postCode'>
+          v-model.trim='newData.zip'>
       </div>
       <div class="profile-personal__input-wrapper profile-personal__input-wrapper--house">
         <label for="profile-house" class="profile-personal__label">House</label>
@@ -95,7 +95,7 @@
           id='profile-house'
           type="text"
           class="profile-personal__input"
-          v-model.trim='newData.house'>
+          v-model.trim='newData.house_number'>
       </div>
       <div class="profile-personal__input-wrapper profile-personal__input-wrapper--apt">
         <label for="profile-apt" class="profile-personal__label">Apt, Suit, etc</label>
@@ -103,7 +103,7 @@
           id='profile-apt'
           type="text"
           class="profile-personal__input"
-          v-model.trim='newData.apt'>
+          v-model.trim='newData.extra_address'>
       </div>
     </form>
   </section>
@@ -144,15 +144,21 @@
       </button-primary>
       <button-secondary
         class='profile-personal__button profile-personal__button--cancel'
+        @click.native='cancel'
         >Cancel
       </button-secondary>
     </div>
   </section>
   <message-success-absolute
-    @click.native='messageSuccess = false'
-    v-if='messageSuccess'
+    @click.native='message.success = false'
+    v-if='message.success'
     >Your changes have been saved
   </message-success-absolute>
+  <message-error-absolute
+    @click.native='message.error = false'
+    v-if='message.error'
+    >An error occurred while saving
+  </message-error-absolute>
 </main>
 </template>
 <script>
@@ -161,9 +167,15 @@ import ButtonPrimary from '@/components/common/buttons/ButtonPrimary.vue';
 import ButtonSecondary from '@/components/common/buttons/ButtonSecondary.vue';
 import IconPencil from '@/components/common/icons/IconPencil.vue';
 import MessageSuccessAbsolute from '@/components/common/messages/MessageSuccessAbsolute.vue';
+import MessageErrorAbsolute from '@/components/common/messages/MessageErrorAbsolute.vue';
 import DropMenuCountry from '@/components/profile/components/DropMenuCountry.vue';
 import Validation from '@/js/validation';
-import { mapState, mapGetters, mapMutations } from 'vuex';
+import {
+  mapState,
+  mapGetters,
+  mapMutations,
+  mapActions,
+} from 'vuex';
 
 export default {
   name: 'PersonalInfo',
@@ -174,18 +186,19 @@ export default {
     ButtonPrimary,
     DropMenuCountry,
     MessageSuccessAbsolute,
+    MessageErrorAbsolute,
   },
   data() {
     return {
       newData: {
         gender: '',
-        name: '',
+        name_first: '',
         city: '',
         country: '',
         street: '',
-        postCode: '',
-        house: '',
-        apt: '',
+        zip: '',
+        house_number: '',
+        extra_address: '',
       },
       image: '',
       errorsText: {
@@ -200,19 +213,22 @@ export default {
       loading: {
         save: false,
       },
-      messageSuccess: false,
+      message: {
+        success: false,
+        error: false,
+      },
     };
   },
   computed: {
     ...mapState('profile', [
       'profile',
-      'lastChangePassword',
     ]),
     ...mapGetters('profile', [
       'getProfileToEdit',
+      'lastChangePassword',
     ]),
     nameStatus() {
-      return Validation.name(this.newData.name);
+      return Validation.name(this.newData.name_first);
     },
     comparedData() {
       let negFlag = false;
@@ -235,16 +251,43 @@ export default {
     ...mapMutations('profile', [
       'updateProfile',
     ]),
+    ...mapActions('profile', [
+      'getProfile',
+      'getProfileAsync',
+      'updateProfile',
+    ]),
+    showMessage(type) {
+      if (this.message[type]) {
+        this.message[type] = false;
+        setTimeout(() => {
+          this.message[type] = true;
+          setTimeout(() => {
+            this.message[type] = false;
+          }, 3000);
+        }, 15);
+      } else {
+        this.message[type] = true;
+          setTimeout(() => {
+            this.message[type] = false;
+          }, 3000);
+      }
+    },
     save() {
       this.loading.save = true;
-      setTimeout(() => {
-        this.loading.save = false;
-        this.updateProfile(this.newData);
-        this.messageSuccess = true;
-        setTimeout(() => {
-          this.messageSuccess = false;
-        }, 6000);
-      }, 1000);
+      this.updateProfile(this.newData)
+        .then(() => {
+          this.loading.save = false;
+          this.getProfile();
+          this.showMessage('success');
+        })
+        .catch((error) => {
+          console.log(error);
+          this.loading.save = false;
+          this.showMessage('error');
+        })
+    },
+    cancel() {
+      this.$router.go(-1);
     },
     getUrl() {
       const image = document.getElementById('change-image').files[0];
@@ -255,7 +298,7 @@ export default {
     },
     nameError() {
       const [error1, error2] = this.errorsText.name;
-      const { name } = this.newData;
+      const name = this.newData.name_first;
       this.myErrors.name = '';
       setTimeout(() => {
         if (name && Validation.digit(name)) {
@@ -276,10 +319,12 @@ export default {
       Object.keys(this.newData).forEach((key) => {
         this.newData[key] = this.getProfileToEdit[key];
       });
+      // Object.assign(this.newData, this.getProfileToEdit);
     },
   },
-  beforeMount() {
-    this.getData();
+  created() {
+    this.getProfileAsync()
+      .then(() => this.getData());
   },
   watch: {
     nameStatus(value) {

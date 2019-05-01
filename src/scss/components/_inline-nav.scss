@@ -23,18 +23,14 @@
   }
   &:hover {
     @media screen and (min-width: $screen-desktop) {
-      color: $N6;
+      color: $N0;
     }
   }
   &:active {
-    color: $N0;
+    color: $N6;
   }
   &--active {
     border-color: $N2;
     color: $N2;
   }
-}
-.inline-nav-link-active {
-  border-color: $N2;
-  color: $N2;
 }

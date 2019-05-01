@@ -62,7 +62,7 @@
         <p class="transaction-box__text">Payout address</p>
         <icon-dropdown class='transaction-box__item-icon'/>
       </li>
-      <li class="transaction-box__item">
+      <li class="transaction-box__item transaction-box__item--end">
         <p class="transaction-box__text">Amount</p>
         <icon-dropdown class='transaction-box__item-icon'/>
       </li>
@@ -76,8 +76,8 @@
     <transition-group name="list-complete" tag="div">
       <payout-card
         class='list-complete-item'
-        v-for='payout in payouts'
-        :key='payout.id'
+        v-for='(payout, index) in payouts'
+        :key='`${index}${payout.id}`'
         :payout='payout'/>
     </transition-group>
   </div>
@@ -87,7 +87,7 @@
 import IconSearch from '@/components/common/icons/IconSearch.vue';
 import IconDropdown from '@/components/common/icons/IconDropdown.vue';
 import PayoutCard from '@/components/transactions/components/PayoutCard.vue';
-import { mapMutations, mapState, mapGetters } from 'vuex';
+import { mapMutations, mapState, mapGetters, mapActions } from 'vuex';
 
 export default {
   name: 'Payouts',
@@ -104,15 +104,19 @@ export default {
     };
   },
   methods: {
-    ...mapMutations('payouts', [
-      'setSearch',
+    ...mapMutations('transactions', {
+      setSearch: 'setPayoutSearch',
+      clearSearch: 'clearSearch',
+    }),
+    ...mapActions('transactions', [
+      'getPayouts',
     ]),
   },
   computed: {
-    ...mapState('payouts', {
-      getSearch: state => state.search,
+    ...mapState('transactions', {
+      getSearch: state => state.searchPayouts,
     }),
-    ...mapGetters('payouts', {
+    ...mapGetters('transactions', {
       payouts: 'getPayouts',
     }),
     search: {
@@ -123,6 +127,14 @@ export default {
         this.setSearch(chars);
       },
     },
+  },
+  beforeDestroy() {
+    this.clearSearch();
+  },
+  created() {
+    this.getPayouts()
+      .then(resp => console.log(resp))
+      .catch(error => console.log(error))
   },
 };
 </script>

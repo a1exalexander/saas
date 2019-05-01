@@ -36,7 +36,7 @@
         class="exchanges-add-api__button exchanges-add-api__button--save"
         :disabled='!apiReady'
         :class='{"button-loading": loading}'
-        @click.native.once='save'
+        @click.native='save'
         >Save
       </button-primary>
       <button-transparent
@@ -53,7 +53,7 @@ import ButtonPrimary from '@/components/common/buttons/ButtonPrimary.vue';
 import ButtonSecondary from '@/components/common/buttons/ButtonSecondary.vue';
 import ButtonTransparent from '@/components/common/buttons/ButtonTransparent.vue';
 import CloseButton from '@/components/common/buttons/CloseButton.vue';
-import { mapMutations, mapGetters } from 'vuex';
+import { mapGetters, mapActions } from 'vuex';
 
 export default {
   name: 'ExchangesAddApi',
@@ -80,7 +80,7 @@ export default {
       'getImages',
     ]),
     apiImage() {
-      if (this.apiName) {
+      if (this.apiName in this.getImages) {
         const image = this.getImages[this.apiName];
         // eslint-disable-next-line
         return require(`@/assets/images/${image}`);
@@ -92,8 +92,8 @@ export default {
     },
   },
   methods: {
-    ...mapMutations('exchanges', [
-      'addApi',
+    ...mapActions('exchanges', [
+      'addExchange',
     ]),
     close() {
       this.$emit('close');
@@ -101,52 +101,38 @@ export default {
     // TODO: change save func to http request
     save() {
       this.loading = true;
-      const getBalance = Math.floor(Math.random() * 1000000);
-      const api = {
-        name: this.apiName,
-        apiKey: this.apiKey,
-        secretKey: this.secretKey,
-        balance: getBalance,
-        status: false,
+      const data = {
+        id: Math.floor(Math.random() * (10000 - 1)) + 1,
+        name: this.apiName.toLowerCase(),
+        type: this.apiName.toLowerCase(),
+        api_key: this.apiKey,
+        sec_key: this.secretKey,
+        status: true,
+        balance: Math.random() * (10000 - 1) + 1,
+        balance_ardor: Math.random() * (10000 - 1) + 1,
+        balance_btc: Math.random() * (10000 - 1) + 1,
+        api_extra: '',
       };
-      setTimeout(() => {
-        this.addApi(api);
-        this.loading = false;
-        this.close();
-      }, 1000);
+      this.addExchange(data)
+        .then(() => {
+          this.loading = false;
+          this.close();
+        })
+        .catch((error) => {
+          console.log(error);
+          this.loading = false;
+          this.close();
+        })
     },
   },
 };
 </script>
 <style lang="scss">
+@import '~@/scss/components/popup';
 .exchanges-add-api {
-  position: fixed;
-  top: 0;
-  bottom: 0;
-  right: 0;
-  left: 0;
-  min-height: 100vh;
-  z-index: 11;
-  @include flex-col(stretch, stretch);
-  @media screen and (min-width: $screen-tablet) {
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    background: rgba(10,11,12,0.80);
-  }
+  @extend %popup;
   &__card {
-    background-color: $N13;
-    flex: 1 1;
-    @include flex-col(stretch, stretch);
-    padding: 24px 28px 48px 24px;
-    @media screen and (min-width: $screen-tablet) {
-      flex: 0 1 27%;
-      min-width: 400px;
-      padding: 28px 40px 32px;
-      border: 1px solid $N11;
-      box-shadow: 0 20px 28px 0 rgba(0,0,0,0.32);
-      position: relative;
-    }
+    @extend %popup-card;
   }
   &__icon-wrapper {
     width: 30px;
@@ -179,20 +165,10 @@ export default {
     }
   }
   &__header {
-    padding-top: 18px;
-    margin-bottom: 24px;
-    @include flex-row(flex-start, center);
-    @media screen and (min-width: $screen-tablet) {
-      padding: 0;
-      margin-bottom: 32px;
-    }
+    @extend %popup-header;
   }
   &__heading {
-    font-size: $H700;
-    font-weight: 500;
-    @media screen and (min-width: $screen-tablet) {
-      font-size: $H800;
-    }
+    @extend %popup-title;
   }
   &__label {
     @include flex-col(stretch, stretch);

@@ -1,0 +1,41 @@
+@import 'popover';
+
+.graph-tooltip {
+  @extend %popover;
+  &:before {
+    display: none;
+  }
+  &:before {
+    display: none;
+  }
+  &__wrapper {
+    @extend %popover-wrapper;
+    border: none !important;
+    background: transparent !important;
+  }
+  &__name {
+    @include text($H200, 500);
+    margin-bottom: 6px;
+    @extend %text-transition;
+  }
+  &__value {
+    @include text($H200, 500, $B2);
+    margin-bottom: 10px;
+    @extend %text-transition;
+    &--orange {
+      color: $Y1;
+    }
+    &--green {
+      color: $G2;
+    }
+  }
+  &__date {
+    @include text($H200, 500, $N6);
+    @extend %text-transition;
+  }
+}
+.apexcharts-tooltip {
+  border: none;
+  background: transparent;
+  box-shadow: none;
+}

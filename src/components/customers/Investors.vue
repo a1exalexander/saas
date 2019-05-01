@@ -2,8 +2,8 @@
 <main class='investors'>
   <transition
     name="custom-classes-transition"
-    enter-active-class="animated dur06 fadeIn"
-    leave-active-class="animated dur04 fadeOut"
+    enter-active-class="animated dur03 fadeIn"
+    leave-active-class="animated dur03 fadeOut"
     mode="out-in">
   <add-investor-popup
     @cancel='closeAddInvestorPopup'
@@ -26,13 +26,13 @@
         class="investors__head-item investors__head-item--phone investors__head-item--end"
         >Phone
       </li>
-      <li class="investors__head-item">Relationship manager</li>
-      <li class="investors__head-item investors__head-item--end">Total balance</li>
-      <li
+      <!-- <li class="investors__head-item">Relationship manager</li> -->
+      <li class="investors__head-item">Total balance</li>
+      <!-- <li
         class="investors__head-item investors__head-item--tokens investors__head-item--end"
         >Tokens
       </li>
-      <li class="investors__head-item">Requests</li>
+      <li class="investors__head-item">Requests</li> -->
     </ul>
   </div>
   <div class="investors__field investors__field--no-yet" v-if='!isInvestors'>
@@ -59,9 +59,9 @@
           <span>Add an investor</span>
         </subtle-icon>
       </div>
-      <transition-group name="list-complete">
+      <transition-group name="list-complete" tag="div">
       <investor
-        v-for='investor in investors'
+        v-for='investor in getInvestors'
         :key='investor.id'
         :investor='investor'
         class="list-complete-item"
@@ -69,9 +69,9 @@
       </transition-group>
     </div>
     <div class="investors__subfield-tablet">
-      <transition-group name="list-complete">
+      <transition-group name="list-complete" tag="div">
       <investor
-        v-for='investor in investors'
+        v-for='investor in getInvestors'
         :key='investor.id'
         :investor='investor'
         class="list-complete-item"/>
@@ -88,7 +88,7 @@ import SubtleIcon from '@/components/common/buttons/SubtleIcon.vue';
 import ButtonPrimaryIcon from '@/components/common/buttons/ButtonPrimaryIcon.vue';
 import AddInvestorPopup from '@/components/customers/AddInvestorPopup.vue';
 import Investor from '@/components/customers/components/Investor.vue';
-import { mapGetters, mapState } from 'vuex';
+import { mapGetters, mapActions } from 'vuex';
 
 export default {
   name: 'Investors',
@@ -107,6 +107,9 @@ export default {
     };
   },
   methods: {
+    ...mapActions('investors', [
+      'getClients',
+    ]),
     addInvestor() {
       this.addInvestorPopup = true;
     },
@@ -114,16 +117,17 @@ export default {
       this.addInvestorPopup = false;
     },
     openProfile(id) {
-      this.$router.push({ path: `/director/customers/profile/${id}` });
+      this.$router.push({ path: `/director/clients/profile/${id}` });
     },
   },
   computed: {
-    ...mapState('investors', [
-      'investors',
-    ]),
     ...mapGetters('investors', [
+      'getInvestors',
       'isInvestors',
     ]),
+  },
+  created() {
+    this.getClients();
   },
 };
 </script>
@@ -186,7 +190,7 @@ export default {
   &__head-list {
     list-style: none;
     display: grid;
-    grid-template-columns: 3fr 2.5fr 2fr 2.2fr 1.4fr 1fr 2fr 0.5fr;
+    grid-template-columns: 3.5fr 2.2fr 1.2fr 2.4fr 0.5fr;
     justify-content: space-between;
     grid-column-gap: 10px;
   }

@@ -51,8 +51,8 @@
 <div class="profile__main">
 <transition
   name="custom-classes-transition"
-  enter-active-class="animated dur06 fadeIn"
-  leave-active-class="animated dur06 fadeOut"
+  enter-active-class="animated dur02 fadeIn"
+  leave-active-class="animated dur02 fadeOut"
   mode="out-in">
 <personal-info v-if='visible.personal' @changePassword='toggleWindow("password")' key='personal'/>
 <security @cancel='toggleWindow("personal")' v-else key='password'/>
@@ -83,10 +83,10 @@ export default {
   },
   computed: {
     ...mapState('profile', {
-      getName: state => state.profile.name,
+      getName: state => state.profile.name_first,
       getAva: state => state.profile.ava,
       status: state => state.status,
-      userId: state => state.profile.userId,
+      userId: state => state.profile.id,
     }),
   },
   methods: {
@@ -105,6 +105,11 @@ export default {
 <style lang="scss">
 .profile {
   padding: 56px 0;
+  display: flex;
+    flex-direction: column;
+    justify-content: stretch;
+    align-items: stretch;
+  max-height: 100vh;
   @media screen and (min-width: $screen-tablet) {
     flex: 1 1;
     padding: 0;
@@ -179,6 +184,8 @@ export default {
     }
   }
   &__main {
+    flex: 1 1 100%;
+    overflow-y: auto;
     @media screen and (min-width: $screen-tablet) {
       flex: 1 1 100%;
       overflow-y: auto;

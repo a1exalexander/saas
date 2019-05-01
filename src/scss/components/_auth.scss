@@ -1,0 +1,70 @@
+%auth-card {
+  padding: 28px;
+  width: 100%;
+  @media screen and (min-width: $screen-tablet) {
+    min-width: 384px;
+    width: 26%;
+    padding: 33px 40px 40px;
+    background-color: $N13;
+    border: 1px solid $N10;
+    border-radius: 2px;
+    box-shadow: 0 20px 28px 0 rgba(10, 11, 12, 0.24);
+  }
+}
+%auth-card-wrapper {
+  min-height: 100vh;
+  @include flex-col(flex-start, stretch);
+  @media screen and (min-width: $screen-tablet) {
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+  }
+}
+%auth-mobile-header {
+  @include flex-row(space-between, center);
+  margin-bottom: 48px;
+  @media screen and (min-width: $screen-tablet) {
+    display: none;
+  }
+}
+%auth-mobile-logo {
+  width: 110px;
+  height: 40px;
+}
+%auth-logo {
+  display: none;
+  @media screen and (min-width: $screen-tablet) {
+    display: block;
+    margin-bottom: 40px;
+  }
+}
+%auth-close-button {
+  position: relative;
+  left: 6px;
+}
+%auth-title {
+  font-size: $H800;
+  font-weight: 500;
+  margin-bottom: 12px;
+  line-height: 1.6;
+  @media screen and (min-width: $screen-tablet) {
+    font-size: $H600;
+    margin-bottom: 26px;
+  }
+}
+%auth-subtitle {
+  font-size: $H500;
+  margin-bottom: 24px;
+  @media screen and (min-width: $screen-tablet) {
+    font-size: $H300;
+    color: $N5;
+  }
+}
+%auth-label-text {
+  font-size: $H500;
+  line-height: 1.2;
+  margin-bottom: 8px;
+  @media screen and (min-width: $screen-tablet) {
+    font-size: $H200;
+  }
+}

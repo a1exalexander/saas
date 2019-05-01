@@ -22,7 +22,7 @@ export default {
     title() {
       let { name } = this.$route;
       if (name === 'Investors') {
-        name = 'Customers';
+        name = 'Clients';
       } else if (name === 'customer-introduction') {
         name = 'Customer\'s profile';
       } else if (name === 'payouts' || name === 'deposits' || name === 'methods') {
@@ -35,7 +35,7 @@ export default {
 </script>
 <style lang="scss">
 .nav-mobile {
-  position: fixed;
+  position: sticky;
   top: 0;
   width: 100%;
   height: 56px;

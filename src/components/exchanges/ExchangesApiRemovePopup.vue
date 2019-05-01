@@ -52,7 +52,7 @@ import ButtonPrimary from '@/components/common/buttons/ButtonPrimary.vue';
 import ButtonSecondary from '@/components/common/buttons/ButtonSecondary.vue';
 import CloseButton from '@/components/common/buttons/CloseButton.vue';
 import Subtle from '@/components/common/buttons/Subtle.vue';
-import { mapMutations } from 'vuex';
+import { mapActions } from 'vuex';
 
 export default {
   name: 'ExchangesApiRemovePopup',
@@ -74,14 +74,25 @@ export default {
     ButtonSecondary,
   },
   methods: {
-    ...mapMutations('exchanges', [
-      'removeApi',
+    ...mapActions('exchanges', [
+      'deleteExchange',
     ]),
     remove() {
       this.loading = true;
-      setTimeout(() => {
-        this.$emit('removeMyApi');
-      }, 500);
+      const data = {
+        id: this.api.id,
+      };
+      this.deleteExchange(data)
+        .then((resp) => {
+          console.log(resp);
+          this.loading = false;
+          this.cancel();
+        })
+        .catch((error) => {
+          console.log(error);
+          this.loading = false;
+          this.cancel();
+        })
     },
     cancel() {
       this.$emit('cancel');

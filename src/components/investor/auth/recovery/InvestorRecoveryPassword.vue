@@ -1,11 +1,11 @@
 <template>
-<div class="recovery-password">
+<div class="recovery-password" @keypress.enter="send">
   <subtle-icon @click.prevent class='recovery-password__email'>
     <icon-mail
       class='icon-button-left recovery-password__button-image'/>
     {{ email }}
   </subtle-icon>
-  <form class="recovery-password__form">
+  <div class="recovery-password__form">
     <div class="recovery-password__label-wrapper">
       <label
         for="account-recovery-pasword"
@@ -30,13 +30,13 @@
         type="password"
         autocomplete="off"
         class="recovery-password__input"
-        :class='{"input-error": error}'
-        @blur='errorPassword'
+        :class='{"input-error": myErrors.password}'
+        @blur='errorPassword("password")'
         v-model.trim="password">
       <p
         class="input-text-error animated dur04 bounceIn"
-        v-show='error'
-        v-html="error">
+        v-show='myErrors.password'
+        v-html="myErrors.password">
       </p>
     </div>
     <ul class="recovery-password__conditions password-conditions">
@@ -73,11 +73,13 @@
         <input
           id='recovery-account-password-confirm'
           type="password"
+          autocomplete="off"
+          @blur="errorPassword('passwordConfirm')"
           class="recovery-password__input"
           v-model='passwordConfirm'>
       </div>
     </label>
-    <label class="recovery-password__checkbox checkbox">
+    <!-- <label class="recovery-password__checkbox checkbox">
       <input
         type="checkbox"
         class="checkbox__input"
@@ -89,16 +91,17 @@
         <p class="checkbox__text">{{ $t('auth.labels.dont ask') }}
         </p>
       </div>
-    </label>
+    </label> -->
     <div class="recovery-password__buttons-wrapper">
       <button-secondary
         @click.prevent.native='cancel'
         class="recovery-password__button">{{ $t('auth.buttons.cancel') }}</button-secondary>
       <button-primary
-        @click.prevent.native='reset'
+        @click.prevent.native='send'
+        :class='{"button-loading": loading}'
         :disabled='!allReady'>{{ $t('auth.buttons.send') }}</button-primary>
     </div>
-  </form>
+  </div>
 </div>
 </template>
 <script>
@@ -120,6 +123,9 @@ export default {
       type: String,
       default: '',
     },
+    token: {
+      type: String,
+    },
   },
   components: {
     IconMail,
@@ -135,9 +141,17 @@ export default {
     return {
       password: '',
       passwordConfirm: '',
-      errorText: this.$t('auth.errors.password.enter'),
-      error: '',
+      errorText: [
+        this.$t('auth.errors.password.enter'),
+        this.$t('auth.errors.password.full'),
+      ],
+      myErrors: {
+        password: '',
+        passwordConfirm: '',
+      },
       showPasswordStatus: false,
+      recaptchaToken: 'token',
+      loading: '',
     };
   },
   methods: {
@@ -145,6 +159,12 @@ export default {
       'toggleRecaptcha',
       'toggleResetMessage',
     ]),
+    onVerify(response) {
+      this.recaptchaToken = response;
+    },
+    onExpired() {
+      this.recaptchaToken = '';
+    },
     showPassword() {
       const element = document.getElementById('account-recovery-pasword');
       if (element.type === 'password') {
@@ -155,36 +175,36 @@ export default {
         this.showPasswordStatus = false;
       }
     },
-    errorPassword() {
-      this.error = '';
+    errorPassword(type) {
+      const password = this[type];
+      const [errorEnter, errorFull] = this.errorText;
+      this.myErrors[type] = '';
       setTimeout(() => {
-        if (!this.password) {
-          this.error = this.errorText;
+        if (!password) {
+          this.myErrors[type] = errorEnter;
+        } else if (!Validation.password(password)) {
+          this.myErrors[type] = errorFull;
         } else {
-          this.error = '';
+          this.myErrors[type] = '';
         }
       }, 15);
     },
     cancel() {
-      this.$router.push('/auth/investor-login');
+      this.$router.push('/auth/investor');
     },
-    reset() {
-      this.toggleResetMessage(true);
-      this.$router.push('/auth/investor-login');
+    send() {
+      if (this.allReady) {
+        this.loading = true;
+        const data = {
+          currentpassword: this.password,
+          newpassword: this.passwordConfirm,
+          auth_token: this.token,
+        };
+       this.$router.push({ path: '/auth/investor', query: { message: 'reset' } });
+      }
     },
   },
   computed: {
-    ...mapState('investorLogin', {
-      getRecaptcha: state => state.offRecaptcha,
-    }),
-    recaptcha: {
-      get() {
-        return this.getRecaptcha;
-      },
-      set(value) {
-        this.toggleRecaptcha(value);
-      },
-    },
     passwordReady() {
       return Validation.password(this.password);
     },
@@ -211,69 +231,22 @@ export default {
         || this.eightChars;
     },
     passwordConfirmReady() {
-      return this.password && this.password === this.passwordConfirm;
+      return Validation.password(this.passwordConfirm);
     },
     allReady() {
-      return this.passwordReady && this.passwordConfirmReady;
+      return this.passwordReady && this.passwordConfirmReady && this.recaptchaToken;
     },
   },
   watch: {
-    password(value) {
-      if (value) this.error = '';
+    passwordReady(value) {
+      if (value) this.myErrors.password = '';
+    },
+    passwordConfirm(value) {
+      if (value) this.myErrors.passwordConfirm = '';
     },
   },
 };
 </script>
 <style lang="scss">
-.recovery-password {
-  &__button-image {
-    width: 18px;
-    height: 18px;
-  }
-  &__email {
-    pointer-events: none;
-    margin-bottom: 20px;
-  }
-  &__label-wrapper {
-    @include flex-row(space-between, flex-end);
-    margin-bottom: 8px;
-  }
-  &__label-text {
-    @extend %auth-label-text;
-    &--no-margin {
-      margin: 0;
-    }
-  }
-  &__label {
-    display: block;
-    margin-bottom: 24px;
-  }
-  &__input {
-    @extend %input;
-    width: 100%;
-  }
-  &__input-wrapper {
-    margin-bottom: 16px;
-    position: relative;
-    &--confirm {
-      margin: 0;
-    }
-  }
-  &__icon {
-    @extend %input-icon;
-    fill: $G1;
-  }
-  &__conditions {
-    margin-bottom: 24px;
-  }
-  &__checkbox {
-    margin-bottom: 32px;
-  }
-  &__buttons-wrapper {
-    @include flex-row(flex-end, center);
-  }
-  &__button {
-    margin-right: 24px;
-  }
-}
+@import '~@/scss/components/recovery-password';
 </style>

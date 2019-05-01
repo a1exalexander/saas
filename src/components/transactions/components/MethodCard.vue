@@ -3,31 +3,46 @@
   <div class="method-card__head">
     <div class="method-card__name-wrapper">
       <icon-wallet class='method-card__icon'/>
-      <p class="method-card__text method-card__text--name">{{ method.name }}</p>
+      <p class="method-card__text method-card__text--name">{{ method.currency }}</p>
     </div>
-    <a href="#" class="method-card__button" @click.stop.prevent='togglePopupMenu(!method.menu)'>
+    <a
+      href="#"
+      class="method-card__button"
+      @click.stop.prevent='popup = !popup'
+      @mouseover="popup = true">
       <icon-dots class='method-card__button-icon'/>
+      <transition
+        name="custom-classes-transition"
+        enter-active-class="animated dur02 fadeIn"
+        leave-active-class="animated dur02 fadeOut"
+        mode="out-in">
       <div
-      @click.stop.prevent
-      class="method-card__popup"
-      v-if='method.menu'>
-        <a href='#' class="method-card__popup-item">Edit</a>
-        <a
-          href='#'
-          @click.prevent="removeMethod(method.id)"
-          class="method-card__popup-item">Remove
-        </a>
+        class="method-card__popup-wrapper"
+        @mouseover="popup = true"
+        @mouseleave="popup = false"
+        v-if='popup'>
+        <div
+          @click.stop.prevent
+          class="method-card__popup">
+          <a href='#' class="method-card__popup-item">Edit</a>
+          <a
+            href='#'
+            @click.prevent="remove"
+            class="method-card__popup-item">Remove
+          </a>
+        </div>
       </div>
+      </transition>
     </a>
   </div>
-  <p class="method-card__text method-card__text--address">{{ method.address }}</p>
-  <p class="method-card__status">{{ method.status }}</p>
+  <p class="method-card__text method-card__text--address">{{ method.public_key }}</p>
+  <p class="method-card__status">Payments Receiving</p>
 </div>
 </template>
 <script>
 import IconWallet from '@/components/common/icons/IconWallet.vue';
 import IconDots from '@/components/common/icons/IconDots.vue';
-import { mapActions } from 'vuex';
+import { mapActions, mapState } from 'vuex';
 
 export default {
   name: 'MethodCard',
@@ -52,6 +67,23 @@ export default {
     ]),
     togglePopupMenu(value) {
       this.toggleMenu([this.method.id, value]);
+    },
+    remove() {
+      this.popup = false;
+      console.log(this.method.id);
+      this.removeMethod(this.method.id);
+    },
+    close() {
+      this.popup = false;
+    },
+  },
+  computed: {
+    ...mapState('billing', [
+      'currencies',
+    ]),
+    currency() {
+      const { name } = this.currencies.find(item => item.id === this.method.currencyId);
+      return name;
     },
   },
 };
@@ -104,22 +136,16 @@ export default {
     pointer-events: none;
   }
   &__popup-wrapper {
-    position: fixed;
-    min-height: 100vh;
-    z-index: 2;
+    position: absolute;
+    right: -12px;
     top: 0;
-    bottom: 0;
-    right: 0;
-    left: 0;
-    background-color: rgba(204, 26, 26, 0.308);
+    z-index: 3;
+    background-color: transparent;
+    padding: 20px 12px;
   }
   &__popup {
     @extend %inline-menu;
-    position: absolute;
     border-color: $N10;
-    z-index: 3;
-    right: 0;
-    top: 100%;
   }
   &__popup-item {
     @extend %inline-menu-text;

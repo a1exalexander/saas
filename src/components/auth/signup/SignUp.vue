@@ -79,7 +79,7 @@
             <div
               class="signup-step__bar-element"
               :class='{"signup-step__bar-element--check":
-                fundNameStatus && countryStatus && operationStatus}'>
+                fundNameStatus && countryStatus}'>
             </div>
           </div>
         </li>
@@ -207,7 +207,6 @@ export default {
       getGender: state => state.personalInfo.gender,
       getFundName: state => state.fund.name,
       getCountry: state => state.fund.country,
-      getOperation: state => state.fund.operation,
       getPassword: state => state.password.value,
       getAgreePassword: state => state.password.agree,
     }),
@@ -223,9 +222,6 @@ export default {
     countryStatus() {
       return !!this.getFundName && !!this.getCountry;
     },
-    operationStatus() {
-      return !!this.getFundName && !!this.getCountry && !!this.getOperation;
-    },
     passwordStatus() {
       return Validation.password(this.getPassword);
     },
@@ -237,10 +233,14 @@ export default {
     ...mapMutations('signup', [
       'closeDropMenus',
       'setRouterStatus',
+      'cleanData',
     ]),
     ...mapActions('signup', [
       'changeRouterStatus',
     ]),
+  },
+  created() {
+    this.cleanData();
   },
 };
 </script>

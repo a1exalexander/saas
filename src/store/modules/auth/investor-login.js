@@ -1,13 +1,10 @@
-/* eslint-disable */
-// Becouse 'no-shadow' and 'no-param-reassing' errors of state aren't errors
-
 const state = {
-  token: localStorage.getItem('investor-token') || '',
+  token: 'demo-token',
   authStatus: '',
   userStatus: '',
   keepUser: false,
   offRecaptcha: false,
-  resetMessage: false,
+  resetMessage: false
 };
 
 const mutations = {
@@ -24,7 +21,7 @@ const mutations = {
   USER_REQUEST: state => {
     state.userStatus = 'loading';
   },
-  USER_SUCCESS: (state) => {
+  USER_SUCCESS: state => {
     state.userStatus = 'success';
   },
   USER_ERROR: state => {
@@ -33,7 +30,7 @@ const mutations = {
   AUTH_LOGOUT: state => {
     state.token = '';
   },
-  toggleKeepingUser( state ) {
+  toggleKeepingUser(state) {
     state.keepUser = !state.keepUser;
   },
   toggleRecaptcha(state, value) {
@@ -41,36 +38,26 @@ const mutations = {
   },
   toggleResetMessage(state, value) {
     state.resetMessage = value;
-  },
+  }
 };
 
 const getters = {
   isAuthenticated: state => !!state.token,
-  authStatus: state => state.authStatus,
+  authStatus: state => state.authStatus
 };
 
-// TODO: Promis functions must be replaced by Http requests
 const actions = {
   AUTH_REQUEST: ({ commit, dispatch }, user) => {
-    return new Promise((resolve, reject) => {
-      commit('AUTH_REQUEST');
-      localStorage.setItem('investor-token', 'super-token');
-      commit('AUTH_SUCCESS', 'super-token');
-      dispatch('USER_REQUEST');
-      resolve();
-    });
+    commit('AUTH_SUCCESS', 'demo-token');
+    dispatch('USER_REQUEST');
   },
   AUTH_LOGOUT: ({ commit }) => {
-    return new Promise(resolve => {
-      commit('AUTH_LOGOUT');
-      localStorage.removeItem('investor-token');
-      resolve();
-    });
+    commit('AUTH_LOGOUT');
   },
   USER_REQUEST: ({ commit }) => {
     commit('USER_REQUEST');
     commit('USER_SUCCESS');
-  },
+  }
 };
 
 export default {
@@ -78,5 +65,5 @@ export default {
   state,
   getters,
   actions,
-  mutations,
+  mutations
 };

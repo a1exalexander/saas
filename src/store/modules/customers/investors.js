@@ -2,11 +2,35 @@
 // Becouse 'no-shadow' and 'no-param-reassing' errors of state aren't errors
 import moment from 'moment-timezone';
 import router from '@/router';
-import investors from '@/helpers/api/investors';
+import { clients, client } from '@/helpers/clients';
 
 const state = {
-  investors: investors,
+  clients: [],
+  client: {
+    id: '',
+    name_first: '',
+    name_last: '',
+    name: '',
+    email: '',
+    photo: '',
+    phone: '',
+    company: '',
+    city: '',
+    country: '',
+    balance: 0,
+    age: '',
+    role: '',
+    sphere: '',
+    online: true,
+    position: '',
+    status: '',
+    manager: '',
+    tokens: 0,
+    last_seen: '',
+    created: '',
+  },
   investorId: '',
+  search: '',
 };
 const newInvestorData = {
   id: '',
@@ -22,20 +46,18 @@ const newInvestorData = {
   sphere: '',
   online: true,
   position: '',
-  status: 'investor',
-  manager: 'Pavlo Zibrov',
-  tokens: 2300,
+  status: '',
+  manager: '',
+  tokens: 0,
   lastSeen: '',
-  ava: '',
   registrationDate: '',
 }
-
 const mutations = {
   setValue(state, [type, value]) {
-    const index = state.investors.findIndex((item) => {
-      return item.id === state.investorId;
-    });
-    state.investors[index][type] = value;
+    state.client = Object.assign({}, state.client, {[type]: value});
+  },
+  setClientValue(state, [type, value]) {
+    state.client = Object.assign({}, state.client, {[type]: value});
   },
   updateProfile(state, data) {
     const index = state.investors.findIndex((item) => {
@@ -60,24 +82,34 @@ const mutations = {
   setInvestorId(state, id) {
     state.investorId = id;
   },
+  updateClients(state, data) {
+    state.clients = [...data];
+  },
+  updateClient(state, data) {
+    Object.assign(state.client, data);
+  },
+  setSearch(state, value) {
+    state.search = value;
+  },
 };
 
 const getters = {
   isInvestors: (state) => {
-    return !!state.investors.length;
+    return !!state.clients.length;
   },
-  getInvestorById: (state) => {
-    if (state.investorId) {
-      const index = state.investors.findIndex((item) => {
-        return item.id === state.investorId;
+  getStatus: (state) => {
+    return state.client.role;
+  },
+  getInvestors: (state) => {
+    if (state.search) {
+      return state.clients.filter((item) => {
+        return item.name.toLowerCase().indexOf(state.search.toLowerCase()) !== -1;
       });
-      return state.investors[index];
     }
-    return newInvestorData;
+    return state.clients;
   },
 };
 
-// TODO: Promis functions must be replaced by Http requests
 const actions = {
   checkInvestorById({ commit, state }, id) {
     return new Promise ((resolve, reject) => {
@@ -95,15 +127,26 @@ const actions = {
   },
   changeRouteBeforeRemove() { 
     return new Promise ((resolve, reject) => {
-      router.push('/director/customers');
+      router.push('/director/clients');
       const timer = setInterval(() => {
         const { name } = router.currentRoute;
-        if (name === 'Investors' || name === 'Customers') {
+        if (name === 'Investors' || name === 'Clients') {
           clearInterval(timer);
           resolve();
         }
       }, 10);
     })
+  },
+  getClients({ commit, rootGetters }) {
+    return new Promise((resolve, reject) => {
+      commit('updateClients', clients);
+    });
+  },
+  getClientById({ commit, rootGetters }, id) {
+    return new Promise((resolve, reject) => {  
+      commit('updateClient', response.data.data.client);
+      resolve(response);
+    });
   },
   removeInvestor({ commit, state, dispatch }) {
     dispatch('changeRouteBeforeRemove').then(() => {

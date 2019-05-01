@@ -1,5 +1,11 @@
 <template>
 <section class="password-step">
+   <message-error-absolute
+    class='auth__message'
+    v-if='message.error'
+    @click.native='message.error = false'>
+    {{ messageText }}
+  </message-error-absolute>
   <p class="password-step__title">{{ $t('auth.titles.password') }}</p>
   <form class="password-step__form">
     <div class="password-step__label-wrapper">
@@ -86,15 +92,6 @@
         <p class="password-conditions__text">{{ $t('auth.errors.password.number') }}</p>
       </li>
     </ul>
-    <vue-recaptcha
-      class="password-step__recaptcha"
-      @click.stop
-      ref="recaptcha"
-      theme='dark'
-      :sitekey="recaptchaSiteKey"
-      @verify="onVerify"
-      @expired="onExpired">
-    </vue-recaptcha>
     <label class="password-step__checkbox checkbox">
       <input
         type="checkbox"
@@ -119,7 +116,7 @@
       :class='{"button-loading": loading}'
       @click.prevent.native='nextStep'
       :disabled='!passwordReady'>{{ $t('auth.buttons.continue') }}
-      <icon-long-arrow-right class='icon-button-right'/>
+      <icon-long-arrow-right class='icon-button-right icon-small'/>
     </button-primary-icon>
   </form>
 </section>
@@ -131,10 +128,9 @@ import IconCheck2 from '@/components/common/icons/IconCheck2.vue';
 import IconCheck from '@/components/common/icons/IconCheck.vue';
 import IconLongArrowRight from '@/components/common/icons/IconLongArrowRight.vue';
 import ButtonPrimaryIcon from '@/components/common/buttons/ButtonPrimaryIcon.vue';
+import MessageErrorAbsolute from '@/components/common/messages/MessageErrorAbsolute.vue';
 import Validation from '@/js/validation';
-import VueRecaptcha from 'vue-recaptcha';
 import IconEyeOff from '@/components/common/icons/IconEyeOff.vue';
-import { siteKey } from '@/api/api';
 import {
   mapGetters,
   mapState,
@@ -152,7 +148,7 @@ export default {
     ButtonPrimaryIcon,
     IconLongArrowRight,
     IconEyeOff,
-    VueRecaptcha,
+    MessageErrorAbsolute,
   },
   data() {
     return {
@@ -161,12 +157,15 @@ export default {
           this.$t('auth.errors.password.enter'),
         ],
       },
+      messageText: '',
       myErrors: {
         password: '',
       },
+      message: {
+        error: false,
+      },
       showPasswordStatus: false,
-      recaptchaSiteKey: siteKey,
-      recaptchaToken: '',
+      recaptchaToken: 'true',
       loading: false,
     };
   },
@@ -196,8 +195,32 @@ export default {
           console.log(resp);
         })
         .catch((error) => {
+          this.loading = false;
+          if (error.data.code === 417) {
+            this.setRouterStatus('email');
+            this.setStepStatus('password');
+          } else if (error.data.msg) {
+            this.messageText = error.data.msg;
+            this.showMessage('error');
+          }
           console.log(error);
         });
+    },
+    showMessage(type) {
+      if (this.message[type]) {
+        this.message[type] = false;
+        setTimeout(() => {
+          this.message[type] = true;
+          setTimeout(() => {
+            this.message[type] = false;
+          }, 4000);
+        }, 15);
+      } else {
+        this.message[type] = true;
+        setTimeout(() => {
+          this.message[type] = false;
+        }, 4000);
+      }
     },
     showPassword() {
       const element = document.getElementById('signup-pasword');
@@ -234,7 +257,7 @@ export default {
         return this.getPassword;
       },
       set(value) {
-        this.setPassword(value);
+        this.setPassword(['value', value]);
       },
     },
     agree: {
@@ -330,6 +353,9 @@ export default {
   }
   &__link {
     @extend %link;
+  }
+  &__recaptcha {
+    margin-bottom: 18px;
   }
 }
 .password-step-ready {

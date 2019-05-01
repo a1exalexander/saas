@@ -1,5 +1,10 @@
 <template>
 <main class="auth__wrapper">
+  <message-error-absolute
+    v-if='isMessage.error'
+    @click.native='isMessage.error = false'>
+    {{ message }}
+  </message-error-absolute>
   <icon-logo class='auth__logo'/>
   <section class="auth animated dur09 fadeIn">
     <div class="auth__mobile-header">
@@ -19,7 +24,7 @@
           class="auth__input"
           @blur='errorName'
           :class='{"input-error": myErrors.name}'
-          v-model.trim="name">
+          v-model.trim="form.name">
         <p
           class="input-text-error animated dur04 bounceIn"
           v-show='myErrors.name'
@@ -34,7 +39,7 @@
           class="auth__input"
           @blur='errorEmail'
           :class='{"input-error": myErrors.email}'
-          v-model.trim="email">
+          v-model.trim="form.email">
         <p
           class="input-text-error animated dur04 bounceIn"
           v-show='myErrors.email'
@@ -66,7 +71,7 @@
         class="auth__input login__input--password"
         :class='{"input-error": myErrors.password}'
         @blur='errorPassword'
-        v-model.trim="password">
+        v-model.trim="form.password">
         <p
           class="input-text-error animated dur04 bounceIn"
           v-show='myErrors.password'
@@ -118,7 +123,7 @@
         <button-primary
           @click.prevent.native='signup'
           :disabled='!signupDisabled'
-          :class='{"button-loading": loading.signup}'
+          :class='{"button-loading": loading}'
           >{{ $t('auth.buttons.signup') }}
         </button-primary>
       </div>
@@ -136,10 +141,12 @@ import Validation from '@/js/validation';
 import IconEyeOff from '@/components/common/icons/IconEyeOff.vue';
 import CloseButton from '@/components/common/buttons/CloseButton.vue';
 import PasswordError from '@/components/common/PasswordError.vue';
-import { mapMutations, mapState } from 'vuex';
+import MessageErrorAbsolute from '@/components/common/messages/MessageErrorAbsolute.vue';
+import messageMixin from '@/mixins/message';
 
 export default {
-  name: 'Login',
+  name: 'Signup',
+  mixins: [messageMixin],
   components: {
     ButtonPrimary,
     SubtleIcon,
@@ -149,6 +156,7 @@ export default {
     IconEyeOff,
     CloseButton,
     PasswordError,
+    MessageErrorAbsolute,
   },
   data() {
     return {
@@ -169,21 +177,24 @@ export default {
           this.$t('auth.errors.name.enter'),
         ],
       },
-      loading: {
-        signup: false,
+      loading: false,
+      form: {
+        code: '',
+        name: '',
+        email: '',
+        password: '',
       },
+      agree: '',
     };
   },
   methods: {
-    ...mapMutations('investorSignup', [
-      'setPassword',
-      'setName',
-      'setEmail',
-      'toggleAgree',
-      'toggleEmailConfirmedMessage',
-    ]),
+    signup() {
+      this.loading = true;
+      const type = process.env.VUE_APP_SECRET;
+      this.$router.push('/auth/investor/?message=verify');
+    },
     close() {
-      this.$router.push('/investor-auth');
+      this.$router.push('/auth/investor');
     },
     showPassword() {
       const element = document.getElementById('signup-password');
@@ -199,11 +210,11 @@ export default {
       const [error1, error2] = this.errorsText.name;
       this.myErrors.name = '';
       setTimeout(() => {
-        if (this.getName && Validation.digit(this.getName)) {
+        if (this.form.name && Validation.digit(this.form.name)) {
           this.myErrors.name = error1;
-        } else if (!this.getName) {
+        } else if (!this.form.name) {
           this.myErrors.name = error2;
-        } else if (!Validation.name(this.getName)) {
+        } else if (!Validation.name(this.form.name)) {
           this.myErrors.name = error2;
         } else {
           this.myErrors.name = '';
@@ -215,11 +226,11 @@ export default {
       const error2 = this.errorsText.email[1];
       this.myErrors.email = '';
       setTimeout(() => {
-        if (this.getEmail && !Validation.email(this.getEmail)) {
+        if (this.form.email && !Validation.email(this.form.email)) {
           this.myErrors.email = error1;
-        } else if (!this.getEmail) {
+        } else if (!this.form.email) {
           this.myErrors.email = error2;
-        } else if (Validation.email(this.getEmail)) {
+        } else if (Validation.email(this.form.email)) {
           this.myErrors.email = '';
         }
       }, 15);
@@ -228,84 +239,38 @@ export default {
       const error = this.errorsText.password;
       this.myErrors.password = '';
       setTimeout(() => {
-        if (!this.getPassword) {
+        if (!this.readyPassword) {
           this.myErrors.password = error;
         } else {
           this.myErrors.password = '';
         }
       }, 15);
     },
-    signup() {
-      this.loading.signup = true;
-      this.toggleEmailConfirmedMessage(true);
-      setTimeout(() => {
-        this.$router.push('/investor-auth');
-        this.loading.signup = false;
-      }, 1000);
-    },
   },
   computed: {
-    ...mapState('investorSignup', {
-      getName: state => state.name,
-      getPassword: state => state.password,
-      getEmail: state => state.email,
-      getAgree: state => state.agree,
-    }),
-    agree: {
-      get() {
-        return this.getAgree;
-      },
-      set() {
-        this.toggleAgree();
-      },
-    },
-    password: {
-      get() {
-        return this.getPassword;
-      },
-      set(value) {
-        this.setPassword(value);
-      },
-    },
-    name: {
-      get() {
-        return this.getName;
-      },
-      set(value) {
-        this.setName(value);
-      },
-    },
-    email: {
-      get() {
-        return this.getEmail;
-      },
-      set(value) {
-        this.setEmail(value);
-      },
-    },
     readyName() {
-      return Validation.name(this.getName);
+      return Validation.name(this.form.name);
     },
     readyEmail() {
-      return Validation.email(this.email);
+      return Validation.email(this.form.email);
     },
     lowerCase() {
-      return Validation.lowerCase(this.password);
+      return Validation.lowerCase(this.form.password);
     },
     upperCase() {
-      return Validation.upperCase(this.password);
+      return Validation.upperCase(this.form.password);
     },
     specialChars() {
-      return Validation.specialChars(this.password);
+      return Validation.specialChars(this.form.password);
     },
     oneNumber() {
-      return Validation.oneNumber(this.password);
+      return Validation.oneNumber(this.form.password);
     },
     eightChars() {
-      return Validation.eightChars(this.password);
+      return Validation.eightChars(this.form.password);
     },
     readyPassword() {
-      return Validation.password(this.password);
+      return Validation.password(this.form.password);
     },
     anyReady() {
       return this.lowerCase
@@ -320,11 +285,20 @@ export default {
   },
   watch: {
     checkPassword(value) {
-      if (value) this.myErros.password = '';
+      if (value) this.myErrors.password = '';
     },
     checkEmail(value) {
-      if (value) this.myErros.email = '';
+      if (value) this.myErrors.email = '';
     },
+  },
+  created() {
+    if (this.$route.query.invite) {
+      this.form.code = this.$route.query.invite;
+      this.$router.replace('/auth/investor/signup');
+    }
   },
 };
 </script>
+<style lang="scss">
+@import '~@/scss/components/auth-card';
+</style>

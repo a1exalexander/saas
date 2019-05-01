@@ -2,7 +2,7 @@
 <form class="account-recovery-step">
   <p
     class="account-recovery-step__subtitle"
-    v-html="`${$t('auth.text.send code')} ${email}`"></p>
+    v-html="`${$t('auth.text.send code')} ${hidden}`"></p>
   <button-primary
     @click.prevent.native='sendEmail'
     :class='{"button-loading": loading}'
@@ -12,15 +12,15 @@
 </template>
 <script>
 import ButtonPrimary from '@/components/common/buttons/ButtonPrimary.vue';
-import { directorAuth } from '@/api/api';
-import http from 'axios';
 
 export default {
   name: 'AccountRecoverySendEmail',
   props: {
+    hidden: {
+      type: String,
+    },
     email: {
       type: String,
-      default: '',
     },
   },
   components: {
@@ -34,17 +34,11 @@ export default {
   methods: {
     sendEmail() {
       this.loading = true;
-      http.post(directorAuth.recovery, this.email)
-        .then((response) => {
-          console.log(response);
-          this.loading = false;
-          this.$emit('sendEmail');
-        }).catch((error) => {
-          this.loading = false;
-          console.log(error);
-          // TODO: change to error
-          this.$emit('sendEmail');
-        });
+      const data = {email: this.email};
+      setTimeout(() => {
+        this.loading = false;
+        this.$emit('sendEmail');
+      }, 1500 );
     },
   },
 };
