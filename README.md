@@ -1,4 +1,4 @@
-№SAAS
+#SAAS
 
 App for managing crypto assets include find investments, create a portfolio and trade. This app developed using the javascript framework Vue.js. For styling, I used the SASS (SCSS syntax) preprocessor and the BEM methodology. All components was created without using of third-party libraries. I created custom components library based on designers artboard and frontend logic. For operation with currencies data i used Decimal.js and Lodash libraries. I used Axios as an API wrapper over Vuex to connect to the backend. I also thought over the architecture of the application and completely divided the JS logic to put it into the corresponding services, utilities and plugins.
 
