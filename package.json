@@ -16,7 +16,7 @@
     "@voerro/vue-tagsinput": "^1.11.2",
     "apexcharts": "^3.6.5",
     "axios": "^0.18.0",
-    "gsap": "^2.1.2",
+    "gsap": "^3.6.0",
     "moment": "^2.24.0",
     "moment-timezone": "^0.5.23",
     "numeral-es6": "^1.0.0",
