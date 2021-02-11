@@ -14,7 +14,7 @@
   "dependencies": {
     "@gravitano/vue-date-range-picker": "^0.1.5",
     "@voerro/vue-tagsinput": "^1.11.2",
-    "apexcharts": "^3.6.5",
+    "apexcharts": "^3.24.0",
     "axios": "^0.18.0",
     "gsap": "^2.1.2",
     "moment": "^2.24.0",
